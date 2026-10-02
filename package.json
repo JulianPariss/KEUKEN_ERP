@@ -1,0 +1,46 @@
+{
+  "name": "erp-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "genroutes": "node scripts/generateRoutes.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@repo/api-contracts": "workspace:*",
+    "@repo/custom-components": "workspace:*",
+    "@repo/devextreme": "workspace:*",
+    "@repo/icons": "workspace:*",
+    "@repo/map-core": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@hookform/resolvers": "5.2.2",
+    "@react-pdf/renderer": "4.3.2",
+    "dayjs": "1.11.20",
+    "devextreme": "25.2.3",
+    "devextreme-react": "25.2.3",
+    "exceljs": "4.4.0",
+    "file-saver": "2.0.5",
+    "i18next": "25.8.0",
+    "jspdf": "4.1.0",
+    "konva": "10.2.1",
+    "next": "16.1.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "7.71.1",
+    "react-konva": "19.2.3",
+    "server-only": "0.0.1",
+    "yup": "1.7.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tsconfig": "workspace:*",
+    "@types/react": "19",
+    "@types/react-dom": "19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "@tailwindcss/postcss": "4",
+    "tailwindcss": "4"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuditPairsSchema",
+  "description": "Esquema de validación para el archivo audit-pairs.json utilizado en revalidate-contracts.",
+  "type": "object",
+  "required": ["version", "pairs"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "description": "Versión semántica del archivo de mapeos (ej: 1.0.0)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripción general de los pares incluidos"
+    },
+    "pairs": {
+      "type": "array",
+      "description": "Colección de entidades y schemas a auditar",
+      "items": {
+        "type": "object",
+        "required": ["label", "ts_file", "ts_interface", "backend_schema"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Identificador de dominio o módulo (ej: products, accounting, wms, common)"
+          },
+          "label": {
+            "type": "string",
+            "description": "Etiqueta legible que describe la entidad y operación (ej: Productos - Ficha y Cabecera)"
+          },
+          "ts_file": {
+            "type": "string",
+            "description": "Ruta relativa dentro de packages/api-contracts/src/erp/backendTypes/ (ej: products.types.ts o accountant/taxes.types.ts)"
+          },
+          "ts_interface": {
+            "type": "string",
+            "description": "Nombre exacto de la interfaz TypeScript exportada (ej: IBProduct, IBItemCreate)"
+          },
+          "backend_schema": {
+            "type": "string",
+            "description": "Nombre exacto del schema OpenAPI en components.schemas (ej: ProductResponse, ProductCreateRequest)"
+          },
+          "service_method": {
+            "type": "string",
+            "description": "Método del servicio frontend que consume esta entidad (ej: productsService.getAll)"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Método HTTP y ruta relativa del backend (ej: GET /api/v1/products/)"
+          }
+        }
+      }
+    }
+  }
+}

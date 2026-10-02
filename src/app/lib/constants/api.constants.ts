@@ -1,0 +1,26 @@
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+export const APIV1_URL = `${BASE_URL}api/v1`;
+export const PAYMENTS_URL = `${APIV1_URL}/payments`;
+export const CASH_REGISTERS_URL = `${PAYMENTS_URL}/cash-registers`;
+export const WMS_URL = `${APIV1_URL}/wms`;
+export const USERS_URL = `${APIV1_URL}/users`;
+export const PRODUCTS_URL = `${APIV1_URL}/products`;
+export const COMMON_URL = `${APIV1_URL}/common`;
+export const INVENTORY_URL = `${APIV1_URL}/wms/inventory`;
+export const AUTH_URL = `${APIV1_URL}/auth`;
+export const PARTNERS_URL = `${APIV1_URL}/partners`;
+export const SALES_CHANNELS_URL = `${PARTNERS_URL}/sales-channels`;
+export const ACCOUNTS_URL = `${APIV1_URL}/accounting`;
+export const DELIVERY_URL = `${APIV1_URL}/delivery`;
+export const ROUTES_URL = `${DELIVERY_URL}/routes`;
+export const ZONES_URL = `${COMMON_URL}/zones`;
+export const DOCUMENTS_URL = `${APIV1_URL}/documents`;
+export const VEHICLES_URL = `${APIV1_URL}/vehicles`;
+export const COMMERCIAL_URL = `${APIV1_URL}/commercial`;
+export const METADATA_URL = `${APIV1_URL}/metadata`;
+export const ADMIN_URL = `${APIV1_URL}/admin`;
+export const BRANCHES_URL = `${COMMON_URL}/branches`;
+export const ESTABLISHMENTS_URL = `${COMMON_URL}/establishments`;
+export const LOGISTICS_CENTERS_URL = `${COMMON_URL}/logistics-centers`;
+
+export const API_KEY = "";

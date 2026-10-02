@@ -1,0 +1,74 @@
+# ==========================================
+# Dependencias y Gestores de Paquetes
+# ==========================================
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ==========================================
+# Compilaciones, Caché y Turborepo
+# ==========================================
+.turbo/
+.next/
+dist/
+dist-ssr/
+build/
+out/
+/coverage/
+
+# ==========================================
+# Variables de Entorno (Mantener seguras)
+# ==========================================
+.env*
+*.local
+!.env.example
+
+# ==========================================
+# Archivos específicos de Proyectos
+# ==========================================
+# Evita rastrear archivos generados automáticamente por Next.js
+next-env.d.ts
+
+# Archivo sensible de constantes en la app React
+# (Ajusta 'app-react' al nombre real de la carpeta en tu monorepo)
+apps/app-react/src/utils/constants/url.constants.ts
+
+# ==========================================
+# Logs y Debug
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==========================================
+# Caché de Herramientas (TS, ESLint)
+# ==========================================
+*.tsbuildinfo
+.eslintcache
+
+# ==========================================
+# Editor, SO y Plataformas
+# ==========================================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.pem
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Despliegue
+.vercel/

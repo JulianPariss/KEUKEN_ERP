@@ -1,0 +1,1 @@
+export { ThemeSwitcher as default, ThemeSwitcher } from '@repo/ui/theme';

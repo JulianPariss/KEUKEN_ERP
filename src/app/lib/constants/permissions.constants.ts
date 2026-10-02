@@ -1,0 +1,37 @@
+import { TBackendPermissionKey } from "../permissions/getPermissions";
+
+const PERMISSIONS_CONSTANTS: Record<string, TBackendPermissionKey[]> = {
+    modifyKeysManager: ['keysManager'],
+    modifyProducts: ['products', 'items', 'presentations'],
+    modifyItems: ['items'],
+    modifyPresentations: ['presentations'],
+    categories: ['categories'],
+    uoms: ['uoms'],
+    users: ['users'],
+    modifyWarehouses: ['warehouses'],
+    modifyLocations: ['locations'],
+    modifyInventory: ['inventory'],
+    viewStock: ['stock'],
+    viewInventory: ['inventory', 'stock'],
+    modifyDelivery: ['delivery'],
+    modifyCashRegisters: ['cashRegisters'],
+    modifyCurrencies: ['currencies'],
+    modifyProviders: ['providers'],
+    modifyPaymentTerms: ['paymentTerms'],
+    modifyPaymentMethods: ['paymentMethods'],
+    modifyCountries: ['countries'],
+    modifyStates: ['states'],
+    modifyTaxCategories: ['taxCategories'],
+    modifyCities: ['cities'],
+    modifySaleBillingModes: ['saleBillingModes'],
+    modifySalesChannels: ['sales-channels'],
+    modifySystem: ['system'],
+    modifyBranches: ['branches'],
+    branches: ['branches'],
+    modifyEstablishments: ['establishments'],
+    establishments: ['establishments'],
+    modifyLogisticsCenters: ['logisticsCenters'],
+    logisticsCenters: ['logisticsCenters'],
+}
+
+export default PERMISSIONS_CONSTANTS;

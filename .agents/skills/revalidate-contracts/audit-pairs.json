@@ -1,0 +1,1582 @@
+{
+  "$schema": "./schemas/audit-pairs.schema.json",
+  "version": "1.0.0",
+  "description": "Mapeo de pares de auditoría: Interfaces TypeScript en @repo/api-contracts/erp/backendTypes vs Schemas OpenAPI en contracts.json",
+  "pairs": [
+    {
+      "domain": "products",
+      "label": "Productos - Ficha y Cabecera",
+      "ts_file": "products.types.ts",
+      "ts_interface": "IBProduct",
+      "backend_schema": "ProductResponse",
+      "service_method": "productsService.getAll / getById",
+      "endpoint": "GET /api/v1/products/ | GET /api/v1/products/{id}"
+    },
+    {
+      "domain": "products",
+      "label": "Productos - Alta",
+      "ts_file": "products.types.ts",
+      "ts_interface": "IBProductCreate",
+      "backend_schema": "ProductCreateRequest",
+      "service_method": "productsService.create",
+      "endpoint": "POST /api/v1/products/"
+    },
+    {
+      "domain": "products",
+      "label": "Productos - Edición",
+      "ts_file": "products.types.ts",
+      "ts_interface": "IBProductUpdate",
+      "backend_schema": "ProductUpdateRequest",
+      "service_method": "productsService.update",
+      "endpoint": "PATCH /api/v1/products/{id}"
+    },
+    {
+      "domain": "products",
+      "label": "Productos - Clasificación Fiscal",
+      "ts_file": "products.types.ts",
+      "ts_interface": "IBProductClassification",
+      "backend_schema": "ProductClassificationResponse",
+      "service_method": "productsService.getClassifications",
+      "endpoint": "GET /api/v1/products/classifications"
+    },
+    {
+      "domain": "items",
+      "label": "Ítems - Maestro",
+      "ts_file": "items.types.ts",
+      "ts_interface": "IBItem",
+      "backend_schema": "ItemResponse",
+      "service_method": "itemsService.getAll / getItembySku",
+      "endpoint": "GET /api/v1/products/items | GET /api/v1/products/item-by-sku/{sku}"
+    },
+    {
+      "domain": "items",
+      "label": "Ítems - Alta",
+      "ts_file": "items.types.ts",
+      "ts_interface": "IBItemCreate",
+      "backend_schema": "ItemCreateRequest",
+      "service_method": "itemsService.create",
+      "endpoint": "POST /api/v1/products/item"
+    },
+    {
+      "domain": "items",
+      "label": "Ítems - Edición",
+      "ts_file": "items.types.ts",
+      "ts_interface": "IBItemUpdate",
+      "backend_schema": "ItemUpdateRequest",
+      "service_method": "itemsService.update",
+      "endpoint": "PATCH /api/v1/products/item/{id}"
+    },
+    {
+      "domain": "presentations",
+      "label": "Presentaciones - Maestro",
+      "ts_file": "presentations.types.ts",
+      "ts_interface": "IBPresentation",
+      "backend_schema": "PresentationResponse",
+      "service_method": "presentationsService.getAll / getAllbyItem",
+      "endpoint": "GET /api/v1/products/presentations/list | GET /api/v1/products/item/{id}/presentations"
+    },
+    {
+      "domain": "presentations",
+      "label": "Presentaciones - Alta",
+      "ts_file": "presentations.types.ts",
+      "ts_interface": "IBPresentationCreate",
+      "backend_schema": "PresentationCreateRequest",
+      "service_method": "presentationsService.create",
+      "endpoint": "POST /api/v1/products/presentation"
+    },
+    {
+      "domain": "presentations",
+      "label": "Presentaciones - Edición",
+      "ts_file": "presentations.types.ts",
+      "ts_interface": "IBPresentationUpdate",
+      "backend_schema": "PresentationUpdateRequest",
+      "service_method": "presentationsService.update",
+      "endpoint": "PATCH /api/v1/products/presentation/{id}"
+    },
+    {
+      "domain": "brands",
+      "label": "Marcas - Maestro",
+      "ts_file": "brands.types.ts",
+      "ts_interface": "IBBrand",
+      "backend_schema": "ProductBrandResponse",
+      "service_method": "brandsService.getAll",
+      "endpoint": "GET /api/v1/products/brands"
+    },
+    {
+      "domain": "brands",
+      "label": "Marcas - Alta",
+      "ts_file": "brands.types.ts",
+      "ts_interface": "IBBrandCreate",
+      "backend_schema": "ProductBrandCreateRequest",
+      "service_method": "brandsService.create",
+      "endpoint": "POST /api/v1/products/brands"
+    },
+    {
+      "domain": "brands",
+      "label": "Marcas - Edición",
+      "ts_file": "brands.types.ts",
+      "ts_interface": "IBBrandUpdate",
+      "backend_schema": "ProductBrandUpdateRequest",
+      "service_method": "brandsService.update",
+      "endpoint": "PATCH /api/v1/products/brands/{id}"
+    },
+    {
+      "domain": "categories",
+      "label": "Categorías - Maestro",
+      "ts_file": "category.types.ts",
+      "ts_interface": "IBCategory",
+      "backend_schema": "CategoryResponse",
+      "service_method": "categoriesService.getAll",
+      "endpoint": "GET /api/v1/products/categories"
+    },
+    {
+      "domain": "categories",
+      "label": "Categorías - Alta",
+      "ts_file": "category.types.ts",
+      "ts_interface": "IBCategoryCreate",
+      "backend_schema": "CategoryCreateRequest",
+      "service_method": "categoriesService.create",
+      "endpoint": "POST /api/v1/products/category"
+    },
+    {
+      "domain": "categories",
+      "label": "Categorías - Edición",
+      "ts_file": "category.types.ts",
+      "ts_interface": "IBCategoryUpdate",
+      "backend_schema": "CategoryUpdateRequest",
+      "service_method": "categoriesService.update",
+      "endpoint": "PATCH /api/v1/products/category/{id}"
+    },
+    {
+      "domain": "saleBillingModes",
+      "label": "Modos de Facturación - Maestro",
+      "ts_file": "saleBillingModes.types.ts",
+      "ts_interface": "IBSaleBillingMode",
+      "backend_schema": "SaleBillingModeResponse",
+      "service_method": "saleBillingModesService.getAll",
+      "endpoint": "GET /api/v1/products/sale-billing-modes"
+    },
+    {
+      "domain": "saleBillingModes",
+      "label": "Modos de Facturación - Alta",
+      "ts_file": "saleBillingModes.types.ts",
+      "ts_interface": "IBSaleBillingModeCreate",
+      "backend_schema": "SaleBillingModeCreateRequest",
+      "service_method": "saleBillingModesService.create",
+      "endpoint": "POST /api/v1/products/sale-billing-modes"
+    },
+    {
+      "domain": "saleBillingModes",
+      "label": "Modos de Facturación - Edición",
+      "ts_file": "saleBillingModes.types.ts",
+      "ts_interface": "IBSaleBillingModeUpdate",
+      "backend_schema": "SaleBillingModeUpdateRequest",
+      "service_method": "saleBillingModesService.update",
+      "endpoint": "PATCH /api/v1/products/sale-billing-modes/{id}"
+    },
+    {
+      "domain": "uom",
+      "label": "Unidades de Medida - Maestro",
+      "ts_file": "uom.types.ts",
+      "ts_interface": "IBUOM",
+      "backend_schema": "UoMResponse",
+      "service_method": "uomsService.getAll",
+      "endpoint": "GET /api/v1/products/uoms"
+    },
+    {
+      "domain": "uom",
+      "label": "Unidades de Medida - Alta",
+      "ts_file": "uom.types.ts",
+      "ts_interface": "IBUOMCreate",
+      "backend_schema": "UoMCreateRequest",
+      "service_method": "uomsService.create",
+      "endpoint": "POST /api/v1/products/uom"
+    },
+    {
+      "domain": "uom",
+      "label": "Unidades de Medida - Edición",
+      "ts_file": "uom.types.ts",
+      "ts_interface": "IBUOMUpdate",
+      "backend_schema": "UoMUpdateRequest",
+      "service_method": "uomsService.update",
+      "endpoint": "PATCH /api/v1/products/uom/{id}"
+    },
+    {
+      "domain": "uom",
+      "label": "Categorías de UoM - Maestro",
+      "ts_file": "uom_category.types.ts",
+      "ts_interface": "IBUoMCategory",
+      "backend_schema": "UoMCategoryResponse",
+      "service_method": "uomCategoriesService.getAll",
+      "endpoint": "GET /api/v1/products/uom-categories"
+    },
+    {
+      "domain": "packagingLevel",
+      "label": "Niveles de Empaque - Maestro",
+      "ts_file": "packagingLevel.types.ts",
+      "ts_interface": "IBPackagingLevel",
+      "backend_schema": "PackagingLevelResponse",
+      "service_method": "packagingLevelService.getAll",
+      "endpoint": "GET /api/v1/products/packaging-levels"
+    },
+    {
+      "domain": "accounting",
+      "label": "Impuestos Contables - Maestro",
+      "ts_file": "accountant/taxes.types.ts",
+      "ts_interface": "IBTax",
+      "backend_schema": "AccountTaxResponse",
+      "service_method": "taxesService.getAll / getById",
+      "endpoint": "GET /api/v1/accounting/taxes"
+    },
+    {
+      "domain": "accounting",
+      "label": "Impuestos Contables - Alta",
+      "ts_file": "accountant/taxes.types.ts",
+      "ts_interface": "IBTaxCreate",
+      "backend_schema": "AccountTaxCreateRequest",
+      "service_method": "taxesService.create",
+      "endpoint": "POST /api/v1/accounting/taxes"
+    },
+    {
+      "domain": "accounting",
+      "label": "Impuestos Contables - Edición",
+      "ts_file": "accountant/taxes.types.ts",
+      "ts_interface": "IBTaxUpdate",
+      "backend_schema": "AccountTaxUpdateRequest",
+      "service_method": "taxesService.update",
+      "endpoint": "PATCH /api/v1/accounting/taxes/{id}"
+    },
+    {
+      "domain": "accounting",
+      "label": "Plan de Cuentas - Fila",
+      "ts_file": "accountant/accounts.types.ts",
+      "ts_interface": "IBAccount",
+      "backend_schema": "ChartAccountResponse",
+      "service_method": "accountsService.getAll",
+      "endpoint": "GET /api/v1/accounting/gl/accounts"
+    },
+    {
+      "domain": "accounting",
+      "label": "Plan de Cuentas - Alta",
+      "ts_file": "accountant/accounts.types.ts",
+      "ts_interface": "IBAccountCreation",
+      "backend_schema": "ChartAccountCreateRequest",
+      "service_method": "accountsService.create",
+      "endpoint": "POST /api/v1/accounting/gl/accounts"
+    },
+    {
+      "domain": "accounting",
+      "label": "Plan de Cuentas - Edición",
+      "ts_file": "accountant/accounts.types.ts",
+      "ts_interface": "IBAccountUpdate",
+      "backend_schema": "ChartAccountUpdateRequest",
+      "service_method": "accountsService.update",
+      "endpoint": "PATCH /api/v1/accounting/gl/accounts/{id}"
+    },
+    {
+      "domain": "accounting",
+      "label": "Plan de Cuentas - Árbol",
+      "ts_file": "accountant/accounts.types.ts",
+      "ts_interface": "IBAccountsTree",
+      "backend_schema": "ChartAccountTreeNode",
+      "service_method": "accountsService.getAllTree",
+      "endpoint": "GET /api/v1/accounting/gl/accounts/tree"
+    },
+    {
+      "domain": "accounting",
+      "label": "Plan de Cuentas - Mayor",
+      "ts_file": "accountant/accounts.types.ts",
+      "ts_interface": "IBAccountLines",
+      "backend_schema": "AccountLedgerLineItem",
+      "service_method": "accountsService.getAccountLines",
+      "endpoint": "GET /api/v1/accounting/gl/accounts/{id}/lines"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Atributos",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataAttribute",
+      "backend_schema": "AttributeResponse",
+      "service_method": "metadataService.getAttributes",
+      "endpoint": "GET /api/v1/metadata/attributes"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Grupos",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataGroup",
+      "backend_schema": "AttributeGroupResponse",
+      "service_method": "metadataService.getGroups",
+      "endpoint": "GET /api/v1/metadata/groups"
+    },
+    {
+      "domain": "common",
+      "label": "Restauración - Papelera",
+      "ts_file": "general.types.ts",
+      "ts_interface": "IBRestoreResponse",
+      "backend_schema": "RestoreResponse",
+      "service_method": "commonService.restore",
+      "endpoint": "POST /api/v1/admin/recovery/{schema}/{table}/{id}/restore"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Almacenes - Maestro",
+      "ts_file": "warehouse/warehouses.types.ts",
+      "ts_interface": "IWarehouseResponse",
+      "backend_schema": "WarehouseResponse",
+      "service_method": "warehouseService.getAll / getById",
+      "endpoint": "GET /api/v1/wms/warehouses | GET /api/v1/wms/warehouses/{warehouse_id}"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Almacenes - Alta",
+      "ts_file": "warehouse/warehouses.types.ts",
+      "ts_interface": "IWarehouseCreate",
+      "backend_schema": "WarehouseCreateRequest",
+      "service_method": "warehouseService.create",
+      "endpoint": "POST /api/v1/wms/warehouses"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Almacenes - Edición",
+      "ts_file": "warehouse/warehouses.types.ts",
+      "ts_interface": "IWarehouseUpdate",
+      "backend_schema": "WarehouseUpdateRequest",
+      "service_method": "warehouseService.update",
+      "endpoint": "PATCH /api/v1/wms/warehouses/{warehouse_id}"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Maestro",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocation",
+      "backend_schema": "LocationResponse",
+      "service_method": "locationService.getAll / getByPath / getByPattern",
+      "endpoint": "GET /api/v1/wms/locations | GET /api/v1/wms/warehouses/{warehouse_id}/locations/{location_id} | GET /api/v1/wms/warehouses/{warehouse_id}/locations-by-path-pattern"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Alta Simple",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocationSimpleCreation",
+      "backend_schema": "LocationCreateRequest",
+      "service_method": "locationService.createSimple",
+      "endpoint": "POST /api/v1/wms/locations"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Edición",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocationUpdate",
+      "backend_schema": "LocationUpdateRequest",
+      "service_method": "locationService.update",
+      "endpoint": "PATCH /api/v1/wms/locations/{location_id}"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Creación Masiva",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocationCreation",
+      "backend_schema": "LocationMassCreateRequest",
+      "service_method": "locationService.create",
+      "endpoint": "POST /api/v1/wms/locations/mass-create"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Cambio de Estado",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocationStateUpdate",
+      "backend_schema": "LocationStateUpdateRequest",
+      "service_method": "locationService.changeState",
+      "endpoint": "PATCH /api/v1/wms/locations/{path}/state"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Ubicaciones - Ocupación",
+      "ts_file": "warehouse/locations.types.ts",
+      "ts_interface": "IBLocationOccupancy",
+      "backend_schema": "LocationOccupancyResponse",
+      "service_method": "locationService.occupancy",
+      "endpoint": "GET /api/v1/wms/locations/{location_id}/occupancy"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Áreas de Almacén - Maestro",
+      "ts_file": "warehouse/areas.types.ts",
+      "ts_interface": "IBArea",
+      "backend_schema": "WarehouseAreaResponse",
+      "service_method": "areaService.getAreasByWarehouse",
+      "endpoint": "GET /api/v1/wms/warehouses/{warehouse_id}/areas"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Áreas de Almacén - Alta",
+      "ts_file": "warehouse/areas.types.ts",
+      "ts_interface": "IBAreaCreate",
+      "backend_schema": "WarehouseAreaCreateRequest",
+      "service_method": "areaService.createArea",
+      "endpoint": "POST /api/v1/wms/warehouses/{warehouse_id}/areas"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Tipos de Área - Maestro",
+      "ts_file": "warehouse/areas.types.ts",
+      "ts_interface": "IBAreaType",
+      "backend_schema": "WarehouseAreaTypeResponse",
+      "service_method": "areaService.getAreaTypes",
+      "endpoint": "GET /api/v1/wms/warehouse-area-types"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Áreas de Almacén - Asignación",
+      "ts_file": "warehouse/areas.types.ts",
+      "ts_interface": "IBAreaAssignment",
+      "backend_schema": "AssignAreaToSubtreeRequest",
+      "service_method": "areaService.assignArea",
+      "endpoint": "POST /api/v1/wms/warehouses/{warehouse_id}/areas/{area_id}/assign"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Inventario - Maestro",
+      "ts_file": "warehouse/inventory.types.ts",
+      "ts_interface": "IBInventory",
+      "backend_schema": "InventorySchema",
+      "service_method": "inventoryService.getById / getByLocation / patch",
+      "endpoint": "GET /api/v1/wms/inventory/{inventory_id} | GET /api/v1/wms/inventory/by-location/{location_id} | PATCH /api/v1/wms/inventory/{inventory_id}/lines"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Inventario - Línea",
+      "ts_file": "warehouse/inventory.types.ts",
+      "ts_interface": "IBInventoryLine",
+      "backend_schema": "InventoryLineSchema",
+      "service_method": "inventoryService.getById (lines)",
+      "endpoint": "GET /api/v1/wms/inventory/{inventory_id}"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Inventario - Alta / Ajuste",
+      "ts_file": "warehouse/inventory.types.ts",
+      "ts_interface": "IBInventoryCreate",
+      "backend_schema": "InventoryAdjustmentRequest",
+      "service_method": "inventoryService.create",
+      "endpoint": "POST /api/v1/wms/inventory"
+    },
+    {
+      "domain": "warehouse",
+      "label": "Inventario - Actualización de Líneas",
+      "ts_file": "warehouse/inventory.types.ts",
+      "ts_interface": "IBInventoryPatch",
+      "backend_schema": "InventoryLinesUpdateRequest",
+      "service_method": "inventoryService.patch",
+      "endpoint": "PATCH /api/v1/wms/inventory/{inventory_id}/lines"
+    },
+    {
+      "domain": "vehicles",
+      "label": "Vehículos - Maestro",
+      "ts_file": "vehicles.types.ts",
+      "ts_interface": "IBVehicle",
+      "backend_schema": "VehicleResponse",
+      "service_method": "vehiclesService.getAll / getById",
+      "endpoint": "GET /api/v1/vehicles | GET /api/v1/vehicles/{vehicle_id}"
+    },
+    {
+      "domain": "vehicles",
+      "label": "Vehículos - Alta",
+      "ts_file": "vehicles.types.ts",
+      "ts_interface": "IBVehicleCreate",
+      "backend_schema": "VehicleCreateRequest",
+      "service_method": "vehiclesService.create",
+      "endpoint": "POST /api/v1/vehicles"
+    },
+    {
+      "domain": "vehicles",
+      "label": "Vehículos - Edición",
+      "ts_file": "vehicles.types.ts",
+      "ts_interface": "IBVehicleUpdate",
+      "backend_schema": "VehicleUpdateRequest",
+      "service_method": "vehiclesService.update",
+      "endpoint": "PATCH /api/v1/vehicles/{vehicle_id}"
+    },
+    {
+      "domain": "zones",
+      "label": "Zonas - Maestro",
+      "ts_file": "zones.types.ts",
+      "ts_interface": "IBZone",
+      "backend_schema": "ZoneResponse",
+      "service_method": "zonesService.getAll",
+      "endpoint": "GET /api/v1/common/zones"
+    },
+    {
+      "domain": "zones",
+      "label": "Zonas - Alta",
+      "ts_file": "zones.types.ts",
+      "ts_interface": "IBZoneCreate",
+      "backend_schema": "ZoneCreateRequest",
+      "service_method": "zonesService.create",
+      "endpoint": "POST /api/v1/common/zones"
+    },
+    {
+      "domain": "zones",
+      "label": "Zonas - Edición",
+      "ts_file": "zones.types.ts",
+      "ts_interface": "IBZoneUpdate",
+      "backend_schema": "ZoneUpdateRequest",
+      "service_method": "zonesService.update",
+      "endpoint": "PATCH /api/v1/common/zones/{zone_id}"
+    },
+    {
+      "domain": "users",
+      "label": "Usuarios - Maestro",
+      "ts_file": "users.types.ts",
+      "ts_interface": "IBUser",
+      "backend_schema": "UserResponse",
+      "service_method": "usersService.getAll / getById",
+      "endpoint": "GET /api/v1/users | GET /api/v1/users/{id}"
+    },
+    {
+      "domain": "users",
+      "label": "Usuarios - Alta",
+      "ts_file": "users.types.ts",
+      "ts_interface": "IBUserCreate",
+      "backend_schema": "UserCreateRequest",
+      "service_method": "usersService.create",
+      "endpoint": "POST /api/v1/users"
+    },
+    {
+      "domain": "users",
+      "label": "Usuarios - Edición",
+      "ts_file": "users.types.ts",
+      "ts_interface": "IBUserUpdate",
+      "backend_schema": "UserPatchRequest",
+      "service_method": "usersService.update",
+      "endpoint": "PATCH /api/v1/users/{user_id}"
+    },
+    {
+      "domain": "system",
+      "label": "Configuración del Sistema - Parámetro",
+      "ts_file": "system.types.ts",
+      "ts_interface": "IBSystemSetting",
+      "backend_schema": "SystemSettingResponse",
+      "service_method": "systemService.getAll",
+      "endpoint": "GET /api/v1/system/settings"
+    },
+    {
+      "domain": "system",
+      "label": "Configuración del Sistema - Edición",
+      "ts_file": "system.types.ts",
+      "ts_interface": "IBSystemSettingUpdate",
+      "backend_schema": "SystemSettingUpsertRequest",
+      "service_method": "systemService.update",
+      "endpoint": "PUT /api/v1/system/settings/{key}"
+    },
+    {
+      "domain": "system",
+      "label": "Configuración del Sistema - Auditoría",
+      "ts_file": "system.types.ts",
+      "ts_interface": "IBSettingsAuditResponse",
+      "backend_schema": "SystemSettingAuditListResponse",
+      "service_method": "systemService.getAudit",
+      "endpoint": "GET /api/v1/system/settings/audit"
+    },
+    {
+      "domain": "userContext",
+      "label": "Sucursales - Maestro",
+      "ts_file": "userContext/branches.types.ts",
+      "ts_interface": "IBBranch",
+      "backend_schema": "BranchResponse",
+      "service_method": "branchesService.getAll / getById",
+      "endpoint": "GET /api/v1/common/branches | GET /api/v1/common/branches/{branch_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Sucursales - Alta",
+      "ts_file": "userContext/branches.types.ts",
+      "ts_interface": "IBBranchCreate",
+      "backend_schema": "BranchCreateRequest",
+      "service_method": "branchesService.create",
+      "endpoint": "POST /api/v1/common/branches"
+    },
+    {
+      "domain": "userContext",
+      "label": "Sucursales - Edición",
+      "ts_file": "userContext/branches.types.ts",
+      "ts_interface": "IBBranchUpdate",
+      "backend_schema": "BranchUpdateRequest",
+      "service_method": "branchesService.update",
+      "endpoint": "PATCH /api/v1/common/branches/{branch_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Sucursales - Detalle",
+      "ts_file": "userContext/branches.types.ts",
+      "ts_interface": "IBBranchDetail",
+      "backend_schema": "BranchResponse",
+      "service_method": "branchesService.getById",
+      "endpoint": "GET /api/v1/common/branches/{branch_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Establecimientos - Maestro",
+      "ts_file": "userContext/establishments.types.ts",
+      "ts_interface": "IBEstablishment",
+      "backend_schema": "EstablishmentResponse",
+      "service_method": "establishmentsService.getAll / getById",
+      "endpoint": "GET /api/v1/common/establishments | GET /api/v1/common/establishments/{establishment_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Establecimientos - Alta",
+      "ts_file": "userContext/establishments.types.ts",
+      "ts_interface": "IBEstablishmentCreate",
+      "backend_schema": "EstablishmentCreateRequest",
+      "service_method": "establishmentsService.create",
+      "endpoint": "POST /api/v1/common/establishments"
+    },
+    {
+      "domain": "userContext",
+      "label": "Establecimientos - Edición",
+      "ts_file": "userContext/establishments.types.ts",
+      "ts_interface": "IBEstablishmentUpdate",
+      "backend_schema": "EstablishmentUpdateRequest",
+      "service_method": "establishmentsService.update",
+      "endpoint": "PATCH /api/v1/common/establishments/{establishment_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Centros Logísticos - Maestro",
+      "ts_file": "userContext/logisticsCenters.types.ts",
+      "ts_interface": "IBLogisticsCenter",
+      "backend_schema": "LogisticsCenterResponse",
+      "service_method": "logisticsCentersService.getAll / getById",
+      "endpoint": "GET /api/v1/common/logistics-centers | GET /api/v1/common/logistics-centers/{logistics_center_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Centros Logísticos - Alta",
+      "ts_file": "userContext/logisticsCenters.types.ts",
+      "ts_interface": "IBLogisticsCenterCreate",
+      "backend_schema": "LogisticsCenterCreateRequest",
+      "service_method": "logisticsCentersService.create",
+      "endpoint": "POST /api/v1/common/logistics-centers"
+    },
+    {
+      "domain": "userContext",
+      "label": "Centros Logísticos - Edición",
+      "ts_file": "userContext/logisticsCenters.types.ts",
+      "ts_interface": "IBLogisticsCenterUpdate",
+      "backend_schema": "LogisticsCenterUpdateRequest",
+      "service_method": "logisticsCentersService.update",
+      "endpoint": "PATCH /api/v1/common/logistics-centers/{logistics_center_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Empresas - Maestro",
+      "ts_file": "userContext/company.types.ts",
+      "ts_interface": "ICompanyResponse",
+      "backend_schema": "CompanyResponse",
+      "service_method": "companiesService.getAll",
+      "endpoint": "GET /api/v1/common/companies"
+    },
+    {
+      "domain": "userContext",
+      "label": "Roles y Claves API - Lista",
+      "ts_file": "userContext/roles.type.ts",
+      "ts_interface": "IBRole",
+      "backend_schema": "ApiKeyListItem",
+      "service_method": "rolesService.getAll",
+      "endpoint": "GET /api/v1/common/companies/{company_id}/api-keys"
+    },
+    {
+      "domain": "userContext",
+      "label": "Autenticación - Login",
+      "ts_file": "userContext/auth.types.ts",
+      "ts_interface": "IBAuth",
+      "backend_schema": "LoginResponse",
+      "service_method": "authService.login",
+      "endpoint": "POST /api/v1/auth/login"
+    },
+    {
+      "domain": "userContext",
+      "label": "Autenticación - Perfil",
+      "ts_file": "userContext/auth.types.ts",
+      "ts_interface": "IBProfile",
+      "backend_schema": "MeResponse",
+      "service_method": "authService.getProfile",
+      "endpoint": "GET /api/v1/auth/me"
+    },
+    {
+      "domain": "routes",
+      "label": "Rutas de Entrega - Maestro",
+      "ts_file": "routes.types.ts",
+      "ts_interface": "IBRouteResponse",
+      "backend_schema": "RouteResponse",
+      "service_method": "routesService.getAll",
+      "endpoint": "GET /api/v1/delivery/routes"
+    },
+    {
+      "domain": "routes",
+      "label": "Rutas de Entrega - Detalle",
+      "ts_file": "routes.types.ts",
+      "ts_interface": "IBRouteDetails",
+      "backend_schema": "RouteDetailResponse",
+      "service_method": "routesService.getById",
+      "endpoint": "GET /api/v1/delivery/routes/{route_id}"
+    },
+    {
+      "domain": "routes",
+      "label": "Rutas de Entrega - Alta",
+      "ts_file": "routes.types.ts",
+      "ts_interface": "IBRouteCreate",
+      "backend_schema": "RouteCreateRequest",
+      "service_method": "routesService.create",
+      "endpoint": "POST /api/v1/delivery/routes"
+    },
+    {
+      "domain": "salesChannels",
+      "label": "Canales de Venta - Maestro",
+      "ts_file": "salesChannels.types.ts",
+      "ts_interface": "IBSalesChannel",
+      "backend_schema": "SalesChannelResponse",
+      "service_method": "salesChannelsService.getAll",
+      "endpoint": "GET /api/v1/partners/sales-channels"
+    },
+    {
+      "domain": "serialNumbers",
+      "label": "Números de Serie - Maestro",
+      "ts_file": "serialNumbers.types.ts",
+      "ts_interface": "IBSerialNumber",
+      "backend_schema": "SerialNumberResponse",
+      "service_method": "serialNumbersService.getAll",
+      "endpoint": "GET /api/v1/wms/serial-numbers"
+    },
+    {
+      "domain": "serialNumbers",
+      "label": "Números de Serie - Alta",
+      "ts_file": "serialNumbers.types.ts",
+      "ts_interface": "IBSerialNumberCreateRequest",
+      "backend_schema": "SerialNumberCreateRequest",
+      "service_method": "serialNumbersService.create",
+      "endpoint": "POST /api/v1/wms/serial-numbers"
+    },
+    {
+      "domain": "stock",
+      "label": "Stock - Líneas con Ubicación",
+      "ts_file": "stock.types.ts",
+      "ts_interface": "IBStockItem",
+      "backend_schema": "StockLineWithLocationResponse",
+      "service_method": "stockService.getAll",
+      "endpoint": "GET /api/v1/wms/stock"
+    },
+    {
+      "domain": "stock",
+      "label": "Stock - Por Ubicación",
+      "ts_file": "stock.types.ts",
+      "ts_interface": "IBStockByLocation",
+      "backend_schema": "LocationStockResponse",
+      "service_method": "stockService.getStockByLocation",
+      "endpoint": "GET /api/v1/wms/stock/{location_id}"
+    },
+    {
+      "domain": "stock",
+      "label": "Stock - Reserva",
+      "ts_file": "stock.types.ts",
+      "ts_interface": "IBStockReserve",
+      "backend_schema": "ReservationResponse",
+      "service_method": "stockService.createReserve",
+      "endpoint": "POST /api/v1/wms/reserve"
+    },
+    {
+      "domain": "stock",
+      "label": "Stock - Solicitud de Reserva",
+      "ts_file": "stock.types.ts",
+      "ts_interface": "IBStockCreate",
+      "backend_schema": "StockReservationRequest",
+      "service_method": "stockService.createReserve",
+      "endpoint": "POST /api/v1/wms/reserve"
+    },
+    {
+      "domain": "stock",
+      "label": "Stock - Resumen",
+      "ts_file": "stock.types.ts",
+      "ts_interface": "IBStockSummaryRow",
+      "backend_schema": "StockSummaryRow",
+      "service_method": "stockService.getStockSummary",
+      "endpoint": "GET /api/v1/wms/stock/summary"
+    },
+    {
+      "domain": "fragility",
+      "label": "Fragilidad - Maestro",
+      "ts_file": "fragility.types.ts",
+      "ts_interface": "IBFragilityClass",
+      "backend_schema": "FragilityClassResponse",
+      "service_method": "fragilityService.getAll",
+      "endpoint": "GET /api/v1/products/handling/fragility-classes"
+    },
+    {
+      "domain": "fragility",
+      "label": "Fragilidad - Alta",
+      "ts_file": "fragility.types.ts",
+      "ts_interface": "IBFragilityClassCreate",
+      "backend_schema": "FragilityClassCreate",
+      "service_method": "fragilityService.create",
+      "endpoint": "POST /api/v1/products/handling/fragility-classes"
+    },
+    {
+      "domain": "fragility",
+      "label": "Fragilidad - Edición",
+      "ts_file": "fragility.types.ts",
+      "ts_interface": "IBFragilityClassUpdate",
+      "backend_schema": "FragilityClassPatch",
+      "service_method": "fragilityService.update",
+      "endpoint": "PATCH /api/v1/products/handling/fragility-classes/{class_id}"
+    },
+    {
+      "domain": "hazard",
+      "label": "Peligrosidad - Maestro",
+      "ts_file": "hazard.types.ts",
+      "ts_interface": "IBHazardClass",
+      "backend_schema": "HazardClassResponse",
+      "service_method": "hazardService.getAll",
+      "endpoint": "GET /api/v1/products/handling/hazard-classes"
+    },
+    {
+      "domain": "hazard",
+      "label": "Peligrosidad - Alta",
+      "ts_file": "hazard.types.ts",
+      "ts_interface": "IBHazardClassCreate",
+      "backend_schema": "HazardClassCreate",
+      "service_method": "hazardService.create",
+      "endpoint": "POST /api/v1/products/handling/hazard-classes"
+    },
+    {
+      "domain": "hazard",
+      "label": "Peligrosidad - Edición",
+      "ts_file": "hazard.types.ts",
+      "ts_interface": "IBHazardClassUpdate",
+      "backend_schema": "HazardClassPatch",
+      "service_method": "hazardService.update",
+      "endpoint": "PATCH /api/v1/products/handling/hazard-classes/{class_id}"
+    },
+    {
+      "domain": "segregationGroups",
+      "label": "Grupos de Segregación - Maestro",
+      "ts_file": "segregationGroups.types.ts",
+      "ts_interface": "IBSegregationGroup",
+      "backend_schema": "SegregationGroupResponse",
+      "service_method": "segregationGroupsService.getAll",
+      "endpoint": "GET /api/v1/products/handling/segregation-groups"
+    },
+    {
+      "domain": "segregationGroups",
+      "label": "Grupos de Segregación - Alta",
+      "ts_file": "segregationGroups.types.ts",
+      "ts_interface": "IBSegregationGroupCreate",
+      "backend_schema": "SegregationGroupCreate",
+      "service_method": "segregationGroupsService.create",
+      "endpoint": "POST /api/v1/products/handling/segregation-groups"
+    },
+    {
+      "domain": "segregationGroups",
+      "label": "Grupos de Segregación - Edición",
+      "ts_file": "segregationGroups.types.ts",
+      "ts_interface": "IBSegregationGroupUpdate",
+      "backend_schema": "SegregationGroupPatch",
+      "service_method": "segregationGroupsService.update",
+      "endpoint": "PATCH /api/v1/products/handling/segregation-groups/{class_id}"
+    },
+    {
+      "domain": "temperature",
+      "label": "Temperatura - Maestro",
+      "ts_file": "temperature.types.ts",
+      "ts_interface": "IBTemperatureClass",
+      "backend_schema": "TemperatureClassResponse",
+      "service_method": "temperatureService.getAll",
+      "endpoint": "GET /api/v1/products/handling/temperature-classes"
+    },
+    {
+      "domain": "temperature",
+      "label": "Temperatura - Alta",
+      "ts_file": "temperature.types.ts",
+      "ts_interface": "IBTemperatureClassCreate",
+      "backend_schema": "TemperatureClassCreate",
+      "service_method": "temperatureService.create",
+      "endpoint": "POST /api/v1/products/handling/temperature-classes"
+    },
+    {
+      "domain": "temperature",
+      "label": "Temperatura - Edición",
+      "ts_file": "temperature.types.ts",
+      "ts_interface": "IBTemperatureClassUpdate",
+      "backend_schema": "TemperatureClassPatch",
+      "service_method": "temperatureService.update",
+      "endpoint": "PATCH /api/v1/products/handling/temperature-classes/{class_id}"
+    },
+    {
+      "domain": "logisticProfile",
+      "label": "Perfiles Logísticos - Maestro",
+      "ts_file": "logisticProfile.types.ts",
+      "ts_interface": "IBLogisticProfile",
+      "backend_schema": "LogisticsProfileResponse",
+      "service_method": "logisticProfileService.getAll",
+      "endpoint": "GET /api/v1/products/handling/logistic-profiles"
+    },
+    {
+      "domain": "logisticProfile",
+      "label": "Perfiles Logísticos - Alta",
+      "ts_file": "logisticProfile.types.ts",
+      "ts_interface": "IBLogisticProfileCreate",
+      "backend_schema": "LogisticsProfileCreate",
+      "service_method": "logisticProfileService.create",
+      "endpoint": "POST /api/v1/products/handling/logistic-profiles"
+    },
+    {
+      "domain": "logisticProfile",
+      "label": "Perfiles Logísticos - Edición",
+      "ts_file": "logisticProfile.types.ts",
+      "ts_interface": "IBLogisticProfileUpdate",
+      "backend_schema": "LogisticsProfilePatch",
+      "service_method": "logisticProfileService.update",
+      "endpoint": "PATCH /api/v1/products/handling/logistic-profiles/{profile_id}"
+    },
+    {
+      "domain": "operativeProfile",
+      "label": "Perfiles Operativos - Maestro",
+      "ts_file": "operativeProfile.types.ts",
+      "ts_interface": "IBOperativeProfile",
+      "backend_schema": "OperationalProfileResponse",
+      "service_method": "operativeProfileService.getAll",
+      "endpoint": "GET /api/v1/products/handling/operative-profiles"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Tipos de Lista de Precios - Maestro",
+      "ts_file": "listTypes.types.ts",
+      "ts_interface": "IBListType",
+      "backend_schema": "PricelistTypeResponse",
+      "service_method": "listTypesService.getAll",
+      "endpoint": "GET /api/v1/commercial/pricelist-types"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Tipos de Lista de Precios - Alta",
+      "ts_file": "listTypes.types.ts",
+      "ts_interface": "IBListTypeCreate",
+      "backend_schema": "PricelistTypeCreateRequest",
+      "service_method": "listTypesService.create",
+      "endpoint": "POST /api/v1/commercial/pricelist-types"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Tipos de Lista de Precios - Edición",
+      "ts_file": "listTypes.types.ts",
+      "ts_interface": "IBListTypePatch",
+      "backend_schema": "PricelistTypeUpdateRequest",
+      "service_method": "listTypesService.update",
+      "endpoint": "PATCH /api/v1/commercial/pricelist-types/{type_id}"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Maestro",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceList",
+      "backend_schema": "PricelistResponse",
+      "service_method": "priceListsService.getAll / getById",
+      "endpoint": "GET /api/v1/commercial/pricelists | GET /api/v1/commercial/pricelists/{pricelist_id}"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Alta",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceListCreate",
+      "backend_schema": "PricelistCreateRequest",
+      "service_method": "priceListsService.create",
+      "endpoint": "POST /api/v1/commercial/pricelists"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Completa",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceListFullResponse",
+      "backend_schema": "PricelistFullResponse",
+      "service_method": "priceListsService.getFull",
+      "endpoint": "GET /api/v1/commercial/pricelists/full"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Ítem Alta",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceListItemCreate",
+      "backend_schema": "PricelistItemCreateRequest",
+      "service_method": "priceListsService.createItem",
+      "endpoint": "POST /api/v1/commercial/pricelists/{pricelist_id}/items"
+    },
+    {
+      "domain": "saleOrders",
+      "label": "Pedidos de Venta - Detalle",
+      "ts_file": "saleOrders.types.ts",
+      "ts_interface": "IBSaleOrderDetail",
+      "backend_schema": "SaleOrderDetailResponse",
+      "service_method": "saleOrdersService.getById",
+      "endpoint": "GET /api/v1/commercial/sale-orders/{sale_order_id}"
+    },
+    {
+      "domain": "saleOrders",
+      "label": "Pedidos de Venta - Maestro",
+      "ts_file": "saleOrders.types.ts",
+      "ts_interface": "IBSaleOrder",
+      "backend_schema": "SaleOrderListItemResponse",
+      "service_method": "saleOrdersService.getAll",
+      "endpoint": "GET /api/v1/sales-orders"
+    },
+    {
+      "domain": "saleOrders",
+      "label": "Pedidos de Venta - Alta",
+      "ts_file": "saleOrders.types.ts",
+      "ts_interface": "IBSaleOrderCreate",
+      "backend_schema": "SaleOrderCreateRequest",
+      "service_method": "saleOrdersService.create",
+      "endpoint": "POST /api/v1/commercial/sale-orders"
+    },
+    {
+      "domain": "salesRoutes",
+      "label": "Rutas de Venta - Maestro",
+      "ts_file": "salesRoutes.types.ts",
+      "ts_interface": "IBSalesRoute",
+      "backend_schema": "SalesRouteResponse",
+      "service_method": "salesRoutesService.getAll",
+      "endpoint": "GET /api/v1/commercial/sales-routes"
+    },
+    {
+      "domain": "salesRoutes",
+      "label": "Rutas de Venta - Alta",
+      "ts_file": "salesRoutes.types.ts",
+      "ts_interface": "IBSalesRouteCreate",
+      "backend_schema": "SalesRouteCreateRequest",
+      "service_method": "salesRoutesService.create",
+      "endpoint": "POST /api/v1/commercial/sales-routes"
+    },
+    {
+      "domain": "currencies",
+      "label": "Monedas - Maestro",
+      "ts_file": "currencies.types.ts",
+      "ts_interface": "IBCurrency",
+      "backend_schema": "CurrencyResponse",
+      "service_method": "currenciesService.getAll",
+      "endpoint": "GET /api/v1/common/currencies"
+    },
+    {
+      "domain": "currencies",
+      "label": "Monedas - Alta",
+      "ts_file": "currencies.types.ts",
+      "ts_interface": "IBCurrencyCreation",
+      "backend_schema": "CurrencyCreateRequest",
+      "service_method": "currenciesService.create",
+      "endpoint": "POST /api/v1/common/currencies"
+    },
+    {
+      "domain": "currencies",
+      "label": "Monedas - Edición",
+      "ts_file": "currencies.types.ts",
+      "ts_interface": "IBCurrencyUpdate",
+      "backend_schema": "CurrencyUpdateRequest",
+      "service_method": "currenciesService.update",
+      "endpoint": "PATCH /api/v1/common/currencies/{code}"
+    },
+    {
+      "domain": "paymentMethods",
+      "label": "Métodos de Pago - Maestro",
+      "ts_file": "paymentMethod.types.ts",
+      "ts_interface": "IBPaymentMethod",
+      "backend_schema": "src__api__routes__partners__partners__PaymentMethodResponse",
+      "service_method": "paymentMethodsService.getAll",
+      "endpoint": "GET /api/v1/partners/payment-methods"
+    },
+    {
+      "domain": "paymentMethods",
+      "label": "Métodos de Pago - Alta",
+      "ts_file": "paymentMethod.types.ts",
+      "ts_interface": "IBPaymentMethodCreation",
+      "backend_schema": "src__api__routes__partners__partners__PaymentMethodCreateRequest",
+      "service_method": "paymentMethodsService.create",
+      "endpoint": "POST /api/v1/partners/payment-methods"
+    },
+    {
+      "domain": "paymentMethods",
+      "label": "Métodos de Pago - Edición",
+      "ts_file": "paymentMethod.types.ts",
+      "ts_interface": "IBPaymentMethodUpdate",
+      "backend_schema": "src__api__routes__partners__partners__PaymentMethodUpdateRequest",
+      "service_method": "paymentMethodsService.update",
+      "endpoint": "PATCH /api/v1/partners/payment-methods/{payment_method_id}"
+    },
+    {
+      "domain": "paymentTerms",
+      "label": "Términos de Pago - Maestro",
+      "ts_file": "paymentTerms.types.ts",
+      "ts_interface": "IBPaymentTerm",
+      "backend_schema": "PaymentTermResponse",
+      "service_method": "paymentTermsService.getAll",
+      "endpoint": "GET /api/v1/partners/payment-terms"
+    },
+    {
+      "domain": "paymentTerms",
+      "label": "Términos de Pago - Alta",
+      "ts_file": "paymentTerms.types.ts",
+      "ts_interface": "IBPaymentTermCreation",
+      "backend_schema": "PaymentTermCreateRequest",
+      "service_method": "paymentTermsService.create",
+      "endpoint": "POST /api/v1/partners/payment-terms"
+    },
+    {
+      "domain": "paymentTerms",
+      "label": "Términos de Pago - Edición",
+      "ts_file": "paymentTerms.types.ts",
+      "ts_interface": "IBPaymentTermUpdate",
+      "backend_schema": "PaymentTermUpdateRequest",
+      "service_method": "paymentTermsService.update",
+      "endpoint": "PATCH /api/v1/partners/payment-terms/{payment_term_id}"
+    },
+    {
+      "domain": "taxCategories",
+      "label": "Categorías Tributarias - Maestro",
+      "ts_file": "taxCategories.types.ts",
+      "ts_interface": "IBTaxCategory",
+      "backend_schema": "PartnerTaxCategoryResponse",
+      "service_method": "taxCategoriesService.getAll",
+      "endpoint": "GET /api/v1/partners/tax-categories"
+    },
+    {
+      "domain": "taxCategories",
+      "label": "Categorías Tributarias - Alta",
+      "ts_file": "taxCategories.types.ts",
+      "ts_interface": "IBTaxCategoryCreation",
+      "backend_schema": "PartnerTaxCategoryCreateRequest",
+      "service_method": "taxCategoriesService.create",
+      "endpoint": "POST /api/v1/partners/tax-categories"
+    },
+    {
+      "domain": "taxCategories",
+      "label": "Categorías Tributarias - Edición",
+      "ts_file": "taxCategories.types.ts",
+      "ts_interface": "IBTaxCategoryUpdate",
+      "backend_schema": "PartnerTaxCategoryUpdateRequest",
+      "service_method": "taxCategoriesService.update",
+      "endpoint": "PATCH /api/v1/partners/tax-categories/{country_tax_scheme_id}"
+    },
+    {
+      "domain": "cities",
+      "label": "Ciudades - Maestro",
+      "ts_file": "cities.types.ts",
+      "ts_interface": "IBCitie",
+      "backend_schema": "CityResponse",
+      "service_method": "citiesService.getAll",
+      "endpoint": "GET /api/v1/partners/cities"
+    },
+    {
+      "domain": "cities",
+      "label": "Ciudades - Alta",
+      "ts_file": "cities.types.ts",
+      "ts_interface": "IBCitieCreation",
+      "backend_schema": "CityCreateRequest",
+      "service_method": "citiesService.create",
+      "endpoint": "POST /api/v1/partners/cities"
+    },
+    {
+      "domain": "cities",
+      "label": "Ciudades - Edición",
+      "ts_file": "cities.types.ts",
+      "ts_interface": "IBCitieUpdate",
+      "backend_schema": "CityUpdateRequest",
+      "service_method": "citiesService.update",
+      "endpoint": "PATCH /api/v1/partners/cities/{id}"
+    },
+    {
+      "domain": "countries",
+      "label": "Países - Maestro",
+      "ts_file": "countries.types.ts",
+      "ts_interface": "IBCountry",
+      "backend_schema": "CountryResponse",
+      "service_method": "countriesService.getAll",
+      "endpoint": "GET /api/v1/partners/countries"
+    },
+    {
+      "domain": "countries",
+      "label": "Países - Alta",
+      "ts_file": "countries.types.ts",
+      "ts_interface": "IBCountryCreation",
+      "backend_schema": "CountryCreateRequest",
+      "service_method": "countriesService.create",
+      "endpoint": "POST /api/v1/partners/countries"
+    },
+    {
+      "domain": "countries",
+      "label": "Países - Edición",
+      "ts_file": "countries.types.ts",
+      "ts_interface": "IBCountryUpdate",
+      "backend_schema": "CountryUpdateRequest",
+      "service_method": "countriesService.update",
+      "endpoint": "PATCH /api/v1/partners/countries/{code}"
+    },
+    {
+      "domain": "states",
+      "label": "Provincias / Estados - Maestro",
+      "ts_file": "states.types.ts",
+      "ts_interface": "IBState",
+      "backend_schema": "StateResponse",
+      "service_method": "statesService.getAll",
+      "endpoint": "GET /api/v1/partners/states"
+    },
+    {
+      "domain": "states",
+      "label": "Provincias / Estados - Alta",
+      "ts_file": "states.types.ts",
+      "ts_interface": "IBStateCreation",
+      "backend_schema": "StateCreateRequest",
+      "service_method": "statesService.create",
+      "endpoint": "POST /api/v1/partners/states"
+    },
+    {
+      "domain": "states",
+      "label": "Provincias / Estados - Edición",
+      "ts_file": "states.types.ts",
+      "ts_interface": "IBStateUpdate",
+      "backend_schema": "StateUpdateRequest",
+      "service_method": "statesService.update",
+      "endpoint": "PATCH /api/v1/partners/states/{id}"
+    },
+    {
+      "domain": "providers",
+      "label": "Proveedores - Maestro",
+      "ts_file": "providers.types.ts",
+      "ts_interface": "IBProvider",
+      "backend_schema": "PartnerResponse",
+      "service_method": "providerService.getAll / getById",
+      "endpoint": "GET /api/v1/partners | GET /api/v1/partners/{partner_id}"
+    },
+    {
+      "domain": "providers",
+      "label": "Proveedores - Alta",
+      "ts_file": "providers.types.ts",
+      "ts_interface": "IBProviderCreation",
+      "backend_schema": "PartnerCreateRequest",
+      "service_method": "providerService.create",
+      "endpoint": "POST /api/v1/partners"
+    },
+    {
+      "domain": "providers",
+      "label": "Proveedores - Edición",
+      "ts_file": "providers.types.ts",
+      "ts_interface": "IBProviderUpdate",
+      "backend_schema": "PartnerUpdateRequest",
+      "service_method": "providerService.update",
+      "endpoint": "PATCH /api/v1/partners/{partner_id}"
+    },
+    {
+      "domain": "commercialPlatforms",
+      "label": "Plataformas Comerciales - Maestro",
+      "ts_file": "commercialPlatforms.types.ts",
+      "ts_interface": "IBCommercialPlatform",
+      "backend_schema": "CommercialPlatformResponse",
+      "service_method": "commercialPlatformsService.getAll",
+      "endpoint": "GET /api/v1/partners/commercial-platforms"
+    },
+    {
+      "domain": "commercialPlatforms",
+      "label": "Plataformas Comerciales - Alta",
+      "ts_file": "commercialPlatforms.types.ts",
+      "ts_interface": "IBCommercialPlatformCreate",
+      "backend_schema": "CommercialPlatformCreate",
+      "service_method": "commercialPlatformsService.create",
+      "endpoint": "POST /api/v1/partners/commercial-platforms"
+    },
+    {
+      "domain": "customers",
+      "label": "Clientes - Maestro",
+      "ts_file": "customers.types.ts",
+      "ts_interface": "IBCustomer",
+      "backend_schema": "PartnerResponse",
+      "service_method": "customersService.getAll / getById",
+      "endpoint": "GET /api/v1/partners/customers | GET /api/v1/partners/customers/{customer_id}"
+    },
+    {
+      "domain": "customers",
+      "label": "Clientes - Alta",
+      "ts_file": "customers.types.ts",
+      "ts_interface": "IBCustomerCreate",
+      "backend_schema": "PartnerCreateRequest",
+      "service_method": "customersService.create",
+      "endpoint": "POST /api/v1/partners/customer"
+    },
+    {
+      "domain": "customers",
+      "label": "Clientes - Edición",
+      "ts_file": "customers.types.ts",
+      "ts_interface": "IBCustomerUpdate",
+      "backend_schema": "CustomerUpdateRequest",
+      "service_method": "customersService.update",
+      "endpoint": "PATCH /api/v1/partners/customers/{customer_id}"
+    },
+    {
+      "domain": "customers",
+      "label": "Clientes - Detalle Completo",
+      "ts_file": "customers.types.ts",
+      "ts_interface": "IBCustomerFull",
+      "backend_schema": "CustomerFullResponse",
+      "service_method": "customersService.getByIdFull",
+      "endpoint": "GET /api/v1/partners/customers/{customer_id}/full"
+    },
+    {
+      "domain": "accounting",
+      "label": "Cajas Registradoras - Maestro",
+      "ts_file": "accountant/cashRegisters.types.ts",
+      "ts_interface": "IBCashRegister",
+      "backend_schema": "CashRegisterResponse",
+      "service_method": "cashRegistersService.getAll",
+      "endpoint": "GET /api/v1/payments/cash-registers"
+    },
+    {
+      "domain": "accounting",
+      "label": "Cajas Registradoras - Alta",
+      "ts_file": "accountant/cashRegisters.types.ts",
+      "ts_interface": "IBCashRegisterCreation",
+      "backend_schema": "CashRegisterCreateRequest",
+      "service_method": "cashRegistersService.create",
+      "endpoint": "POST /api/v1/payments/cash-registers"
+    },
+    {
+      "domain": "accounting",
+      "label": "Cajas Registradoras - Edición",
+      "ts_file": "accountant/cashRegisters.types.ts",
+      "ts_interface": "IBCashRegisterUpdate",
+      "backend_schema": "CashRegisterUpdateRequest",
+      "service_method": "cashRegistersService.update",
+      "endpoint": "PATCH /api/v1/payments/cash-registers/{id}"
+    },
+    {
+      "domain": "accounting",
+      "label": "Asientos Contables - Maestro",
+      "ts_file": "accountant/journals.types.ts",
+      "ts_interface": "IBJournal",
+      "backend_schema": "GeneralJournalResponse",
+      "service_method": "journalsService.getAll",
+      "endpoint": "GET /api/v1/accounting/gl/journals"
+    },
+    {
+      "domain": "accounting",
+      "label": "Asientos Contables - Alta",
+      "ts_file": "accountant/journals.types.ts",
+      "ts_interface": "IBJournalEntry",
+      "backend_schema": "ManualJournalEntryCreateRequest",
+      "service_method": "journalsService.create",
+      "endpoint": "POST /api/v1/accounting/gl/journals"
+    },
+    {
+      "domain": "accounting",
+      "label": "Períodos Contables - Maestro",
+      "ts_file": "accountant/periods.types.ts",
+      "ts_interface": "IBPeriod",
+      "backend_schema": "FiscalPeriodResponse",
+      "service_method": "periodsService.getAll",
+      "endpoint": "GET /api/v1/accounting/gl/periods"
+    },
+    {
+      "domain": "accounting",
+      "label": "Períodos Contables - Alta",
+      "ts_file": "accountant/periods.types.ts",
+      "ts_interface": "IBPeriodCreation",
+      "backend_schema": "FiscalPeriodCreateRequest",
+      "service_method": "periodsService.create",
+      "endpoint": "POST /api/v1/accounting/gl/periods"
+    },
+    {
+      "domain": "accounting",
+      "label": "Períodos Contables - Edición",
+      "ts_file": "accountant/periods.types.ts",
+      "ts_interface": "IBPeriodUpdate",
+      "backend_schema": "FiscalPeriodUpdateRequest",
+      "service_method": "periodsService.update",
+      "endpoint": "PATCH /api/v1/accounting/gl/periods/{period_id}"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Clientes - Maestro",
+      "ts_file": "audiences/customerClusters.types.ts",
+      "ts_interface": "IBCustomerCluster",
+      "backend_schema": "CustomerClusterResponse",
+      "service_method": "customerClustersService.getAll",
+      "endpoint": "GET /api/v1/commercial/customer-clusters"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Clientes - Alta",
+      "ts_file": "audiences/customerClusters.types.ts",
+      "ts_interface": "IBCustomerClusterCreate",
+      "backend_schema": "CustomerClusterCreateRequest",
+      "service_method": "customerClustersService.create",
+      "endpoint": "POST /api/v1/commercial/customer-clusters"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Clientes - Edición",
+      "ts_file": "audiences/customerClusters.types.ts",
+      "ts_interface": "IBCustomerClusterUpdate",
+      "backend_schema": "CustomerClusterUpdateRequest",
+      "service_method": "customerClustersService.update",
+      "endpoint": "PATCH /api/v1/commercial/customer-clusters/{cluster_id}"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Clientes - Miembro",
+      "ts_file": "audiences/customerClusters.types.ts",
+      "ts_interface": "IBCustomerClusterMember",
+      "backend_schema": "CustomerClusterMemberResponse",
+      "service_method": "customerClustersService.getMembers",
+      "endpoint": "GET /api/v1/commercial/customer-clusters/{cluster_id}/members"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Ítems - Maestro",
+      "ts_file": "audiences/itemClusters.types.ts",
+      "ts_interface": "IBItemCluster",
+      "backend_schema": "ItemClusterResponse",
+      "service_method": "itemClustersService.getAll",
+      "endpoint": "GET /api/v1/commercial/item-clusters"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Ítems - Alta",
+      "ts_file": "audiences/itemClusters.types.ts",
+      "ts_interface": "IBItemClusterCreate",
+      "backend_schema": "ItemClusterCreateRequest",
+      "service_method": "itemClustersService.create",
+      "endpoint": "POST /api/v1/commercial/item-clusters"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Ítems - Edición",
+      "ts_file": "audiences/itemClusters.types.ts",
+      "ts_interface": "IBItemClusterUpdate",
+      "backend_schema": "ItemClusterUpdateRequest",
+      "service_method": "itemClustersService.update",
+      "endpoint": "PATCH /api/v1/commercial/item-clusters/{cluster_id}"
+    },
+    {
+      "domain": "audiences",
+      "label": "Clusters de Ítems - Miembro",
+      "ts_file": "audiences/itemClusters.types.ts",
+      "ts_interface": "IBItemClusterMember",
+      "backend_schema": "ItemClusterMemberResponse",
+      "service_method": "itemClustersService.getMembers",
+      "endpoint": "GET /api/v1/commercial/item-clusters/{cluster_id}/members"
+    },
+    {
+      "domain": "audiences",
+      "label": "Reglas de Segmentación - Previsualización",
+      "ts_file": "audiences/clusterRules.types.ts",
+      "ts_interface": "IBClusterPreviewRequest",
+      "backend_schema": "CustomerClusterPreviewRequest",
+      "service_method": "customerClustersService.preview",
+      "endpoint": "POST /api/v1/commercial/customer-clusters/preview"
+    },
+    {
+      "domain": "audiences",
+      "label": "Reglas de Segmentación - Resultado Previsualización",
+      "ts_file": "audiences/clusterRules.types.ts",
+      "ts_interface": "IBClusterPreviewResult",
+      "backend_schema": "CustomerClusterPreviewResponse",
+      "service_method": "customerClustersService.preview",
+      "endpoint": "POST /api/v1/commercial/customer-clusters/preview"
+    },
+    {
+      "domain": "audiences",
+      "label": "Reglas de Segmentación - Refresco",
+      "ts_file": "audiences/clusterRules.types.ts",
+      "ts_interface": "IBClusterRefreshResult",
+      "backend_schema": "ClusterRefreshResponse",
+      "service_method": "customerClustersService.refresh",
+      "endpoint": "POST /api/v1/commercial/customer-clusters/{cluster_id}/refresh"
+    },
+    {
+      "domain": "audiences",
+      "label": "Reglas de Segmentación - Resumen",
+      "ts_file": "audiences/clusterRules.types.ts",
+      "ts_interface": "IBClusterSummary",
+      "backend_schema": "CustomerClusterSummaryResponse",
+      "service_method": "customerClustersService.summary",
+      "endpoint": "GET /api/v1/commercial/customer-clusters/{cluster_id}/summary"
+    },
+    {
+      "domain": "codelists",
+      "label": "Listas de Códigos - Categorías Tributarias",
+      "ts_file": "codelists.types.ts",
+      "ts_interface": "IBCodelistTaxCategory",
+      "backend_schema": "CodelistTaxCategoryResponse",
+      "service_method": "codelistsService.getTaxCategories",
+      "endpoint": "GET /api/v1/documents/codelists/tax-categories"
+    },
+    {
+      "domain": "consignments",
+      "label": "Consignaciones - Maestro",
+      "ts_file": "consignments.types.ts",
+      "ts_interface": "IBConsignment",
+      "backend_schema": "ItemConsignmentResponse",
+      "service_method": "consignmentsService.getAll",
+      "endpoint": "GET /api/v1/wms/item-consignments"
+    },
+    {
+      "domain": "consignments",
+      "label": "Consignaciones - Alta",
+      "ts_file": "consignments.types.ts",
+      "ts_interface": "IBConsignmentCreateRequest",
+      "backend_schema": "ItemConsignmentCreateRequest",
+      "service_method": "consignmentsService.create",
+      "endpoint": "POST /api/v1/wms/item-consignments"
+    },
+    {
+      "domain": "consignments",
+      "label": "Consignaciones - Devolución",
+      "ts_file": "consignments.types.ts",
+      "ts_interface": "IBConsignmentReturnRequest",
+      "backend_schema": "ItemConsignmentReturnRequest",
+      "service_method": "consignmentsService.return",
+      "endpoint": "POST /api/v1/wms/item-consignments/{consignment_id}/return"
+    },
+    {
+      "domain": "documents",
+      "label": "Documentos - Maestro",
+      "ts_file": "documents.types.ts",
+      "ts_interface": "IBDocument",
+      "backend_schema": "DocumentListItemResponse",
+      "service_method": "documentsService.getAll",
+      "endpoint": "GET /api/v1/documents/"
+    },
+    {
+      "domain": "localization",
+      "label": "Localización Fiscal - Esquemas",
+      "ts_file": "localization.types.ts",
+      "ts_interface": "IBTaxScheme",
+      "backend_schema": "LocalizationTaxSchemeResponse",
+      "service_method": "localizationService.getTaxSchemes",
+      "endpoint": "GET /api/v1/documents/localization/tax-schemes"
+    },
+    {
+      "domain": "localization",
+      "label": "Localización Fiscal - Autoridades",
+      "ts_file": "localization.types.ts",
+      "ts_interface": "IBTaxAuthorityScheme",
+      "backend_schema": "TaxAuthoritySchemeResponse",
+      "service_method": "localizationService.getTaxAuthoritySchemes",
+      "endpoint": "GET /api/v1/documents/localization/tax-authority-schemes"
+    },
+    {
+      "domain": "localization",
+      "label": "Localización Fiscal - Identidad",
+      "ts_file": "localization.types.ts",
+      "ts_interface": "IBIdentityScheme",
+      "backend_schema": "LocalizationIdentitySchemeResponse",
+      "service_method": "localizationService.getIdentitySchemes",
+      "endpoint": "GET /api/v1/documents/localization/identity-schemes"
+    }
+  ]
+}
