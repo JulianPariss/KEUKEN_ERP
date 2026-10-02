@@ -1,9 +1,9 @@
 # Reporte de Auditoria y Revalidacion de Contratos (Frontend vs Backend)
 
-- **Fecha:** 2026-09-30 18:14:24
+- **Fecha:** 2026-10-02 17:57:42
 - **Especificacion OpenAPI (Backend):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\contracts.json`
 - **Mapeos Utilizados:** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\audit-pairs.json`
-- **Total Modelos Auditados:** 175
+- **Total Modelos Auditados:** 188
 
 ---
 
@@ -11,10 +11,10 @@
 
 | Codigo | Categoria de Hallazgo | Total Casos |
 | :---: | :--- | :---: |
-| [E1] | **Campos Faltantes en Frontend** | **20** |
-| [E2] | **Campos Sobrantes o Deprecados** | **11** |
+| [E1] | **Campos Faltantes en Frontend** | **0** |
+| [E2] | **Campos Sobrantes o Deprecados** | **0** |
 | [E3] | **Discrepancias de Tipo** | **0** |
-| [E4] | **Nullability & Optionality Mismatch** | **8** |
+| [E4] | **Nullability & Optionality Mismatch** | **0** |
 
 ---
 
@@ -172,22 +172,22 @@
 | accounting | Cajas Registradoras - Maestro | `IBCashRegister` | `CashRegisterResponse` | [OK] |
 | accounting | Cajas Registradoras - Alta | `IBCashRegisterCreation` | `CashRegisterCreateRequest` | [OK] |
 | accounting | Cajas Registradoras - Edición | `IBCashRegisterUpdate` | `CashRegisterUpdateRequest` | [OK] |
-| accounting | Asientos Contables - Maestro | `IBJournal` | `GeneralJournalResponse` | [DISCREPANCIAS] (E1:4 E2:7 E3:0 E4:0) |
-| accounting | Asientos Contables - Alta | `IBJournalEntry` | `ManualJournalEntryCreateRequest` | [DISCREPANCIAS] (E1:1 E2:0 E3:0 E4:2) |
-| accounting | Períodos Contables - Maestro | `IBPeriod` | `FiscalPeriodResponse` | [DISCREPANCIAS] (E1:4 E2:0 E3:0 E4:0) |
+| accounting | Asientos Contables - Maestro | `IBJournal` | `JournalListItem` | [OK] |
+| accounting | Asientos Contables - Alta | `IBJournalEntry` | `ManualJournalEntryCreateRequest` | [OK] |
+| accounting | Períodos Contables - Maestro | `IBPeriod` | `FiscalPeriodResponse` | [OK] |
 | accounting | Períodos Contables - Alta | `IBPeriodCreation` | `FiscalPeriodCreateRequest` | [OK] |
 | accounting | Períodos Contables - Edición | `IBPeriodUpdate` | `FiscalPeriodUpdateRequest` | [OK] |
-| audiences | Clusters de Clientes - Maestro | `IBCustomerCluster` | `CustomerClusterResponse` | [DISCREPANCIAS] (E1:0 E2:2 E3:0 E4:1) |
-| audiences | Clusters de Clientes - Alta | `IBCustomerClusterCreate` | `CustomerClusterCreateRequest` | [DISCREPANCIAS] (E1:2 E2:0 E3:0 E4:0) |
-| audiences | Clusters de Clientes - Edición | `IBCustomerClusterUpdate` | `CustomerClusterUpdateRequest` | [DISCREPANCIAS] (E1:2 E2:0 E3:0 E4:0) |
-| audiences | Clusters de Clientes - Miembro | `IBCustomerClusterMember` | `CustomerClusterMemberResponse` | [DISCREPANCIAS] (E1:1 E2:0 E3:0 E4:2) |
-| audiences | Clusters de Ítems - Maestro | `IBItemCluster` | `ItemClusterResponse` | [DISCREPANCIAS] (E1:0 E2:2 E3:0 E4:1) |
-| audiences | Clusters de Ítems - Alta | `IBItemClusterCreate` | `ItemClusterCreateRequest` | [DISCREPANCIAS] (E1:2 E2:0 E3:0 E4:0) |
-| audiences | Clusters de Ítems - Edición | `IBItemClusterUpdate` | `ItemClusterUpdateRequest` | [DISCREPANCIAS] (E1:2 E2:0 E3:0 E4:0) |
-| audiences | Clusters de Ítems - Miembro | `IBItemClusterMember` | `ItemClusterMemberResponse` | [DISCREPANCIAS] (E1:1 E2:0 E3:0 E4:2) |
+| audiences | Clusters de Clientes - Maestro | `IBCustomerCluster` | `CustomerClusterResponse` | [OK] |
+| audiences | Clusters de Clientes - Alta | `IBCustomerClusterCreate` | `CustomerClusterCreateRequest` | [OK] |
+| audiences | Clusters de Clientes - Edición | `IBCustomerClusterUpdate` | `CustomerClusterUpdateRequest` | [OK] |
+| audiences | Clusters de Clientes - Miembro | `IBCustomerClusterMember` | `CustomerClusterMemberResponse` | [OK] |
+| audiences | Clusters de Ítems - Maestro | `IBItemCluster` | `ItemClusterResponse` | [OK] |
+| audiences | Clusters de Ítems - Alta | `IBItemClusterCreate` | `ItemClusterCreateRequest` | [OK] |
+| audiences | Clusters de Ítems - Edición | `IBItemClusterUpdate` | `ItemClusterUpdateRequest` | [OK] |
+| audiences | Clusters de Ítems - Miembro | `IBItemClusterMember` | `ItemClusterMemberResponse` | [OK] |
 | audiences | Reglas de Segmentación - Previsualización | `IBClusterPreviewRequest` | `CustomerClusterPreviewRequest` | [OK] |
 | audiences | Reglas de Segmentación - Resultado Previsualización | `IBClusterPreviewResult` | `CustomerClusterPreviewResponse` | [OK] |
-| audiences | Reglas de Segmentación - Refresco | `IBClusterRefreshResult` | `ClusterRefreshResponse` | [DISCREPANCIAS] (E1:1 E2:0 E3:0 E4:0) |
+| audiences | Reglas de Segmentación - Refresco | `IBClusterRefreshResult` | `ClusterRefreshResponse` | [OK] |
 | audiences | Reglas de Segmentación - Resumen | `IBClusterSummary` | `CustomerClusterSummaryResponse` | [OK] |
 | codelists | Listas de Códigos - Categorías Tributarias | `IBCodelistTaxCategory` | `CodelistTaxCategoryResponse` | [OK] |
 | consignments | Consignaciones - Maestro | `IBConsignment` | `ItemConsignmentResponse` | [OK] |
@@ -197,203 +197,21 @@
 | localization | Localización Fiscal - Esquemas | `IBTaxScheme` | `LocalizationTaxSchemeResponse` | [OK] |
 | localization | Localización Fiscal - Autoridades | `IBTaxAuthorityScheme` | `TaxAuthoritySchemeResponse` | [OK] |
 | localization | Localización Fiscal - Identidad | `IBIdentityScheme` | `LocalizationIdentitySchemeResponse` | [OK] |
+| commercialPlatforms | Plataformas Comerciales - Edición | `IBCommercialPlatformUpdate` | `CommercialPlatformUpdate` | [OK] |
+| uom | Categorías de UoM - Alta | `IBUoMCategoryCreate` | `UoMCategoryCreateRequest` | [OK] |
+| uom | Categorías de UoM - Edición | `IBUoMCategoryUpdate` | `UoMCategoryUpdateRequest` | [OK] |
+| userContext | Roles y Claves API - Alta | `IBRoleCreate` | `ApiKeyCreateRequest` | [OK] |
+| userContext | Roles y Claves API - Edición | `IBRoleUpdate` | `ApiKeyPatchRequest` | [OK] |
+| metadata | Metadatos - Atributos Alta | `IBMetadataAttributeCreate` | `AttributeCreateRequest` | [OK] |
+| metadata | Metadatos - Atributos Edición | `IBMetadataAttributeUpdate` | `AttributeUpdateRequest` | [OK] |
+| metadata | Metadatos - Grupos Alta | `IBMetadataGroupCreate` | `AttributeGroupCreateRequest` | [OK] |
+| metadata | Metadatos - Grupos Edición | `IBMetadataGroupUpdate` | `AttributeGroupUpdateRequest` | [OK] |
+| metadata | Metadatos - Valores Consulta | `IBEntityMetadataResponse` | `EntityMetadataResponse` | [OK] |
+| metadata | Metadatos - Valores Guardado | `IBEntityMetadataRequest` | `EntityMetadataRequest` | [OK] |
+| priceLists | Listas de Precios - Edición | `IBPriceListUpdate` | `PricelistUpdateRequest` | [OK] |
+| priceLists | Listas de Precios - Ítems Masivo | `IBPriceListBulkUpdate` | `PricelistItemsBulkRequest` | [OK] |
 
 ---
 
 ## 3. Desglose Detallado por Entidad con Discrepancias
-
-### Asientos Contables - Maestro
-
-- **Frontend:** `IBJournal` (`packages/api-contracts/src/erp/backendTypes/accountant/journals.types.ts`)
-- **Backend:** `GeneralJournalResponse`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `company_id` | `string` | Si | No |
-| `date_from` | `string` | Si | No |
-| `date_to` | `string` | Si | No |
-| `items` | `array` | Si | No |
-
-#### [E2] Campos Sobrantes o Deprecados en Frontend
-| Propiedad Frontend | Tipo Frontend |
-| :--- | :--- |
-| `id` | `string` |
-| `name` | `string` |
-| `code` | `string` |
-| `type` | `string` |
-| `active` | `boolean` |
-| `default_account_id` | `string` |
-| `currency_id` | `string` |
-
----
-
-### Asientos Contables - Alta
-
-- **Frontend:** `IBJournalEntry` (`packages/api-contracts/src/erp/backendTypes/accountant/journals.types.ts`)
-- **Backend:** `ManualJournalEntryCreateRequest`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `document_type_id` | `string` | No | Si |
-
-#### [E4] Nullability & Optionality Mismatch
-| Propiedad | Conflicto | Frontend | Backend |
-| :--- | :--- | :--- | :--- |
-| `ref` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-| `date` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-
----
-
-### Períodos Contables - Maestro
-
-- **Frontend:** `IBPeriod` (`packages/api-contracts/src/erp/backendTypes/accountant/periods.types.ts`)
-- **Backend:** `FiscalPeriodResponse`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `company_id` | `string` | Si | No |
-| `is_opening_period` | `boolean` | No | No |
-| `created_at` | `string` | Si | No |
-| `warnings` | `array` | No | No |
-
----
-
-### Clusters de Clientes - Maestro
-
-- **Frontend:** `IBCustomerCluster` (`packages/api-contracts/src/erp/backendTypes/audiences/customerClusters.types.ts`)
-- **Backend:** `CustomerClusterResponse`
-
-#### [E2] Campos Sobrantes o Deprecados en Frontend
-| Propiedad Frontend | Tipo Frontend |
-| :--- | :--- |
-| `deleted_at` | `string` |
-| `deleted_by_name` | `string` |
-
-#### [E4] Nullability & Optionality Mismatch
-| Propiedad | Conflicto | Frontend | Backend |
-| :--- | :--- | :--- | :--- |
-| `excluded_count` | Backend lo exige obligatorio no-nulo, pero Frontend lo permite opcional/nulo | `optional=True, nullable=False` | `required=True, nullable=False` |
-
----
-
-### Clusters de Clientes - Alta
-
-- **Frontend:** `IBCustomerClusterCreate` (`packages/api-contracts/src/erp/backendTypes/audiences/customerClusters.types.ts`)
-- **Backend:** `CustomerClusterCreateRequest`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `metadata` | `object` | No | No |
-| `active` | `boolean` | No | No |
-
----
-
-### Clusters de Clientes - Edición
-
-- **Frontend:** `IBCustomerClusterUpdate` (`packages/api-contracts/src/erp/backendTypes/audiences/customerClusters.types.ts`)
-- **Backend:** `CustomerClusterUpdateRequest`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `kind` | `string` | No | Si |
-| `metadata` | `object` | No | Si |
-
----
-
-### Clusters de Clientes - Miembro
-
-- **Frontend:** `IBCustomerClusterMember` (`packages/api-contracts/src/erp/backendTypes/audiences/customerClusters.types.ts`)
-- **Backend:** `CustomerClusterMemberResponse`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `excluded_at` | `string` | No | Si |
-
-#### [E4] Nullability & Optionality Mismatch
-| Propiedad | Conflicto | Frontend | Backend |
-| :--- | :--- | :--- | :--- |
-| `customer_name` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-| `customer_ref` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-
----
-
-### Clusters de Ítems - Maestro
-
-- **Frontend:** `IBItemCluster` (`packages/api-contracts/src/erp/backendTypes/audiences/itemClusters.types.ts`)
-- **Backend:** `ItemClusterResponse`
-
-#### [E2] Campos Sobrantes o Deprecados en Frontend
-| Propiedad Frontend | Tipo Frontend |
-| :--- | :--- |
-| `deleted_at` | `string` |
-| `deleted_by_name` | `string` |
-
-#### [E4] Nullability & Optionality Mismatch
-| Propiedad | Conflicto | Frontend | Backend |
-| :--- | :--- | :--- | :--- |
-| `excluded_count` | Backend lo exige obligatorio no-nulo, pero Frontend lo permite opcional/nulo | `optional=True, nullable=False` | `required=True, nullable=False` |
-
----
-
-### Clusters de Ítems - Alta
-
-- **Frontend:** `IBItemClusterCreate` (`packages/api-contracts/src/erp/backendTypes/audiences/itemClusters.types.ts`)
-- **Backend:** `ItemClusterCreateRequest`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `metadata` | `object` | No | No |
-| `active` | `boolean` | No | No |
-
----
-
-### Clusters de Ítems - Edición
-
-- **Frontend:** `IBItemClusterUpdate` (`packages/api-contracts/src/erp/backendTypes/audiences/itemClusters.types.ts`)
-- **Backend:** `ItemClusterUpdateRequest`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `kind` | `string` | No | Si |
-| `metadata` | `object` | No | Si |
-
----
-
-### Clusters de Ítems - Miembro
-
-- **Frontend:** `IBItemClusterMember` (`packages/api-contracts/src/erp/backendTypes/audiences/itemClusters.types.ts`)
-- **Backend:** `ItemClusterMemberResponse`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `excluded_at` | `string` | No | Si |
-
-#### [E4] Nullability & Optionality Mismatch
-| Propiedad | Conflicto | Frontend | Backend |
-| :--- | :--- | :--- | :--- |
-| `item_name` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-| `item_ref` | Backend envía null o es opcional, pero Frontend lo define obligatorio no-nulo | `string (non-null, required)` | `string (nullable=True)` |
-
----
-
-### Reglas de Segmentación - Refresco
-
-- **Frontend:** `IBClusterRefreshResult` (`packages/api-contracts/src/erp/backendTypes/audiences/clusterRules.types.ts`)
-- **Backend:** `ClusterRefreshResponse`
-
-#### [E1] Campos Faltantes en Frontend
-| Propiedad Backend | Tipo OpenAPI | Requerido | Nullable |
-| :--- | :--- | :---: | :---: |
-| `excluded_count` | `integer` | Si | No |
-
----
 

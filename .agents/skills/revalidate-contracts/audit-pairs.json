@@ -748,7 +748,7 @@
       "ts_interface": "IBSerialNumber",
       "backend_schema": "SerialNumberResponse",
       "service_method": "serialNumbersService.getAll",
-      "endpoint": "GET /api/v1/wms/serial-numbers"
+      "endpoint": "GET /api/v1/wms/items/{item_id}/serial-numbers | GET /api/v1/wms/serial-numbers/{serial_number}"
     },
     {
       "domain": "serialNumbers",
@@ -919,7 +919,7 @@
       "ts_interface": "IBLogisticProfile",
       "backend_schema": "LogisticsProfileResponse",
       "service_method": "logisticProfileService.getAll",
-      "endpoint": "GET /api/v1/products/handling/logistic-profiles"
+      "endpoint": "GET /api/v1/products/handling/logistics-profiles"
     },
     {
       "domain": "logisticProfile",
@@ -928,7 +928,7 @@
       "ts_interface": "IBLogisticProfileCreate",
       "backend_schema": "LogisticsProfileCreate",
       "service_method": "logisticProfileService.create",
-      "endpoint": "POST /api/v1/products/handling/logistic-profiles"
+      "endpoint": "POST /api/v1/products/handling/logistics-profiles"
     },
     {
       "domain": "logisticProfile",
@@ -937,7 +937,7 @@
       "ts_interface": "IBLogisticProfileUpdate",
       "backend_schema": "LogisticsProfilePatch",
       "service_method": "logisticProfileService.update",
-      "endpoint": "PATCH /api/v1/products/handling/logistic-profiles/{profile_id}"
+      "endpoint": "PATCH /api/v1/products/handling/logistics-profiles/{profile_id}"
     },
     {
       "domain": "operativeProfile",
@@ -946,7 +946,7 @@
       "ts_interface": "IBOperativeProfile",
       "backend_schema": "OperationalProfileResponse",
       "service_method": "operativeProfileService.getAll",
-      "endpoint": "GET /api/v1/products/handling/operative-profiles"
+      "endpoint": "GET /api/v1/wms/operational-profiles"
     },
     {
       "domain": "priceLists",
@@ -1008,8 +1008,8 @@
       "ts_file": "priceLists.types.ts",
       "ts_interface": "IBPriceListItemCreate",
       "backend_schema": "PricelistItemCreateRequest",
-      "service_method": "priceListsService.createItem",
-      "endpoint": "POST /api/v1/commercial/pricelists/{pricelist_id}/items"
+      "service_method": "priceListsService.addRule",
+      "endpoint": "POST /api/v1/commercial/pricelist-items"
     },
     {
       "domain": "saleOrders",
@@ -1017,8 +1017,8 @@
       "ts_file": "saleOrders.types.ts",
       "ts_interface": "IBSaleOrderDetail",
       "backend_schema": "SaleOrderDetailResponse",
-      "service_method": "saleOrdersService.getById",
-      "endpoint": "GET /api/v1/commercial/sale-orders/{sale_order_id}"
+      "service_method": "saleOrdersService.getFullById",
+      "endpoint": "GET /api/v1/sales-orders/{sale_order_id}/details"
     },
     {
       "domain": "saleOrders",
@@ -1252,7 +1252,7 @@
       "ts_interface": "IBProvider",
       "backend_schema": "PartnerResponse",
       "service_method": "providerService.getAll / getById",
-      "endpoint": "GET /api/v1/partners | GET /api/v1/partners/{partner_id}"
+      "endpoint": "GET /api/v1/partners/suppliers | GET /api/v1/partners/suppliers/{supplier_id}"
     },
     {
       "domain": "providers",
@@ -1261,7 +1261,7 @@
       "ts_interface": "IBProviderCreation",
       "backend_schema": "PartnerCreateRequest",
       "service_method": "providerService.create",
-      "endpoint": "POST /api/v1/partners"
+      "endpoint": "POST /api/v1/partners/supplier"
     },
     {
       "domain": "providers",
@@ -1270,7 +1270,7 @@
       "ts_interface": "IBProviderUpdate",
       "backend_schema": "PartnerUpdateRequest",
       "service_method": "providerService.update",
-      "endpoint": "PATCH /api/v1/partners/{partner_id}"
+      "endpoint": "PATCH /api/v1/partners/suppliers/{supplier_id}"
     },
     {
       "domain": "commercialPlatforms",
@@ -1358,9 +1358,9 @@
       "label": "Asientos Contables - Maestro",
       "ts_file": "accountant/journals.types.ts",
       "ts_interface": "IBJournal",
-      "backend_schema": "GeneralJournalResponse",
-      "service_method": "journalsService.getAll",
-      "endpoint": "GET /api/v1/accounting/gl/journals"
+      "backend_schema": "JournalListItem",
+      "service_method": "journalsService.getAllJournals",
+      "endpoint": "GET /api/v1/accounting/journals"
     },
     {
       "domain": "accounting",
@@ -1368,8 +1368,8 @@
       "ts_file": "accountant/journals.types.ts",
       "ts_interface": "IBJournalEntry",
       "backend_schema": "ManualJournalEntryCreateRequest",
-      "service_method": "journalsService.create",
-      "endpoint": "POST /api/v1/accounting/gl/journals"
+      "service_method": "journalsService.journalEntry",
+      "endpoint": "POST /api/v1/accounting/journals/{journal_id}/entries"
     },
     {
       "domain": "accounting",
@@ -1522,7 +1522,7 @@
       "ts_interface": "IBConsignment",
       "backend_schema": "ItemConsignmentResponse",
       "service_method": "consignmentsService.getAll",
-      "endpoint": "GET /api/v1/wms/item-consignments"
+      "endpoint": "GET /api/v1/wms/consignments | GET /api/v1/wms/consignments/{consignment_id}"
     },
     {
       "domain": "consignments",
@@ -1531,7 +1531,7 @@
       "ts_interface": "IBConsignmentCreateRequest",
       "backend_schema": "ItemConsignmentCreateRequest",
       "service_method": "consignmentsService.create",
-      "endpoint": "POST /api/v1/wms/item-consignments"
+      "endpoint": "POST /api/v1/wms/consignments"
     },
     {
       "domain": "consignments",
@@ -1540,7 +1540,7 @@
       "ts_interface": "IBConsignmentReturnRequest",
       "backend_schema": "ItemConsignmentReturnRequest",
       "service_method": "consignmentsService.return",
-      "endpoint": "POST /api/v1/wms/item-consignments/{consignment_id}/return"
+      "endpoint": "PATCH /api/v1/wms/consignments/{consignment_id}/return"
     },
     {
       "domain": "documents",
@@ -1577,6 +1577,123 @@
       "backend_schema": "LocalizationIdentitySchemeResponse",
       "service_method": "localizationService.getIdentitySchemes",
       "endpoint": "GET /api/v1/documents/localization/identity-schemes"
+    },
+    {
+      "domain": "commercialPlatforms",
+      "label": "Plataformas Comerciales - Edición",
+      "ts_file": "commercialPlatforms.types.ts",
+      "ts_interface": "IBCommercialPlatformUpdate",
+      "backend_schema": "CommercialPlatformUpdate",
+      "service_method": "commercialPlatformsService.update",
+      "endpoint": "PATCH /api/v1/partners/commercial-platforms/{platform_id}"
+    },
+    {
+      "domain": "uom",
+      "label": "Categorías de UoM - Alta",
+      "ts_file": "uom_category.types.ts",
+      "ts_interface": "IBUoMCategoryCreate",
+      "backend_schema": "UoMCategoryCreateRequest",
+      "service_method": "uomCategoriesService.create",
+      "endpoint": "POST /api/v1/products/uom-category"
+    },
+    {
+      "domain": "uom",
+      "label": "Categorías de UoM - Edición",
+      "ts_file": "uom_category.types.ts",
+      "ts_interface": "IBUoMCategoryUpdate",
+      "backend_schema": "UoMCategoryUpdateRequest",
+      "service_method": "uomCategoriesService.update",
+      "endpoint": "PATCH /api/v1/products/uom-category/{category_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Roles y Claves API - Alta",
+      "ts_file": "userContext/roles.type.ts",
+      "ts_interface": "IBRoleCreate",
+      "backend_schema": "ApiKeyCreateRequest",
+      "service_method": "roleService.create",
+      "endpoint": "POST /api/v1/common/companies/{company_id}/api-keys"
+    },
+    {
+      "domain": "userContext",
+      "label": "Roles y Claves API - Edición",
+      "ts_file": "userContext/roles.type.ts",
+      "ts_interface": "IBRoleUpdate",
+      "backend_schema": "ApiKeyPatchRequest",
+      "service_method": "roleService.update",
+      "endpoint": "PATCH /api/v1/common/companies/{company_id}/api-keys/{key_id}"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Atributos Alta",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataAttributeCreate",
+      "backend_schema": "AttributeCreateRequest",
+      "service_method": "metadataService.createAttribute",
+      "endpoint": "POST /api/v1/metadata/attributes"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Atributos Edición",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataAttributeUpdate",
+      "backend_schema": "AttributeUpdateRequest",
+      "service_method": "metadataService.updateAttribute",
+      "endpoint": "PATCH /api/v1/metadata/attributes/{attribute_id}"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Grupos Alta",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataGroupCreate",
+      "backend_schema": "AttributeGroupCreateRequest",
+      "service_method": "metadataService.createGroup",
+      "endpoint": "POST /api/v1/metadata/groups"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Grupos Edición",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBMetadataGroupUpdate",
+      "backend_schema": "AttributeGroupUpdateRequest",
+      "service_method": "metadataService.updateGroup",
+      "endpoint": "PATCH /api/v1/metadata/groups/{group_id}"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Valores Consulta",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBEntityMetadataResponse",
+      "backend_schema": "EntityMetadataResponse",
+      "service_method": "metadataService.getValues",
+      "endpoint": "GET /api/v1/metadata/values/{entity_type}/{entity_id}"
+    },
+    {
+      "domain": "metadata",
+      "label": "Metadatos - Valores Guardado",
+      "ts_file": "metadata.types.ts",
+      "ts_interface": "IBEntityMetadataRequest",
+      "backend_schema": "EntityMetadataRequest",
+      "service_method": "metadataService.saveValues",
+      "endpoint": "PUT /api/v1/metadata/values/{entity_type}/{entity_id}"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Edición",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceListUpdate",
+      "backend_schema": "PricelistUpdateRequest",
+      "service_method": "priceListsService.update",
+      "endpoint": "PATCH /api/v1/commercial/pricelists/{pricelist_id}"
+    },
+    {
+      "domain": "priceLists",
+      "label": "Listas de Precios - Ítems Masivo",
+      "ts_file": "priceLists.types.ts",
+      "ts_interface": "IBPriceListBulkUpdate",
+      "backend_schema": "PricelistItemsBulkRequest",
+      "service_method": "priceListsService.bulkUpdate",
+      "endpoint": "PATCH /api/v1/commercial/pricelist-items/bulk"
     }
   ]
 }

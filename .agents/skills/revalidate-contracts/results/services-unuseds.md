@@ -1,6 +1,6 @@
 # Reporte de Endpoints Backend No Consumidos en Frontend (Unused Services)
 
-- **Fecha de Generación:** 2026-09-30 18:14:24
+- **Fecha de Generación:** 2026-10-02 17:57:42
 - **Especificación OpenAPI (Backend):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\contracts.json`
 - **Mapeo Frontend (Pares Auditados):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\audit-pairs.json`
 
@@ -11,9 +11,9 @@
 | Métrica | Valor |
 | :--- | :---: |
 | **Total Endpoints en Backend (OpenAPI)** | **608** |
-| **Endpoints Mapeados/Consumidos en Frontend** | **186** |
-| **Endpoints Backend No Consumidos (`unused`)** | **439** |
-| **Cobertura de Consumo en Frontend** | **30.59%** |
+| **Endpoints Mapeados/Consumidos en Frontend** | **201** |
+| **Endpoints Backend No Consumidos (`unused`)** | **408** |
+| **Cobertura de Consumo en Frontend** | **33.06%** |
 
 ---
 
@@ -21,10 +21,10 @@
 
 | Módulo / Categoría Funcional | Cantidad de Endpoints |
 | :--- | :---: |
-| Productos - Handling | **27** |
-| Entidades - Catálogos | **20** |
+| Productos - Handling | **24** |
+| Entidades - Catálogos | **19** |
 | WMS - Transferencias | **18** |
-| Comercial - Pedidos de Venta | **18** |
+| Comercial - Pedidos de Venta | **17** |
 | Contabilidad - Motor de posteo | **16** |
 | WMS - Putaway ABC | **13** |
 | Contabilidad - Activos fijos | **13** |
@@ -32,25 +32,21 @@
 | Contabilidad - Inflación / RECPAM | **10** |
 | Comercial - Equipos de venta | **10** |
 | Entidades - Clientes | **10** |
-| Metadata | **10** |
 | Contabilidad - Asientos y valoración | **8** |
 | Comercial - Audiencias clientes | **8** |
 | Comercial - Audiencias ítems | **8** |
 | WMS - Master (Ubicaciones) | **7** |
-| WMS - Flujo áreas | **7** |
 | Abastecimiento | **7** |
 | Comprobantes - Documentos | **7** |
 | Comprobantes - Workflow | **7** |
-| Comercial - Listas de precios | **7** |
-| Entidades - Proveedores | **7** |
 | Usuarios | **6** |
+| WMS - Flujo áreas | **6** |
 | Catálogo - Publicación en plataformas | **6** |
 | Catálogo - Multimedia por ítem | **6** |
+| Comercial - Listas de precios | **6** |
 | Storage - Carpeta de usuario | **6** |
 | WMS - Master (Lotes) | **5** |
 | WMS - Master (Putaway) | **5** |
-| WMS - Consignación | **5** |
-| WMS - Serial Numbers | **5** |
 | WMS - Packages | **5** |
 | WMS - Olas de Trabajo | **5** |
 | Productos - Productos | **5** |
@@ -60,25 +56,24 @@
 | Emisión - Config | **5** |
 | Configuración - Sistema | **4** |
 | Productos - Ítems | **4** |
-| Productos - UoM Categorías | **4** |
 | Contabilidad - Medios de pago | **4** |
-| Comercial - Precios Items | **4** |
 | Configuración - Monedas | **4** |
+| Metadata | **4** |
 | Storage - Retention policies (deployment) | **4** |
 | WMS - Stock (Listados) | **3** |
 | General / Sin Categoría | **3** |
+| WMS - Serial Numbers | **3** |
 | Productos - Categorías | **3** |
 | Productos - Presentaciones | **3** |
 | Comprobantes - Codelists | **3** |
 | Contabilidad - Plan de cuentas | **3** |
 | Contabilidad - FX / Diferencia de cambio | **3** |
 | Contabilidad - Cuentas Corrientes | **3** |
-| Contabilidad - Asientos manuales | **3** |
 | Comercial - Descuentos | **3** |
 | Entidades - Options | **3** |
+| Entidades - Proveedores | **3** |
 | Storage - Retention policies | **3** |
 | Configuración - Empresas | **3** |
-| Configuración - API Keys | **3** |
 | Admin - Recovery / Papelera | **2** |
 | WMS - Master (Ubicaciones - Masivo) | **2** |
 | WMS - Stock (Operaciones) | **2** |
@@ -86,19 +81,22 @@
 | Productos - Options | **2** |
 | Productos - Marcas | **2** |
 | Productos - UoM | **2** |
+| Productos - UoM Categorías | **2** |
 | Productos - Utilidades | **2** |
 | Comprobantes - Pagos | **2** |
 | Contabilidad - Asientos GL | **2** |
+| Contabilidad - Asientos manuales | **2** |
 | Comercial - Tipos de lista | **2** |
+| Comercial - Precios Items | **2** |
 | Comercial - Rutas de venta | **2** |
 | Configuración - Zonas | **2** |
 | WMS - Master (Almacenes) | **1** |
 | WMS - Options | **1** |
 | WMS - Inventario | **1** |
 | WMS - Valuación | **1** |
+| WMS - Consignación | **1** |
 | Pagos - Integración | **1** |
 | Contabilidad - Impuestos | **1** |
-| Contabilidad - Diarios | **1** |
 | Distribución - Entregas | **1** |
 | Distribución - Utilidades | **1** |
 | Logística - Vehículos | **1** |
@@ -108,7 +106,8 @@
 | Configuración - Establecimientos | **1** |
 | Configuración - Centros Logísticos | **1** |
 | Configuración - Sucursales | **1** |
-| **TOTAL** | **439** |
+| Configuración - API Keys | **1** |
+| **TOTAL** | **408** |
 
 ---
 
@@ -204,7 +203,7 @@
 | `DELETE` | `/api/v1/commercial/sales-teams/{team_id}/members/{user_id}` | Eliminar (soft) miembro del equipo | `delete_sales_team_member_api_v1_commercial_sales_teams__team_id__members__user_id__delete` |
 | `PATCH` | `/api/v1/commercial/sales-teams/{team_id}/members/{user_id}` | Editar miembro del equipo | `update_sales_team_member_api_v1_commercial_sales_teams__team_id__members__user_id__patch` |
 
-### Comercial - Listas de precios (7 endpoints)
+### Comercial - Listas de precios (6 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
@@ -212,7 +211,6 @@
 | `PUT` | `/api/v1/commercial/pricelist-sale-terms` | Upsert términos comerciales por producto/ítem (múltiplo de venta) | `upsert_pricelist_sale_terms_api_v1_commercial_pricelist_sale_terms_put` |
 | `DELETE` | `/api/v1/commercial/pricelist-sale-terms/{terms_id}` | Eliminar términos comerciales (múltiplo) por ID | `delete_pricelist_sale_terms_api_v1_commercial_pricelist_sale_terms__terms_id__delete` |
 | `DELETE` | `/api/v1/commercial/pricelists/{pricelist_id}` | Eliminar lista de precios (soft delete) | `delete_pricelist_api_v1_commercial_pricelists__pricelist_id__delete` |
-| `PATCH` | `/api/v1/commercial/pricelists/{pricelist_id}` | Actualizar lista de precios (parcial) | `update_pricelist_api_v1_commercial_pricelists__pricelist_id__patch` |
 | `GET` | `/api/v1/commercial/pricelists/{pricelist_id}/full` | Lista completa: cabecera + precios calculados por ítem (paginado) | `get_pricelist_full_api_v1_commercial_pricelists__pricelist_id__full_get` |
 | `POST` | `/api/v1/commercial/pricelists/{pricelist_id}/recalculate` | Recalcular precios publicados de todos los ítems | `recalculate_pricelist_api_v1_commercial_pricelists__pricelist_id__recalculate_post` |
 
@@ -222,7 +220,7 @@
 | :---: | :--- | :--- | :--- |
 | `GET` | `/api/v1/commercial/pricelists/options` | Opciones livianas de listas de precios (combobox) | `list_pricelist_options_endpoint_api_v1_commercial_pricelists_options_get` |
 
-### Comercial - Pedidos de Venta (18 endpoints)
+### Comercial - Pedidos de Venta (17 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
@@ -243,7 +241,6 @@
 | `GET` | `/api/v1/commercial/sale-orders/{sale_order_id}/price-options/{item_id}` | Precios del ítem en lista regular y negociables del pedido | `get_sale_order_price_options_api_v1_commercial_sale_orders__sale_order_id__price_options__item_id__get` |
 | `GET` | `/api/v1/commercial/sale-orders/{sale_order_id}/pricing-context` | Contexto de precios del pedido (regular + pool negociable) | `get_sale_order_pricing_context_api_v1_commercial_sale_orders__sale_order_id__pricing_context_get` |
 | `GET` | `/api/v1/sales-orders/full-data` | Listar pedidos con líneas (full-data) | `list_sale_orders_full_data_api_v1_sales_orders_full_data_get` |
-| `GET` | `/api/v1/sales-orders/{sale_order_id}/details` | Detalle de un pedido con líneas | `get_sale_order_details_api_v1_sales_orders__sale_order_id__details_get` |
 
 ### Comercial - Política de precios por canal (1 endpoints)
 
@@ -251,12 +248,10 @@
 | :---: | :--- | :--- | :--- |
 | `GET` | `/api/v1/commercial/pricing-channel-policies` | Listar políticas canal → lista de precios | `list_pricing_channel_policies_api_v1_commercial_pricing_channel_policies_get` |
 
-### Comercial - Precios Items (4 endpoints)
+### Comercial - Precios Items (2 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `POST` | `/api/v1/commercial/pricelist-items` | Añadir regla de precio a una lista | `create_pricelist_item_api_v1_commercial_pricelist_items_post` |
-| `PATCH` | `/api/v1/commercial/pricelist-items/bulk` | Guardado masivo de reglas de precio (transaccional) | `bulk_patch_pricelist_items_api_v1_commercial_pricelist_items_bulk_patch` |
 | `DELETE` | `/api/v1/commercial/pricelist-items/{item_rule_id}` | Eliminar regla de precio | `delete_pricelist_item_api_v1_commercial_pricelist_items__item_rule_id__delete` |
 | `PATCH` | `/api/v1/commercial/pricelist-items/{item_rule_id}` | Actualizar regla de precio | `update_pricelist_item_api_v1_commercial_pricelist_items__item_rule_id__patch` |
 
@@ -313,13 +308,11 @@
 | `POST` | `/api/v1/documents/{document_id}/send` | Send Document | `send_document_api_v1_documents__document_id__send_post` |
 | `POST` | `/api/v1/documents/{document_id}/validate` | Validate Document | `validate_document_api_v1_documents__document_id__validate_post` |
 
-### Configuración - API Keys (3 endpoints)
+### Configuración - API Keys (1 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `POST` | `/api/v1/common/companies/{company_id}/api-keys` | Create Api Key | `create_api_key_api_v1_common_companies__company_id__api_keys_post` |
 | `DELETE` | `/api/v1/common/companies/{company_id}/api-keys/{key_id}` | Delete Api Key | `delete_api_key_api_v1_common_companies__company_id__api_keys__key_id__delete` |
-| `PATCH` | `/api/v1/common/companies/{company_id}/api-keys/{key_id}` | Patch Api Key | `patch_api_key_api_v1_common_companies__company_id__api_keys__key_id__patch` |
 
 ### Configuración - Centros Logísticos (1 endpoints)
 
@@ -403,13 +396,12 @@
 | `GET` | `/api/v1/accounting/gl/entries` | Listar asientos contables (paginado) | `list_gl_entries_api_v1_accounting_gl_entries_get` |
 | `GET` | `/api/v1/accounting/gl/entries/{move_id}` | Detalle de asiento (ruta canónica /gl/) | `get_gl_entry_api_v1_accounting_gl_entries__move_id__get` |
 
-### Contabilidad - Asientos manuales (3 endpoints)
+### Contabilidad - Asientos manuales (2 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
 | `GET` | `/api/v1/accounting/entries/{move_id}` | Obtener detalle de un asiento contable | `get_journal_entry_api_v1_accounting_entries__move_id__get` |
 | `POST` | `/api/v1/accounting/entries/{move_id}/post` | Postear asiento (manual) | `post_manual_entry_api_v1_accounting_entries__move_id__post_post` |
-| `POST` | `/api/v1/accounting/journals/{journal_id}/entries` | Crear asiento manual (opcionalmente postear) | `create_manual_entry_api_v1_accounting_journals__journal_id__entries_post` |
 
 ### Contabilidad - Asientos y valoración (8 endpoints)
 
@@ -431,12 +423,6 @@
 | `POST` | `/api/v1/accounting/current-accounts/{cc_id}/adjustments` | Registrar ajuste manual en Cuenta Corriente | `record_adjustment_api_v1_accounting_current_accounts__cc_id__adjustments_post` |
 | `GET` | `/api/v1/accounting/current-accounts/{cc_id}/balance` | Consultar saldo de Cuenta Corriente | `get_cc_balance_api_v1_accounting_current_accounts__cc_id__balance_get` |
 | `GET` | `/api/v1/accounting/current-accounts/{cc_id}/statement` | Resumen de cuenta (Movimientos) | `get_cc_statement_api_v1_accounting_current_accounts__cc_id__statement_get` |
-
-### Contabilidad - Diarios (1 endpoints)
-
-| Método | Ruta de API | Resumen / Descripción | Operation ID |
-| :---: | :--- | :--- | :--- |
-| `GET` | `/api/v1/accounting/journals` | Listar diarios contables | `list_account_journals_api_v1_accounting_journals_get` |
 
 ### Contabilidad - FX / Diferencia de cambio (3 endpoints)
 
@@ -547,13 +533,12 @@
 | `POST` | `/api/v1/issuance-config/amount-rules` | Upsert factura_amount_rule (desactiva la activa del mismo iva_condition) | `upsert_amount_rule_api_v1_issuance_config_amount_rules_post` |
 | `GET` | `/api/v1/issuance-config/resolve` | Resolver issuance_config (cascada address→customer→company) | `resolve_config_api_v1_issuance_config_resolve_get` |
 
-### Entidades - Catálogos (20 endpoints)
+### Entidades - Catálogos (19 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
 | `DELETE` | `/api/v1/partners/cities/{city_id}` | Eliminar o desactivar ciudad/localidad | `deactivate_city_api_v1_partners_cities__city_id__delete` |
 | `GET` | `/api/v1/partners/cities/{city_id}` | Obtener ciudad/localidad | `get_city_api_v1_partners_cities__city_id__get` |
-| `PATCH` | `/api/v1/partners/commercial-platforms/{platform_id}` | Actualizar plataforma comercial | `update_commercial_platform_api_v1_partners_commercial_platforms__platform_id__patch` |
 | `DELETE` | `/api/v1/partners/countries/{country_id}` | Eliminar o desactivar país | `deactivate_country_api_v1_partners_countries__country_id__delete` |
 | `GET` | `/api/v1/partners/countries/{country_id}` | Obtener país | `get_country_api_v1_partners_countries__country_id__get` |
 | `DELETE` | `/api/v1/partners/payment-methods/{payment_method_id}` | Desactivar método de pago | `deactivate_payment_method_api_v1_partners_payment_methods__payment_method_id__delete` |
@@ -595,16 +580,12 @@
 | `GET` | `/api/v1/partners/payment-terms/options` | Opciones livianas de condiciones de pago (combobox) | `list_payment_term_options_endpoint_api_v1_partners_payment_terms_options_get` |
 | `GET` | `/api/v1/partners/suppliers/options` | Opciones livianas de proveedores (combobox) | `list_supplier_options_endpoint_api_v1_partners_suppliers_options_get` |
 
-### Entidades - Proveedores (7 endpoints)
+### Entidades - Proveedores (3 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `POST` | `/api/v1/partners/supplier` | Create Supplier | `create_supplier_api_v1_partners_supplier_post` |
-| `GET` | `/api/v1/partners/suppliers` | Listar proveedores (paginado) | `list_suppliers_api_v1_partners_suppliers_get` |
 | `GET` | `/api/v1/partners/suppliers/full` | Listar proveedores completos (paginado) | `list_suppliers_full_api_v1_partners_suppliers_full_get` |
 | `DELETE` | `/api/v1/partners/suppliers/{supplier_id}` | Delete Supplier | `delete_supplier_api_v1_partners_suppliers__supplier_id__delete` |
-| `GET` | `/api/v1/partners/suppliers/{supplier_id}` | Get Supplier | `get_supplier_api_v1_partners_suppliers__supplier_id__get` |
-| `PATCH` | `/api/v1/partners/suppliers/{supplier_id}` | Update Supplier | `update_supplier_api_v1_partners_suppliers__supplier_id__patch` |
 | `GET` | `/api/v1/partners/suppliers/{supplier_id}/full` | Proveedor completo (cabecera ampliada) | `get_supplier_full_api_v1_partners_suppliers__supplier_id__full_get` |
 
 ### General / Sin Categoría (3 endpoints)
@@ -621,19 +602,13 @@
 | :---: | :--- | :--- | :--- |
 | `DELETE` | `/api/v1/vehicles/{vehicle_id}` | Delete Vehicle | `delete_vehicle_api_v1_vehicles__vehicle_id__delete` |
 
-### Metadata (10 endpoints)
+### Metadata (4 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `POST` | `/api/v1/metadata/attributes` | Crear atributo en el catálogo | `create_metadata_attribute_api_v1_metadata_attributes_post` |
 | `DELETE` | `/api/v1/metadata/attributes/{attribute_id}` | Desactivar atributo (active=false) | `delete_metadata_attribute_api_v1_metadata_attributes__attribute_id__delete` |
 | `GET` | `/api/v1/metadata/attributes/{attribute_id}` | Obtener atributo por ID | `get_metadata_attribute_api_v1_metadata_attributes__attribute_id__get` |
-| `PATCH` | `/api/v1/metadata/attributes/{attribute_id}` | Actualizar atributo (code inmutable) | `update_metadata_attribute_api_v1_metadata_attributes__attribute_id__patch` |
 | `POST` | `/api/v1/metadata/attributes/{attribute_id}/rename` | Renombrar code con transferencia de datos | `rename_metadata_attribute_api_v1_metadata_attributes__attribute_id__rename_post` |
-| `POST` | `/api/v1/metadata/groups` | Crear grupo del catálogo | `create_metadata_group_api_v1_metadata_groups_post` |
-| `PATCH` | `/api/v1/metadata/groups/{group_id}` | Actualizar grupo (code inmutable) | `update_metadata_group_api_v1_metadata_groups__group_id__patch` |
-| `GET` | `/api/v1/metadata/values/{entity_type}/{entity_id}` | Obtener valores metadata de una entidad | `get_metadata_values_api_v1_metadata_values__entity_type___entity_id__get` |
-| `PUT` | `/api/v1/metadata/values/{entity_type}/{entity_id}` | Guardar valores metadata (batch atómico) | `put_metadata_values_api_v1_metadata_values__entity_type___entity_id__put` |
 | `DELETE` | `/api/v1/metadata/values/{entity_type}/{entity_id}/{attribute_code}` | Eliminar una clave del JSONB metadata | `delete_metadata_value_api_v1_metadata_values__entity_type___entity_id___attribute_code__delete` |
 
 ### Pagos - Cajas y Rendiciones (5 endpoints)
@@ -667,7 +642,7 @@
 | `DELETE` | `/api/v1/products/sale-billing-modes/{mode_id}` | Soft delete de modo de venta/facturación | `deactivate_sale_billing_mode_catalog_api_v1_products_sale_billing_modes__mode_id__delete` |
 | `GET` | `/api/v1/products/sale-billing-modes/{mode_id}` | Detalle de modo de venta/facturación | `get_sale_billing_mode_catalog_api_v1_products_sale_billing_modes__mode_id__get` |
 
-### Productos - Handling (27 endpoints)
+### Productos - Handling (24 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
@@ -682,11 +657,8 @@
 | `DELETE` | `/api/v1/products/handling/fragility-classes/{class_id}` | Soft delete de clase de fragilidad de envase | `delete_fragility_class_api_v1_products_handling_fragility_classes__class_id__delete` |
 | `GET` | `/api/v1/products/handling/hazard-classes/options` | Opciones livianas de clases de peligro (combobox) | `list_hazard_class_options_api_v1_products_handling_hazard_classes_options_get` |
 | `DELETE` | `/api/v1/products/handling/hazard-classes/{class_id}` | Soft delete de clase de peligro ADR/IATA | `delete_hazard_class_api_v1_products_handling_hazard_classes__class_id__delete` |
-| `GET` | `/api/v1/products/handling/logistics-profiles` | Listar circuitos logísticos de la compañía | `list_logistics_profiles_api_v1_products_handling_logistics_profiles_get` |
-| `POST` | `/api/v1/products/handling/logistics-profiles` | Crear un circuito logístico | `create_logistics_profile_api_v1_products_handling_logistics_profiles_post` |
 | `GET` | `/api/v1/products/handling/logistics-profiles/options` | Opciones livianas de circuitos logísticos (combobox) | `list_logistics_profile_options_api_v1_products_handling_logistics_profiles_options_get` |
 | `DELETE` | `/api/v1/products/handling/logistics-profiles/{profile_id}` | Soft delete de un circuito logístico | `delete_logistics_profile_api_v1_products_handling_logistics_profiles__profile_id__delete` |
-| `PATCH` | `/api/v1/products/handling/logistics-profiles/{profile_id}` | Actualizar parcialmente un circuito logístico | `patch_logistics_profile_api_v1_products_handling_logistics_profiles__profile_id__patch` |
 | `GET` | `/api/v1/products/handling/segregation-groups/options` | Opciones livianas de grupos de segregación (combobox) | `list_segregation_group_options_api_v1_products_handling_segregation_groups_options_get` |
 | `DELETE` | `/api/v1/products/handling/segregation-groups/{class_id}` | Soft delete de grupo de segregación | `delete_segregation_group_api_v1_products_handling_segregation_groups__class_id__delete` |
 | `GET` | `/api/v1/products/handling/segregation-rules` | Listar reglas de segregación | `list_segregation_rules_api_v1_products_handling_segregation_rules_get` |
@@ -738,14 +710,12 @@
 | `GET` | `/api/v1/products/uom/{uom_id}` | Get Uom | `get_uom_api_v1_products_uom__uom_id__get` |
 | `DELETE` | `/api/v1/products/uoms/{uom_id}` | Delete Uom | `delete_uom_api_v1_products_uoms__uom_id__delete` |
 
-### Productos - UoM Categorías (4 endpoints)
+### Productos - UoM Categorías (2 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
 | `DELETE` | `/api/v1/products/uom-categories/{category_id}` | Delete Uom Category | `delete_uom_category_api_v1_products_uom_categories__category_id__delete` |
-| `POST` | `/api/v1/products/uom-category` | Create Uom Category | `create_uom_category_api_v1_products_uom_category_post` |
 | `GET` | `/api/v1/products/uom-category/{category_id}` | Get Uom Category | `get_uom_category_api_v1_products_uom_category__category_id__get` |
-| `PATCH` | `/api/v1/products/uom-category/{category_id}` | Update Uom Category | `update_uom_category_api_v1_products_uom_category__category_id__patch` |
 
 ### Productos - Utilidades (2 endpoints)
 
@@ -802,15 +772,11 @@
 | `GET` | `/api/v1/users/salesmen` | Listar vendedores | `list_salesmen_api_v1_users_salesmen_get` |
 | `GET` | `/api/v1/users/salesmen/options` | Opciones livianas de vendedores (combobox) | `list_salesmen_options_api_v1_users_salesmen_options_get` |
 
-### WMS - Consignación (5 endpoints)
+### WMS - Consignación (1 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `GET` | `/api/v1/wms/consignments` | Listar consignaciones | `list_consignments_api_v1_wms_consignments_get` |
-| `POST` | `/api/v1/wms/consignments` | Create Consignment | `create_consignment_api_v1_wms_consignments_post` |
 | `POST` | `/api/v1/wms/consignments/expire` | Expire Consignments | `expire_consignments_api_v1_wms_consignments_expire_post` |
-| `GET` | `/api/v1/wms/consignments/{consignment_id}` | Obtener consignación | `get_consignment_api_v1_wms_consignments__consignment_id__get` |
-| `PATCH` | `/api/v1/wms/consignments/{consignment_id}/return` | Return Consignment | `return_consignment_api_v1_wms_consignments__consignment_id__return_patch` |
 
 ### WMS - Devoluciones y Mermas (10 endpoints)
 
@@ -827,11 +793,10 @@
 | `POST` | `/api/v1/returns/reasons/{reason_id}/deactivate` | Desactivar motivo de devolución | `deactivate_return_reason_api_v1_returns_reasons__reason_id__deactivate_post` |
 | `POST` | `/api/v1/returns/scrap` | Registrar merma o producto desechado | `scrap_product_api_v1_returns_scrap_post` |
 
-### WMS - Flujo áreas (7 endpoints)
+### WMS - Flujo áreas (6 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `GET` | `/api/v1/wms/operational-profiles` | Listar perfiles operativos WMS | `list_operational_profiles_api_v1_wms_operational_profiles_get` |
 | `GET` | `/api/v1/wms/warehouse-areas/{area_id}/handling-capabilities` | Obtener capabilities handling de un área | `get_area_handling_capabilities_api_v1_wms_warehouse_areas__area_id__handling_capabilities_get` |
 | `PUT` | `/api/v1/wms/warehouse-areas/{area_id}/handling-capabilities` | Reemplazar capabilities handling de un área | `put_area_handling_capabilities_api_v1_wms_warehouse_areas__area_id__handling_capabilities_put` |
 | `GET` | `/api/v1/wms/warehouses/{warehouse_id}/area-flow-routes` | Listar rutas de flujo de un almacén | `list_area_flow_routes_api_v1_wms_warehouses__warehouse_id__area_flow_routes_get` |
@@ -934,15 +899,13 @@
 | `POST` | `/api/v1/wms/warehouses/{warehouse_id}/abc/recompute` | Recomputar clases ABC del almacén | `recompute_abc_api_v1_wms_warehouses__warehouse_id__abc_recompute_post` |
 | `POST` | `/api/v1/wms/warehouses/{warehouse_id}/suggest-replenishment` | Sugerir reposición reserva → pick-face | `post_suggest_replenishment_api_v1_wms_warehouses__warehouse_id__suggest_replenishment_post` |
 
-### WMS - Serial Numbers (5 endpoints)
+### WMS - Serial Numbers (3 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
 | `GET` | `/api/v1/wms/items/serialized-with-possession` | List Serialized Items With Possession | `list_serialized_items_with_possession_api_v1_wms_items_serialized_with_possession_get` |
-| `GET` | `/api/v1/wms/items/{item_id}/serial-numbers` | List Serial Numbers By Item | `list_serial_numbers_by_item_api_v1_wms_items__item_id__serial_numbers_get` |
 | `DELETE` | `/api/v1/wms/serial-numbers/{serial_id}` | Soft Delete Serial Number | `soft_delete_serial_number_api_v1_wms_serial_numbers__serial_id__delete` |
 | `PATCH` | `/api/v1/wms/serial-numbers/{serial_id}` | Update Serial Number | `update_serial_number_api_v1_wms_serial_numbers__serial_id__patch` |
-| `GET` | `/api/v1/wms/serial-numbers/{serial_number}` | Get Serial Number Traceability | `get_serial_number_traceability_api_v1_wms_serial_numbers__serial_number__get` |
 
 ### WMS - Stock (Listados) (3 endpoints)
 
