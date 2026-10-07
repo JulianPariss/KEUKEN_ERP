@@ -336,7 +336,7 @@ const ProductModal = ({ isOpen, onClose, onSuccess, onHidden, uoms, categories, 
 
             <SimpleItem
                 dataField="procurementType"
-                label={{ text: "Tipo de Abastecimiento" }}
+                label={{ text: "Abastecimiento" }}
                 editorType="dxSelectBox"
                 editorOptions={{
                     dataSource: PROCUREMENT_TYPES_OPTIONS,

@@ -18,12 +18,19 @@ export type TRouteKey =
     'salebillingmodes' | 'uom-categories' | 'sales-channels' | 'productdetail' | 'taxes' |
     'serial-numbers' | 'consignments' | 'partners' | 'customers' | 'commercial-platforms' |
     'articlehandling' | 'metadata' | 'pricelistdetail' | 'saleorderdetail' | 'system' |
-    'audit' | 'localization' | 'structure' | 'branches' | 'establishments' | 'logisticcenters' | 'audiences' | 'details' | 'mapa';
+    'audit' | 'localization' | 'structure' | 'branches' | 'establishments' | 'logisticcenters' | 'audiences' | 'details' | 'mapa' | 'companies';
 
 export type TCustomDataRoutes = Record<TRouteKey, ICustomDataRoute>;
 
 
 export const CustomDataRoutes: TCustomDataRoutes = {
+
+    companies: {
+        icon: 'home',
+        text: 'Empresas',
+        position: 50,
+        parentSubText: 'Gestión de Empresas'
+    },
 
     structure: {
         icon: 'hierarchy',

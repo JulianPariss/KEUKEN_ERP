@@ -201,7 +201,7 @@ const ProductSection = (props: IProductSection) => {
 
                     <SimpleItem
                         dataField="procurementType"
-                        label={{ text: "Tipo de Abastecimiento" }}
+                        label={{ text: "Abastecimiento" }}
                         editorType="dxSelectBox"
                         editorOptions={{
                             dataSource: PROCUREMENT_TYPES_OPTIONS,

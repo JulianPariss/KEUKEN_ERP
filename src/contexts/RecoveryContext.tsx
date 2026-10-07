@@ -34,8 +34,7 @@ export function RecoveryProvider({ children }: { children: ReactNode }) {
         isRouteSupported && (
             isSuperAdmin ||
             (permissions && (
-                Boolean((permissions as any)['admin:recovery:read']) ||
-                Boolean(permissions)
+                Boolean((permissions as any)['admin:recovery:read'])
             ))
         )
     );

@@ -51,6 +51,10 @@
   --color-focus-300: var(--focus-300);
   --color-focus-500: var(--focus-500);
 
+  --color-success: var(--status-success, #0b7731);
+  --color-warning: var(--status-warning, #e7c712);
+  --color-error: var(--status-error, #bf1126);
+
   --radius-dx: var(--rounded-dx);
   --shadow-r-lg: 0 0 10px rgba(0, 0, 0, 0.1);
   --shadow-top-lg: 0 -3px 4px rgba(0, 0, 0, 0.12);

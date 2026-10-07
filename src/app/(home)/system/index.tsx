@@ -55,9 +55,9 @@ const SystemClient = () => {
                 setSelectedSetting(data);
                 setIsModalOpen(true);
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            visible: (e: any) => {
-                return !!(canModify && e?.row?.data && !e.row.data.isReadOnly);
+            visible: (data: any) => {
+                const item = data?.row?.data ?? data;
+                return !!(canModify && item && !item.isReadOnly);
             }
         },
         {
@@ -66,9 +66,9 @@ const SystemClient = () => {
             onClick: (data: IFSystemSetting) => {
                 handleTestConnection(data);
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            visible: (e: any) => {
-                return !!(canModify && e?.row?.data);
+            visible: (data: any) => {
+                const item = data?.row?.data ?? data;
+                return !!(canModify && item);
             }
         }
     ], [canModify, handleTestConnection]);

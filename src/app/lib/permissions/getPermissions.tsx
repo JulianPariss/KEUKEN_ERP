@@ -276,9 +276,18 @@ export const MASTER_PERMISSIONS = {
             extract: [] as string[],
         }
     },
+    companies: {
+        label: 'Gestión de Empresas',
+        backendMap: {
+            view: ['common:companies:read'],
+            modify: ['common:companies:write'],
+            extract: [] as string[],
+        }
+    },
 } as const;
 
 export const VIEW_TO_MODULE_MAP: Record<TViewPermissionKey, TModuleKey> = {
+    companiesView: 'common',
     productosView: 'products',
     warehousesView: 'wms',
     defaultView: 'users',
@@ -376,11 +385,15 @@ export type TViewPermissionKey =
     | 'branchesView'
     | 'logisticsCentersView'
     | 'establishmentsView'
-    | 'structureView';
+    | 'structureView'
+    | 'companiesView';
 
 export type TViewPermissionsRequireds = Record<TViewPermissionKey, TBackendPermissionKey[] | IViewPermissionConfig>;
 
 export const viewPermissionsRequireds: TViewPermissionsRequireds = {
+    companiesView: [
+        "companies",
+    ],
     productosView: [
         "products",
         "items",
@@ -506,4 +519,5 @@ export const ROUTE_VIEW_MAP: Record<string, TViewPermissionKey> = {
     '/structure/branches': 'branchesView',
     '/structure/logisticCenters': 'logisticsCentersView',
     '/structure/establishments': 'establishmentsView',
+    '/companies': 'companiesView',
 };

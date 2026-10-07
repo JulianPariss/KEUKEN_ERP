@@ -254,7 +254,7 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
 
                     <SimpleItem
                         dataField="procurementType"
-                        label={{ text: "Tipo de Abastecimiento" }}
+                        label={{ text: "Abastecimiento" }}
                         editorType="dxTextBox"
                         editorOptions={{
                             stylingMode: "filled"

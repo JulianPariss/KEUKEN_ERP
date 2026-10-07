@@ -1,6 +1,6 @@
 'use client';
 
-import { loginAction, logoutAction } from '@/app/actions/auth.actions';
+import { loginAction, logoutAction, updatePermissionsCookieAction } from '@/app/actions/auth.actions';
 import { TFPermissionsConfig } from '@/app/lib/permissions/getPermissions';
 import { mapPermissionsToFrontend } from '@/app/lib/utils/permission.helper';
 import { authService } from '@/app/services/userContext/auth.service';
@@ -65,11 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 try {
                     const parsedProfileContext: IFProfileContext = JSON.parse(savedProfileContext);
                     setProfileContext(parsedProfileContext);
-                    if (parsedProfileContext.scopesEffective?.length) {
-                        effectivePermissions = parsedProfileContext.scopesEffective;
-                    } else if (parsedProfileContext.rolesEffective?.length) {
-                        effectivePermissions = parsedProfileContext.rolesEffective;
-                    }
+                    effectivePermissions = Array.from(new Set([
+                        ...(parsedProfileContext.rolesEffective || []),
+                        ...(parsedUser.roles || []),
+                        ...(parsedProfileContext.scopesEffective || []),
+                    ]));
                 } catch (e) {
                     console.error('Error parsing stored profileContext:', e);
                 }
@@ -140,9 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setProfileContext(fetchedProfileContext);
                 localStorage.setItem('profileContext', JSON.stringify(fetchedProfileContext));
                 
-                const effectivePermissions = fetchedProfileContext.scopesEffective?.length 
-                    ? fetchedProfileContext.scopesEffective 
-                    : (fetchedProfileContext.rolesEffective || user?.roles || []);
+                const effectivePermissions = Array.from(new Set([
+                    ...(fetchedProfileContext.rolesEffective || []),
+                    ...(user?.roles || []),
+                    ...(fetchedProfileContext.scopesEffective || []),
+                ]));
                 setPermissions(mapPermissionsToFrontend(effectivePermissions));
             } else {
                 const permissionsArray = user?.roles || [];
@@ -186,10 +188,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setProfileContext(newProfileContext);
                 localStorage.setItem('profileContext', JSON.stringify(newProfileContext));
 
-                const effectivePermissions = newProfileContext.scopesEffective?.length 
-                    ? newProfileContext.scopesEffective 
-                    : (newProfileContext.rolesEffective || []);
+                const effectivePermissions = Array.from(new Set([
+                    ...(newProfileContext.rolesEffective || []),
+                    ...(user?.roles || []),
+                    ...(newProfileContext.scopesEffective || []),
+                ]));
                 setPermissions(mapPermissionsToFrontend(effectivePermissions));
+
+                // Sincronizar cookie del servidor para que el proxy valide la compañía actual
+                updatePermissionsCookieAction(effectivePermissions).catch((err) => {
+                    console.error('Error updating permissions cookie on refresh:', err);
+                });
+
+                if (user) {
+                    const updatedUser = { ...user, roles: effectivePermissions };
+                    setUser(updatedUser);
+                    localStorage.setItem('userData', JSON.stringify(updatedUser));
+                }
+
                 return newProfileContext;
             } catch (err) {
                 console.error('Error updating profile context:', err);

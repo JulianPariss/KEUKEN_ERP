@@ -35,6 +35,11 @@ export const ROUTES = [
     "routeKey": "audiences"
   },
   {
+    "id": "companies",
+    "path": "/companies",
+    "routeKey": "companies"
+  },
+  {
     "id": "customers",
     "path": "/customers",
     "routeKey": "customers"
@@ -309,6 +314,11 @@ export const FIRST_LEVEL_ROUTES = [
     "id": "audiences",
     "path": "/audiences",
     "routeKey": "audiences"
+  },
+  {
+    "id": "companies",
+    "path": "/companies",
+    "routeKey": "companies"
   },
   {
     "id": "customers",

@@ -32,7 +32,6 @@ Se debe utilizar el componente `Popup` de `devextreme-react/popup` con las sigui
 **Estilos de los Inputs (`editorOptions`):**
 - Todos los inputs (`dxTextBox`, `dxSelectBox`, etc.) deben usar:
   - `stylingMode: 'filled'`
-  - `elementAttr: { class: SHARED_INPUT_CLASS }` (Importado desde `@/contexts/DxConfigProvider`).
 - Los campos de texto (`dxTextBox`) deben tener `valueChangeEvent: "blur"`.
 
 ### Botones de Acción (ToolbarItem)

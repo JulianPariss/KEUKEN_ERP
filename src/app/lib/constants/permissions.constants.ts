@@ -32,6 +32,8 @@ const PERMISSIONS_CONSTANTS: Record<string, TBackendPermissionKey[]> = {
     establishments: ['establishments'],
     modifyLogisticsCenters: ['logisticsCenters'],
     logisticsCenters: ['logisticsCenters'],
+    modifyCompanies: ['companies'],
+    companies: ['companies'],
 }
 
 export default PERMISSIONS_CONSTANTS;
