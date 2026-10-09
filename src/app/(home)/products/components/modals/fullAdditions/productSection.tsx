@@ -3,8 +3,16 @@
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { CustomRule, RequiredRule } from "devextreme-react/validator";
 import TagBox from "devextreme-react/tag-box";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PROCUREMENT_TYPES_OPTIONS } from "@/app/lib/constants/product.constants";
+import { currenciesService } from "@/app/services/payments_services/currencies.service";
+import { logisticProfileService } from "@/app/services/product_services/logisticProfile.service";
+import { temperatureService } from "@/app/services/product_services/temperature.service";
+import { hazardService } from "@/app/services/product_services/hazard.service";
+import { segregationGroupsService } from "@/app/services/product_services/segregationGroups.service";
+import { IFCurrency, IFLogisticProfile, IFTemperatureClass, IFHazardClass, IFSegregationGroup } from "@repo/api-contracts/erp";
+import { CheckBox } from "devextreme-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface IProductSection {
     productData: any;
@@ -34,6 +42,24 @@ const ProductSection = (props: IProductSection) => {
         saleBillingModes,
         taxes
     } = props;
+
+    const { token } = useAuth();
+    const [currencies, setCurrencies] = useState<IFCurrency[]>([]);
+    const [logisticsProfiles, setLogisticsProfiles] = useState<IFLogisticProfile[]>([]);
+    const [temperatureClasses, setTemperatureClasses] = useState<IFTemperatureClass[]>([]);
+    const [hazardClasses, setHazardClasses] = useState<IFHazardClass[]>([]);
+    const [segregationGroups, setSegregationGroups] = useState<IFSegregationGroup[]>([]);
+
+    const hasHandlingData = !!productData?.defaultLogisticsProfileId || !!productData?.defaultTemperatureClassId || !!productData?.defaultHazardClassId || !!productData?.defaultSegregationGroupId || !!productData?.handlingNotes;
+
+    useEffect(() => {
+        if (!token) return;
+        currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
+        logisticProfileService.getAll(currentCompany, token).then(setLogisticsProfiles).catch(console.error);
+        temperatureService.getAll(currentCompany, token).then(setTemperatureClasses).catch(console.error);
+        hazardService.getAll(currentCompany, token).then(setHazardClasses).catch(console.error);
+        segregationGroupsService.getAll(currentCompany, token).then(setSegregationGroups).catch(console.error);
+    }, [token, currentCompany]);
 
     const descriptionRef = useRef<HTMLParagraphElement>(null);
 
@@ -237,6 +263,26 @@ const ProductSection = (props: IProductSection) => {
                     />
 
                     <SimpleItem
+                        dataField="currencyId"
+                        label={{ text: "Moneda de Venta" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: currencies,
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: "filled",
+                            placeholder: "Seleccione moneda...",
+                            dropDownOptions: {
+                                wrapperAttr: {
+                                    class: "popup-menu-container"
+                                }
+                            }
+                        }}
+                    />
+
+                    <SimpleItem
                         dataField="companyId"
                         label={{ text: "Compañía" }}
                         editorType="dxSelectBox"
@@ -386,8 +432,126 @@ const ProductSection = (props: IProductSection) => {
                             </p>
                         </div>
                     </SimpleItem>
-                </GroupItem>
+                              </GroupItem>
             </Form>
+
+            {/* Manejo de Artículos - Collapsible Section */}
+            <details
+                className="group border border-main/10 rounded-dx bg-primary-0/40 shadow-sm mt-2 transition-all duration-300"
+                open={hasHandlingData}
+                onToggle={(e: any) => {
+                    if (!e.target.open) {
+                        const handlingForm = formRef.current?.instance(); // Re-use main formRef to clear data if needed
+                        if (handlingForm) {
+                            handlingForm.updateData("defaultLogisticsProfileId", null);
+                            handlingForm.updateData("defaultTemperatureClassId", null);
+                            handlingForm.updateData("defaultHazardClassId", null);
+                            handlingForm.updateData("defaultSegregationGroupId", null);
+                            handlingForm.updateData("handlingNotes", "");
+                        }
+                    }
+                }}
+            >
+                <summary className="p-5 cursor-pointer list-none flex justify-between items-center focus:outline-none rounded-dx">
+                    <div>
+                        <h3 className="text-lg font-bold text-dx-primary mb-1 group-open:text-focus-300 transition-colors">Manejo de Artículos</h3>
+                        <p className="text-xs opacity-60">Configuración por defecto</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="text-xs font-semibold text-main/60 bg-main/5 px-3 py-1 rounded-full group-open:hidden">
+                            Usando valores por defecto
+                        </div>
+                        <div className="text-xs font-semibold text-focus-300 bg-focus-300/10 px-3 py-1 rounded-full hidden group-open:block">
+                            Definiendo valores manualmente
+                        </div>
+                        <i className="dx-icon-chevronright group-open:rotate-90 transition-transform duration-300 text-main/50" />
+                    </div>
+                </summary>
+
+                <div className="px-5 pb-5 border-t border-main/5 pt-5">
+                    <Form
+                        formData={productData}
+                        colCount={2}
+                        scrollingEnabled={false}
+                    >
+                        <SimpleItem
+                            dataField="defaultLogisticsProfileId"
+                            label={{ text: "Perfil Logístico" }}
+                            editorType="dxSelectBox"
+                            editorOptions={{
+                                dataSource: logisticsProfiles,
+                                valueExpr: "id",
+                                displayExpr: "name",
+                                searchEnabled: true,
+                                showClearButton: true,
+                                stylingMode: 'filled',
+                                placeholder: "Seleccione...",
+                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                            }}
+                        />
+
+                        <SimpleItem
+                            dataField="defaultTemperatureClassId"
+                            label={{ text: "Clase de Temperatura" }}
+                            editorType="dxSelectBox"
+                            editorOptions={{
+                                dataSource: temperatureClasses,
+                                valueExpr: "id",
+                                displayExpr: "name",
+                                searchEnabled: true,
+                                showClearButton: true,
+                                stylingMode: 'filled',
+                                placeholder: "Seleccione...",
+                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                            }}
+                        />
+
+                        <SimpleItem
+                            dataField="defaultHazardClassId"
+                            label={{ text: "Clase de Peligro" }}
+                            editorType="dxSelectBox"
+                            editorOptions={{
+                                dataSource: hazardClasses,
+                                valueExpr: "id",
+                                displayExpr: "name",
+                                searchEnabled: true,
+                                showClearButton: true,
+                                stylingMode: 'filled',
+                                placeholder: "Seleccione...",
+                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                            }}
+                        />
+
+                        <SimpleItem
+                            dataField="defaultSegregationGroupId"
+                            label={{ text: "Grupo de Segregación" }}
+                            editorType="dxSelectBox"
+                            editorOptions={{
+                                dataSource: segregationGroups,
+                                valueExpr: "id",
+                                displayExpr: "name",
+                                searchEnabled: true,
+                                showClearButton: true,
+                                stylingMode: 'filled',
+                                placeholder: "Seleccione...",
+                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                            }}
+                        />
+
+                        <SimpleItem
+                            colSpan={2}
+                            dataField="handlingNotes"
+                            label={{ text: "Notas de Manipulación" }}
+                            editorType="dxTextArea"
+                            editorOptions={{
+                                height: 90,
+                                placeholder: "Instrucciones especiales de manejo...",
+                                stylingMode: 'filled'
+                            }}
+                        />
+                    </Form>
+                </div>
+            </details>
             {false && <TagBox />}
         </div>
     );

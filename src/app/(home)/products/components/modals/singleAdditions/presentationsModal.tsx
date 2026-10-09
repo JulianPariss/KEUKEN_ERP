@@ -32,6 +32,7 @@ const emptyPresentationData = {
     uomRatio: 1,
     packagingLevelId: "",
     active: true,
+    isPrimary: false,
 };
 
 const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], uoms, packagingLevels, initialData, isEditing = false }: PresentationsModalProps) => {
@@ -53,6 +54,7 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
                     uomRatio: initialData.uomRatio || 1,
                     packagingLevelId: initialData.packagingLevelId || "",
                     active: initialData.active ?? true,
+                    isPrimary: initialData.isPrimary ?? false,
                 }
                 : { ...emptyPresentationData };
 
@@ -170,7 +172,7 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
                     validationRules={[
                         { type: 'required', message: "El código de barras es obligatorio" },
                         { type: 'stringLength', max: FIELD_LIMITS.stringMiddle, message: `El código de barras no puede superar los ${FIELD_LIMITS.stringMiddle} caracteres` },
-                        { type: 'pattern', pattern: /^[0-9]+$/, message: "El código de barras solo puede contener números" }
+                        { type: 'pattern', pattern: /^[a-zA-Z0-9\-_]+$/, message: "El código de barras solo puede contener caracteres alfanuméricos, guiones y guiones bajos" }
                     ]}
                 />
 
@@ -234,6 +236,16 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
                     editorType="dxCheckBox"
                     editorOptions={{
                         text: "Activo",
+                        stylingMode: 'filled',
+                    }}
+                />
+
+                <SimpleItem
+                    dataField="isPrimary"
+                    label={{ text: "Principal" }}
+                    editorType="dxCheckBox"
+                    editorOptions={{
+                        text: "Es Principal",
                         stylingMode: 'filled',
                     }}
                 />

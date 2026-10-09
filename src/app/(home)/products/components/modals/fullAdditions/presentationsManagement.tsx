@@ -3,7 +3,7 @@
 import { IFUOM } from "@repo/api-contracts/erp";
 import { IFPackagingLevel } from "@repo/api-contracts/erp";
 import { generateUUID } from "@/lib/utils/id.helper";
-import { NumberBox, TextBox } from "devextreme-react";
+import { NumberBox, TextBox, CheckBox } from "devextreme-react";
 import { Button, SelectBox } from '@repo/devextreme';
 import { ValidationGroup } from "devextreme-react/validation-group";
 import Validator, { CustomRule, RequiredRule, PatternRule } from "devextreme-react/validator";
@@ -35,6 +35,7 @@ const PresentationsManagement = ({
         uomRatio: 1,
         packagingLevelId: "",
         active: true,
+        isPrimary: false,
     });
 
     const addPresentationToCurrentItem = () => {
@@ -66,6 +67,7 @@ const PresentationsManagement = ({
             uomRatio: 1,
             packagingLevelId: "",
             active: true,
+            isPrimary: false,
         };
 
         // Cambiar la key del ValidationGroup remonta los inputs de forma 100% limpia y prístina sin alterar la referencia de currentItem ni resetear el scroll del <Form>
@@ -82,7 +84,7 @@ const PresentationsManagement = ({
     return (
         <div>
             <ValidationGroup key={groupKey} ref={validationGroupRef}>
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-6 gap-4">
                     <div className="flex flex-col gap-2">
                         <label className="text-xs opacity-60">Nombre</label>
                         <TextBox
@@ -120,7 +122,7 @@ const PresentationsManagement = ({
                         >
                             <Validator>
                                 <RequiredRule message="Código requerido" />
-                                <PatternRule pattern={/^[0-9]+$/} message="El código de barras solo puede contener números" />
+                                <PatternRule pattern={/^[a-zA-Z0-9\-_]+$/} message="Solo alfanuméricos y guiones" />
                                 <CustomRule
                                     message="Código ya en uso"
                                     validationCallback={(e) => {
@@ -200,13 +202,25 @@ const PresentationsManagement = ({
                                     <RequiredRule message="Ratio requerido" />
                                 </Validator>
                             </NumberBox>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs opacity-60">Es Principal</label>
+                        <div className="flex gap-2 items-center h-[34px]">
+                            <CheckBox
+                                defaultValue={tempPresentationRef.current.isPrimary}
+                                onValueChanged={(e) => {
+                                    tempPresentationRef.current.isPrimary = !!e.value;
+                                }}
+                            />
                             <Button
                                 text="Añadir"
                                 icon="add"
                                 type="default"
                                 stylingMode="outlined"
                                 onClick={addPresentationToCurrentItem}
-                                className="flex-shrink-0"
+                                className="flex-shrink-0 ml-auto"
                             />
                         </div>
                     </div>
@@ -215,37 +229,71 @@ const PresentationsManagement = ({
 
             {(currentItem.presentations || []).length > 0 ? (
                 <div className="mt-4 p-2 bg-main/5 rounded-dx">
-                    <table className="w-full text-xs">
-                        <thead>
-                            <tr className="border-b border-main/10 text-left text-dx-primary opacity-60">
-                                <th className="p-1">Nombre</th>
-                                <th className="p-1">Barras</th>
-                                <th className="p-1">UoM</th>
-                                <th className="p-1">Nivel Empaque</th>
-                                <th className="p-1">Ratio</th>
-                                <th className="p-1 text-end">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentItem.presentations.map((p: any) => (
-                                <tr key={p.tempId} className="border-b border-main/5 last:border-0 hover:bg-main/5 transition-colors">
-                                    <td className="p-1">{p.name}</td>
-                                    <td className="p-1">{p.barcode}</td>
-                                    <td className="p-1">{uoms.find((u: any) => u.id === p.uomId)?.name}</td>
-                                    <td className="p-1">{packagingLevels.find((pl: any) => pl.id === p.packagingLevelId)?.name}</td>
-                                    <td className="p-1">{p.uomRatio}</td>
-                                    <td className="p-1 text-end">
-                                        <Button
-                                            icon="trash"
-                                            type="danger"
-                                            stylingMode="text"
-                                            onClick={() => removePresentationFromCurrentItem(p.tempId)}
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    {Array.from(new Set(currentItem.presentations.map((p: any) => p.packagingLevelId))).map((levelId: any) => {
+                        const levelName = packagingLevels.find((pl: any) => pl.id === levelId)?.name || "Desconocido";
+                        const levelPresentations = currentItem.presentations.filter((p: any) => p.packagingLevelId === levelId);
+                        
+                        return (
+                            <div key={levelId} className="mb-4 last:mb-0">
+                                <h4 className="text-sm font-bold text-dx-primary opacity-80 border-b border-main/10 pb-1 mb-2 px-1">
+                                    Nivel: {levelName}
+                                </h4>
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="border-b border-main/10 text-left text-dx-primary opacity-60">
+                                            <th className="p-1">Nombre</th>
+                                            <th className="p-1">Barras</th>
+                                            <th className="p-1">UoM</th>
+                                            <th className="p-1">Ratio</th>
+                                            <th className="p-1 text-center w-[80px]">Principal</th>
+                                            <th className="p-1 text-end w-[60px]">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {levelPresentations.map((p: any) => (
+                                            <tr key={p.tempId} className="border-b border-main/5 last:border-0 hover:bg-main/5 transition-colors">
+                                                <td className="p-1">{p.name}</td>
+                                                <td className="p-1">{p.barcode}</td>
+                                                <td className="p-1">{uoms.find((u: any) => u.id === p.uomId)?.name}</td>
+                                                <td className="p-1">{p.uomRatio}</td>
+                                                <td className="p-1 text-center">
+                                                    <div className="flex justify-center">
+                                                        <CheckBox
+                                                            value={p.isPrimary}
+                                                            onValueChanged={(e) => {
+                                                                if (e.event) { // Only handle user clicks
+                                                                    const val = !!e.value;
+                                                                    // Update all presentations for this level
+                                                                    currentItem.presentations.forEach((pres: any) => {
+                                                                        if (pres.packagingLevelId === levelId) {
+                                                                            if (pres.tempId === p.tempId) {
+                                                                                pres.isPrimary = val;
+                                                                            } else if (val) { // If making this primary, others must be false
+                                                                                pres.isPrimary = false;
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                    setGroupKey(k => k + 1); // Trigger re-render to reflect changes
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </td>
+                                                <td className="p-1 text-end">
+                                                    <Button
+                                                        icon="trash"
+                                                        type="danger"
+                                                        stylingMode="text"
+                                                        onClick={() => removePresentationFromCurrentItem(p.tempId)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        );
+                    })}
                 </div>
             ) : (
                 <div className="mt-4 p-4 bg-main/5 rounded-dx">

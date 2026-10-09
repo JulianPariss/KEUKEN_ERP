@@ -7,8 +7,13 @@ import { Button } from '@repo/devextreme';
 import { Tooltip } from "devextreme-react/tooltip";
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { CustomRule, RequiredRule } from "devextreme-react/validator";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
+import { useAuth } from "@/contexts/AuthContext";
+import { currenciesService } from "@/app/services/payments_services/currencies.service";
+import { providerService } from "@/app/services/location_services/provider.service";
+import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
+import { IFCurrency, IFProvider, IFCommercialPlatform } from "@repo/api-contracts/erp";
 
 import { generateUUID } from "@/lib/utils/id.helper";
 import { createEmptyItem } from "./creation";
@@ -129,10 +134,30 @@ const ItemsSection = (props: IItemsSectionProps) => {
         packagingLevels
     } = props;
 
+    const { token } = useAuth();
+    const [currencies, setCurrencies] = useState<IFCurrency[]>([]);
+    const [suppliers, setSuppliers] = useState<IFProvider[]>([]);
+    const [platforms, setPlatforms] = useState<IFCommercialPlatform[]>([]);
+
+    useEffect(() => {
+        if (!token) return;
+        currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
+        providerService.getAll(token, currentCompany).then(res => setSuppliers(res.items)).catch(console.error);
+        commercialPlatformsService.getAll({ companyId: currentCompany, limit: 500, offset: 0 }, token).then(res => setPlatforms(res.items)).catch(console.error);
+    }, [token, currentCompany]);
+
     const hasItems = itemsData.length > 0;
 
     const selectedMode = saleBillingModes?.find((m: any) => m.code === productData.saleBillingModeCode);
     const requiresSecondaryUom = selectedMode ? (selectedMode.requiresSecondaryUom || selectedMode.isDualUom) : false;
+    const isService = productData?.classification === 'SERVICIO';
+
+    // If it's a service, force isInventoryItem to false in the current item
+    useEffect(() => {
+        if (isService && currentItem.isInventoryItem) {
+            setCurrentItem((prev: any) => ({ ...prev, isInventoryItem: false }));
+        }
+    }, [isService, currentItem.isInventoryItem, setCurrentItem]);
 
     const addItem = () => {
         const result = formRef.current?.instance().validate();
@@ -189,18 +214,18 @@ const ItemsSection = (props: IItemsSectionProps) => {
                                 label={{ text: "Nombre de Item" }}
                                 editorType="dxTextBox"
                                 editorOptions={{
-                                    placeholder: "Ingrese el nombre",
+                                    placeholder: productData?.name || "Nombre del Producto por defecto",
                                     valueChangeEvent: "blur",
                                     stylingMode: 'filled',
                                     maxLength: FIELD_LIMITS.stringLong,
                                 }}
                             >
-                                <RequiredRule message="El nombre es obligatorio" />
                                 <CustomRule
                                     message="Este nombre ya existe en la lista"
                                     reevaluate={true}
                                     validationCallback={(e) => {
                                         const val = typeof e.value === 'string' ? e.value.trim().toLowerCase() : '';
+                                        if (!val) return true;
                                         return !itemsData.some(i => i.itemName.trim().toLowerCase() === val);
                                     }}
                                 />
@@ -324,6 +349,59 @@ const ItemsSection = (props: IItemsSectionProps) => {
                             >
                                 {requiresSecondaryUom && <RequiredRule message="El ratio de unidad es obligatorio" />}
                             </SimpleItem>
+
+                            <SimpleItem
+                                dataField="currencyId"
+                                label={{ text: "Moneda de Venta" }}
+                                editorType="dxSelectBox"
+                                editorOptions={{
+                                    dataSource: currencies,
+                                    valueExpr: "id",
+                                    displayExpr: "name",
+                                    searchEnabled: true,
+                                    showClearButton: true,
+                                    stylingMode: 'filled',
+                                    placeholder: "Seleccione moneda...",
+                                    dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                                }}
+                            />
+
+                        </GroupItem>
+
+                        <GroupItem colSpan={4} colCount={1} cssClass="!p-0 mt-3">
+                            <SimpleItem
+                                dataField="suppliers"
+                                label={{ text: "Proveedores" }}
+                                editorType="dxTagBox"
+                                editorOptions={{
+                                    dataSource: suppliers,
+                                    valueExpr: "id",
+                                    displayExpr: "name",
+                                    searchEnabled: true,
+                                    showClearButton: true,
+                                    stylingMode: 'filled',
+                                    placeholder: "Seleccione proveedores...",
+                                    width: "100%",
+                                    dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                                }}
+                            />
+
+                            <SimpleItem
+                                dataField="platformIds"
+                                label={{ text: "Plataformas Comerciales" }}
+                                editorType="dxTagBox"
+                                editorOptions={{
+                                    dataSource: platforms,
+                                    valueExpr: "id",
+                                    displayExpr: "name",
+                                    searchEnabled: true,
+                                    showClearButton: true,
+                                    stylingMode: 'filled',
+                                    placeholder: "Seleccione plataformas...",
+                                    width: "100%",
+                                    dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                                }}
+                            />
                         </GroupItem>
 
                         <GroupItem colSpan={4} colCount={4} cssClass="!p-0 mt-4">

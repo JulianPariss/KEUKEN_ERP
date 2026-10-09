@@ -43,7 +43,7 @@ const steps = [
     { label: "Vista Previa" }
 ];
 
-export const createEmptyItem = (companyId: string = "") => ({
+export const createEmptyItem = (companyId: string = "", currencyId: string | null = null) => ({
     sku: "",
     companyId,
     itemName: "",
@@ -60,10 +60,13 @@ export const createEmptyItem = (companyId: string = "") => ({
     requiresExpiry: false,
     isSerializable: false,
     isConsignmentItem: false,
+    currencyId,
+    suppliers: [] as string[],
+    platformIds: [] as string[],
     presentations: [] as any[],
 });
 
-export const createEmptyProduct = (companyId: string = "") => ({
+export const createEmptyProduct = (companyId: string = "", currencyId: string | null = null) => ({
     id: undefined as string | undefined,
     name: "",
     classification: "",
@@ -77,6 +80,12 @@ export const createEmptyProduct = (companyId: string = "") => ({
     saleBillingModeCode: "",
     defaultSecUomId: "",
     taxIds: [] as string[],
+    currencyId,
+    defaultLogisticsProfileId: null,
+    defaultTemperatureClassId: null,
+    defaultHazardClassId: null,
+    defaultSegregationGroupId: null,
+    handlingNotes: "",
 });
 
 const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, categories, brands, taxes, initialData, canCreatePresentation = true, packagingLevels }: ItemsModalProps) => {
@@ -112,10 +121,10 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         fetchClassifications();
     }, [isOpen, token, currentCompany?.id]);
 
-    const [productData, setProductData] = useState(createEmptyProduct(currentCompany?.id ?? ""));
+    const [productData, setProductData] = useState(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
 
     const [itemsData, setItemsData] = useState<any[]>([]);
-    const [currentItem, setCurrentItem] = useState(createEmptyItem(currentCompany?.id ?? ""));
+    const [currentItem, setCurrentItem] = useState(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
 
     useEffect(() => {
         const fetchModes = async () => {
@@ -136,8 +145,8 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         setIsAddingItem(true);
         setShowCancelConfirm(false);
         setItemsData([]);
-        setCurrentItem(createEmptyItem(currentCompany?.id ?? ""));
-        setProductData(createEmptyProduct(currentCompany?.id ?? ""));
+        setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
+        setProductData(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
         if (onHidden) {
             onHidden();
         }
@@ -149,7 +158,7 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             setIsAddingItem(true);
             setShowCancelConfirm(false);
             setItemsData([]);
-            setCurrentItem(createEmptyItem(currentCompany?.id ?? ""));
+            setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
 
             if (initialData) {
                 setProductData({
@@ -166,9 +175,15 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     saleBillingModeCode: initialData.saleBillingModeCode || "",
                     defaultSecUomId: initialData.defaultSecUomId || "",
                     taxIds: initialData.taxIds || [],
+                    currencyId: initialData.currencyId || currentCompany?.currencyId || null,
+                    defaultLogisticsProfileId: initialData.defaultLogisticsProfileId || null,
+                    defaultTemperatureClassId: initialData.defaultTemperatureClassId || null,
+                    defaultHazardClassId: initialData.defaultHazardClassId || null,
+                    defaultSegregationGroupId: initialData.defaultSegregationGroupId || null,
+                    handlingNotes: initialData.handlingNotes || "",
                 });
             } else {
-                setProductData(createEmptyProduct(currentCompany?.id ?? ''));
+                setProductData(createEmptyProduct(currentCompany?.id ?? '', currentCompany?.currencyId ?? null));
             }
 
             setTimeout(() => {
@@ -229,6 +244,12 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     saleBillingModeCode: productData.saleBillingModeCode || undefined,
                     defaultSecUomId: productData.defaultSecUomId || undefined,
                     taxIds: productData.taxIds || [],
+                    currencyId: productData.currencyId || null,
+                    defaultLogisticsProfileId: productData.defaultLogisticsProfileId || null,
+                    defaultTemperatureClassId: productData.defaultTemperatureClassId || null,
+                    defaultHazardClassId: productData.defaultHazardClassId || null,
+                    defaultSegregationGroupId: productData.defaultSegregationGroupId || null,
+                    handlingNotes: productData.handlingNotes || "",
                 },
                 items: itemsData.map((item) => ({
                     sku: item.sku,
@@ -248,6 +269,9 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     requiresExpiry: item.requiresExpiry,
                     isSerializable: item.isSerializable,
                     isConsignmentItem: item.isConsignmentItem,
+                    currencyId: item.currencyId,
+                    suppliers: item.suppliers,
+                    platformIds: item.platformIds,
                     presentations: item.presentations.map((presentation: any) => ({
                         name: presentation.name,
                         barcode: presentation.barcode,
@@ -256,6 +280,7 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                         packagingLevelId: presentation.packagingLevelId,
                         packagingLevelCode: presentation.packagingLevelCode || packagingLevels.find(pl => pl.id === presentation.packagingLevelId)?.code,
                         active: presentation.active !== undefined ? presentation.active : true,
+                        isPrimary: presentation.isPrimary ?? false,
                     }))
                 }))
             }
