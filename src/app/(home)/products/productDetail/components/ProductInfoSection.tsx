@@ -114,14 +114,14 @@ export default function ProductInfoSection({ product, brands }: IProductInfoSect
             <div className="flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-3">
                     <h2 className="text-lg font-bold text-main">Detalles</h2>
-                    <div className="!text-[9px] px-2 py-0.5 bg-focus-500 rounded-full hidden sm:flex items-center gap-1.5 text-xs !text-focus-300">
+                    {/*                     <div className="!text-[9px] px-2 py-0.5 bg-focus-500 rounded-full hidden sm:flex items-center gap-1.5 text-xs !text-focus-300">
                         <span className="uppercase font-semibold">ID:</span>
                         <span className="font-semibold">{product.id}</span>
-                    </div>
+                    </div> */}
                 </div>
                 <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-dx border ${product.active
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                    ? "bg-focus-300/15 text-focus-300 border-focus-300/30"
+                    : "bg-focus-500/5 text-focus-500 border-focus-500/30"
                     }`}>
                     {product.active ? "Activo" : "Inactivo"}
                 </span>

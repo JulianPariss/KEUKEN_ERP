@@ -30,6 +30,10 @@ export async function apiFetch<T>(
         ...(options.headers as Record<string, string> || {}),
     };
 
+    if (typeof FormData !== 'undefined' && options.body instanceof FormData) {
+        delete mergedHeaders['Content-Type'];
+    }
+
     const response = await fetch(url, {
         ...options,
         headers: mergedHeaders,

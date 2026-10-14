@@ -5,6 +5,7 @@ export const CASH_REGISTERS_URL = `${PAYMENTS_URL}/cash-registers`;
 export const WMS_URL = `${APIV1_URL}/wms`;
 export const USERS_URL = `${APIV1_URL}/users`;
 export const PRODUCTS_URL = `${APIV1_URL}/products`;
+export const ITEMS_URL = `${APIV1_URL}/items`;
 export const COMMON_URL = `${APIV1_URL}/common`;
 export const INVENTORY_URL = `${APIV1_URL}/wms/inventory`;
 export const AUTH_URL = `${APIV1_URL}/auth`;

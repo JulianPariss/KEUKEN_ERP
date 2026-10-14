@@ -13,6 +13,7 @@ import { segregationGroupsService } from "@/app/services/product_services/segreg
 import { providerService } from "@/app/services/location_services/provider.service";
 import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
 import { IFCurrency, IFLogisticProfile, IFTemperatureClass, IFHazardClass, IFSegregationGroup, IFProvider, IFCommercialPlatform } from "@repo/api-contracts/erp";
+import ItemMediaUploadSection from "./itemMediaUploadSection";
 
 interface IPreviewSectionProps {
     productData: any;
@@ -38,13 +39,13 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
 
     useEffect(() => {
         if (!token || !currentCompany?.id) return;
-        currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
+        currenciesService.getAll(token).then(res => setCurrencies(res?.items || [])).catch(console.error);
         logisticProfileService.getAll(currentCompany.id, token).then(setLogisticsProfiles).catch(console.error);
         temperatureService.getAll(currentCompany.id, token).then(setTemperatureClasses).catch(console.error);
         hazardService.getAll(currentCompany.id, token).then(setHazardClasses).catch(console.error);
         segregationGroupsService.getAll(currentCompany.id, token).then(setSegregationGroups).catch(console.error);
-        providerService.getAll(token, currentCompany.id).then(res => setSuppliers(res.items)).catch(console.error);
-        commercialPlatformsService.getAll({ companyId: currentCompany.id, limit: 500, offset: 0 }, token).then(res => setPlatforms(res.items)).catch(console.error);
+        providerService.getAll(token, currentCompany.id).then(res => setSuppliers(res?.items || [])).catch(console.error);
+        commercialPlatformsService.getAll({ companyId: currentCompany.id, limit: 500, offset: 0 }, token).then(res => setPlatforms(res?.items || [])).catch(console.error);
     }, [token, currentCompany?.id]);
 
     const getCurrencyName = (id: string) => currencies.find(c => c.id === id)?.name || id;
@@ -52,8 +53,22 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
     const getTempName = (id: string) => temperatureClasses.find(t => t.id === id)?.name || id;
     const getHazardName = (id: string) => hazardClasses.find(h => h.id === id)?.name || id;
     const getSegregationName = (id: string) => segregationGroups.find(s => s.id === id)?.name || id;
-    const getSupplierName = (id: string) => suppliers.find(s => s.id === id)?.name || id;
-    const getPlatformName = (id: string) => platforms.find(p => p.id === id)?.name || id;
+    const getSupplierName = (idOrItem: any) => {
+        if (!idOrItem) return "";
+        const id = typeof idOrItem === "object" ? idOrItem.id : idOrItem;
+        const found = suppliers.find(s => s.id === id);
+        if (found) return found.name;
+        if (typeof idOrItem === "object" && idOrItem.name) return idOrItem.name;
+        return id;
+    };
+    const getPlatformName = (idOrItem: any) => {
+        if (!idOrItem) return "";
+        const id = typeof idOrItem === "object" ? idOrItem.id : idOrItem;
+        const found = platforms.find(p => p.id === id);
+        if (found) return found.name;
+        if (typeof idOrItem === "object" && idOrItem.name) return idOrItem.name;
+        return id;
+    };
 
     const getUomName = (id: string) => uoms.find(u => u.id === id)?.name || id;
     const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || id;
@@ -64,10 +79,27 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
     const selectedMode = saleBillingModes?.find((m: any) => m.code === productData.saleBillingModeCode);
 
     const renderItemTitle = (item: any) => {
+        const displayName = item.itemName || productData?.name || "Sin nombre";
         return (
             <div className="flex justify-between items-center w-full pr-8">
-                <span className="font-semibold text-dx-primary">{item.itemName}</span>
-                <span className="bg-focus-300/10 text-focus-300 px-2 py-0.5 rounded text-xs">{item.sku}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                    {item.media?.[0]?.previewUrl && (
+                        <img
+                            src={item.media[0].previewUrl}
+                            alt=""
+                            className="w-5 h-5 object-cover rounded border border-main/10 shrink-0"
+                        />
+                    )}
+                    <span className="font-semibold text-dx-primary truncate">{displayName}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                    {item.media && item.media.length > 0 && (
+                        <span className="bg-focus-500/15 text-focus-300 px-2 py-0.5 rounded text-xs font-medium">
+                            {item.media.length} {item.media.length === 1 ? 'imagen' : 'imágenes'}
+                        </span>
+                    )}
+                    <span className="bg-focus-300/10 text-focus-300 px-2 py-0.5 rounded text-xs">{item.sku}</span>
+                </div>
             </div>
         );
     };
@@ -75,24 +107,80 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
     const renderItemContent = (item: any) => {
         const requiresSecondaryUom = selectedMode ? (selectedMode.requiresSecondaryUom || selectedMode.isDualUom) : false;
 
+        const getDisplayLogistics = (id?: string) => {
+            if (id) return getLogisticName(id);
+            if (productData?.defaultLogisticsProfileId) return "Hereda del Producto";
+            return "Sin configuración";
+        };
+
+        const getDisplayTemperature = (id?: string) => {
+            if (id) return getTempName(id);
+            if (productData?.defaultTemperatureClassId) return "Hereda del Producto";
+            return "Sin configuración";
+        };
+
+        const getDisplayHazard = (id?: string) => {
+            if (id) return getHazardName(id);
+            if (productData?.defaultHazardClassId) return "Hereda del Producto";
+            return "Sin configuración";
+        };
+
+        const getDisplaySegregation = (id?: string) => {
+            if (id) return getSegregationName(id);
+            if (productData?.defaultSegregationGroupId) return "Hereda del Producto";
+            return "Sin configuración";
+        };
+
+        const itemSuppliers = (item.suppliers || item.supplierIds || []);
+        const itemPlatforms = (item.platformIds || item.platforms || []);
+
         return (
             <div className="p-4 bg-primary-0/20 flex flex-col gap-4">
+                <div className="flex flex-wrap gap-2 items-center">
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${item.active !== false ? "bg-success/15 text-success border border-success/30" : "bg-error/15 text-error border border-error/30"}`}>
+                        {item.active !== false ? "Activo" : "Inactivo"}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${item.isInventoryItem ? "bg-focus-500/15 text-focus-300 border border-focus-500/30" : "bg-main/5 text-main/50 border border-main/10"}`}>
+                        {item.isInventoryItem ? "Controla Stock" : "Sin Stock"}
+                    </span>
+                    {item.requiresExpiry && (
+                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-warning/15 text-warning border border-warning/30">
+                            Requiere Vencimiento
+                        </span>
+                    )}
+                    {item.isSerializable && (
+                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                            Serializable
+                        </span>
+                    )}
+                    {item.isConsignmentItem && (
+                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                            Consignación
+                        </span>
+                    )}
+                </div>
+
                 <Form
                     formData={{
-                        itemName: item.itemName,
+                        itemName: item.itemName || productData?.name || "—",
                         sku: item.sku,
                         costMethod: item.costMethod === 'average' ? 'Promedio' : item.costMethod === 'fifo' ? 'FIFO' : 'Estándar',
+                        currencyId: item.currencyId ? getCurrencyName(item.currencyId) : "—",
                         weight: item.weight,
                         volume: item.volume,
                         palletUnits: item.palletUnits,
                         palletUomId: getUomName(item.palletUomId),
                         uomRatio: item.uomRatio,
-                        logisticsProfileId: getLogisticName(item.logisticsProfileId),
-                        temperatureClassId: getTempName(item.temperatureClassId),
-                        hazardClassId: getHazardName(item.hazardClassId),
-                        segregationGroupId: getSegregationName(item.segregationGroupId),
-                        suppliers: item.supplierIds?.map(getSupplierName).join(", ") || "—",
-                        platforms: item.platformIds?.map(getPlatformName).join(", ") || "—"
+                        logisticsProfileId: getDisplayLogistics(item.logisticsProfileId),
+                        temperatureClassId: getDisplayTemperature(item.temperatureClassId),
+                        hazardClassId: getDisplayHazard(item.hazardClassId),
+                        segregationGroupId: getDisplaySegregation(item.segregationGroupId),
+                        suppliers: Array.isArray(itemSuppliers) && itemSuppliers.length > 0 
+                            ? itemSuppliers.map(getSupplierName).filter(Boolean).join(", ") 
+                            : "—",
+                        platforms: Array.isArray(itemPlatforms) && itemPlatforms.length > 0 
+                            ? itemPlatforms.map(getPlatformName).filter(Boolean).join(", ") 
+                            : "—"
                     }}
                     readOnly={true}
                     labelLocation="top"
@@ -121,6 +209,15 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                         <SimpleItem
                             dataField="costMethod"
                             label={{ text: "Método de Costo" }}
+                            editorType="dxTextBox"
+                            editorOptions={{
+                                stylingMode: 'filled'
+                            }}
+                        />
+
+                        <SimpleItem
+                            dataField="currencyId"
+                            label={{ text: "Moneda de Venta" }}
                             editorType="dxTextBox"
                             editorOptions={{
                                 stylingMode: 'filled'
@@ -246,7 +343,7 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                                             <td className="p-2 text-xs text-main">{packagingLevels?.find(pl => pl.id === pres.packagingLevelId)?.name || pres.packagingLevelId || "—"}</td>
                                             <td className="p-2 text-xs text-main text-right font-semibold">{pres.uomRatio ?? "—"}</td>
                                             <td className="p-2 text-xs text-main text-center">
-                                                {pres.isPrimary ? <i className="dx-icon-check text-green-500" /> : <i className="dx-icon-close text-red-500" />}
+                                                {pres.isPrimary ? <i className="dx-icon-check text-success" /> : <i className="dx-icon-close text-error" />}
                                             </td>
                                         </tr>
                                     ))}
@@ -257,6 +354,19 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                 ) : (
                     <div className="mt-2 p-2 bg-main/5 rounded text-sm text-main/60">
                         No hay presentaciones para este ítem.
+                    </div>
+                )}
+
+                {item.media && item.media.length > 0 && (
+                    <div className="mt-3 flex flex-col gap-2">
+                        <h4 className="text-sm font-semibold text-dx-primary border-b border-main/10 pb-1">
+                            Imágenes ({item.media.length})
+                        </h4>
+                        <ItemMediaUploadSection
+                            media={item.media}
+                            onChange={() => {}}
+                            readOnly={true}
+                        />
                     </div>
                 )}
             </div>
@@ -277,10 +387,10 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                     saleBillingModeCode: getSaleBillingModeName(productData.saleBillingModeCode),
                     defaultSecUomId: productData.defaultSecUomId ? getUomName(productData.defaultSecUomId) : "Ninguna",
                     currencyId: productData.currencyId ? getCurrencyName(productData.currencyId) : "—",
-                    defaultLogisticsProfileId: productData.defaultLogisticsProfileId ? getLogisticName(productData.defaultLogisticsProfileId) : "—",
-                    defaultTemperatureClassId: productData.defaultTemperatureClassId ? getTempName(productData.defaultTemperatureClassId) : "—",
-                    defaultHazardClassId: productData.defaultHazardClassId ? getHazardName(productData.defaultHazardClassId) : "—",
-                    defaultSegregationGroupId: productData.defaultSegregationGroupId ? getSegregationName(productData.defaultSegregationGroupId) : "—",
+                    defaultLogisticsProfileId: productData.defaultLogisticsProfileId ? getLogisticName(productData.defaultLogisticsProfileId) : "Sin configuración",
+                    defaultTemperatureClassId: productData.defaultTemperatureClassId ? getTempName(productData.defaultTemperatureClassId) : "Sin configuración",
+                    defaultHazardClassId: productData.defaultHazardClassId ? getHazardName(productData.defaultHazardClassId) : "Sin configuración",
+                    defaultSegregationGroupId: productData.defaultSegregationGroupId ? getSegregationName(productData.defaultSegregationGroupId) : "Sin configuración",
                     handlingNotes: productData.handlingNotes || ""
                 }}
                 readOnly={true}

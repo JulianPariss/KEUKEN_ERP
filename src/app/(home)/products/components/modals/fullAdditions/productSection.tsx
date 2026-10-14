@@ -50,8 +50,6 @@ const ProductSection = (props: IProductSection) => {
     const [hazardClasses, setHazardClasses] = useState<IFHazardClass[]>([]);
     const [segregationGroups, setSegregationGroups] = useState<IFSegregationGroup[]>([]);
 
-    const hasHandlingData = !!productData?.defaultLogisticsProfileId || !!productData?.defaultTemperatureClassId || !!productData?.defaultHazardClassId || !!productData?.defaultSegregationGroupId || !!productData?.handlingNotes;
-
     useEffect(() => {
         if (!token) return;
         currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
@@ -306,7 +304,7 @@ const ProductSection = (props: IProductSection) => {
                 <GroupItem
                     colSpan={2}
                     colCount={2}
-                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm"
+                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm !mb-6"
                 >
                     <SimpleItem
                         colSpan={2}
@@ -432,127 +430,102 @@ const ProductSection = (props: IProductSection) => {
                             </p>
                         </div>
                     </SimpleItem>
-                              </GroupItem>
-            </Form>
+                </GroupItem>
 
-            {/* Manejo de Artículos - Collapsible Section */}
-            <details
-                className="group border border-main/10 rounded-dx bg-primary-0/40 shadow-sm mt-2 transition-all duration-300"
-                open={hasHandlingData}
-                onToggle={(e: any) => {
-                    if (!e.target.open) {
-                        const handlingForm = formRef.current?.instance(); // Re-use main formRef to clear data if needed
-                        if (handlingForm) {
-                            handlingForm.updateData("defaultLogisticsProfileId", null);
-                            handlingForm.updateData("defaultTemperatureClassId", null);
-                            handlingForm.updateData("defaultHazardClassId", null);
-                            handlingForm.updateData("defaultSegregationGroupId", null);
-                            handlingForm.updateData("handlingNotes", "");
-                        }
-                    }
-                }}
-            >
-                <summary className="p-5 cursor-pointer list-none flex justify-between items-center focus:outline-none rounded-dx">
-                    <div>
-                        <h3 className="text-lg font-bold text-dx-primary mb-1 group-open:text-focus-300 transition-colors">Manejo de Artículos</h3>
-                        <p className="text-xs opacity-60">Configuración por defecto</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="text-xs font-semibold text-main/60 bg-main/5 px-3 py-1 rounded-full group-open:hidden">
-                            Usando valores por defecto
-                        </div>
-                        <div className="text-xs font-semibold text-focus-300 bg-focus-300/10 px-3 py-1 rounded-full hidden group-open:block">
-                            Definiendo valores manualmente
-                        </div>
-                        <i className="dx-icon-chevronright group-open:rotate-90 transition-transform duration-300 text-main/50" />
-                    </div>
-                </summary>
-
-                <div className="px-5 pb-5 border-t border-main/5 pt-5">
-                    <Form
-                        formData={productData}
-                        colCount={2}
-                        scrollingEnabled={false}
+                {/* Card 3: Manejo de Artículos */}
+                <GroupItem
+                    colSpan={2}
+                    colCount={2}
+                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm"
+                >
+                    <SimpleItem
+                        colSpan={2}
+                        cssClass="!p-0"
+                        label={{ visible: false }}
                     >
-                        <SimpleItem
-                            dataField="defaultLogisticsProfileId"
-                            label={{ text: "Perfil Logístico" }}
-                            editorType="dxSelectBox"
-                            editorOptions={{
-                                dataSource: logisticsProfiles,
-                                valueExpr: "id",
-                                displayExpr: "name",
-                                searchEnabled: true,
-                                showClearButton: true,
-                                stylingMode: 'filled',
-                                placeholder: "Seleccione...",
-                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
-                            }}
-                        />
+                        <div className="mb-6 border-b border-main/10 pb-4">
+                            <h3 className="text-lg font-bold text-dx-primary mb-1">Manejo de Artículos</h3>
+                            <p className="text-xs opacity-60">Configuración por defecto para el producto.</p>
+                        </div>
+                    </SimpleItem>
 
-                        <SimpleItem
-                            dataField="defaultTemperatureClassId"
-                            label={{ text: "Clase de Temperatura" }}
-                            editorType="dxSelectBox"
-                            editorOptions={{
-                                dataSource: temperatureClasses,
-                                valueExpr: "id",
-                                displayExpr: "name",
-                                searchEnabled: true,
-                                showClearButton: true,
-                                stylingMode: 'filled',
-                                placeholder: "Seleccione...",
-                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
-                            }}
-                        />
+                    <SimpleItem
+                        dataField="defaultLogisticsProfileId"
+                        label={{ text: "Perfil Logístico" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: logisticsProfiles,
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: 'filled',
+                            placeholder: "Seleccione...",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                        }}
+                    />
 
-                        <SimpleItem
-                            dataField="defaultHazardClassId"
-                            label={{ text: "Clase de Peligro" }}
-                            editorType="dxSelectBox"
-                            editorOptions={{
-                                dataSource: hazardClasses,
-                                valueExpr: "id",
-                                displayExpr: "name",
-                                searchEnabled: true,
-                                showClearButton: true,
-                                stylingMode: 'filled',
-                                placeholder: "Seleccione...",
-                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
-                            }}
-                        />
+                    <SimpleItem
+                        dataField="defaultTemperatureClassId"
+                        label={{ text: "Clase de Temperatura" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: temperatureClasses,
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: 'filled',
+                            placeholder: "Seleccione...",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                        }}
+                    />
 
-                        <SimpleItem
-                            dataField="defaultSegregationGroupId"
-                            label={{ text: "Grupo de Segregación" }}
-                            editorType="dxSelectBox"
-                            editorOptions={{
-                                dataSource: segregationGroups,
-                                valueExpr: "id",
-                                displayExpr: "name",
-                                searchEnabled: true,
-                                showClearButton: true,
-                                stylingMode: 'filled',
-                                placeholder: "Seleccione...",
-                                dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
-                            }}
-                        />
+                    <SimpleItem
+                        dataField="defaultHazardClassId"
+                        label={{ text: "Clase de Peligro" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: hazardClasses,
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: 'filled',
+                            placeholder: "Seleccione...",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                        }}
+                    />
 
-                        <SimpleItem
-                            colSpan={2}
-                            dataField="handlingNotes"
-                            label={{ text: "Notas de Manipulación" }}
-                            editorType="dxTextArea"
-                            editorOptions={{
-                                height: 90,
-                                placeholder: "Instrucciones especiales de manejo...",
-                                stylingMode: 'filled'
-                            }}
-                        />
-                    </Form>
-                </div>
-            </details>
-            {false && <TagBox />}
+                    <SimpleItem
+                        dataField="defaultSegregationGroupId"
+                        label={{ text: "Grupo de Segregación" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: segregationGroups,
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: 'filled',
+                            placeholder: "Seleccione...",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
+                        }}
+                    />
+
+                    <SimpleItem
+                        colSpan={2}
+                        dataField="handlingNotes"
+                        label={{ text: "Notas de Manipulación" }}
+                        editorType="dxTextArea"
+                        editorOptions={{
+                            height: 90,
+                            placeholder: "Instrucciones especiales de manejo...",
+                            stylingMode: 'filled'
+                        }}
+                    />
+                </GroupItem>
+            </Form>
         </div>
     );
 };

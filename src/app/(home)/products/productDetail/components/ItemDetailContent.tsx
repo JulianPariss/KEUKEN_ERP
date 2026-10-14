@@ -1,46 +1,34 @@
 'use client';
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { metadataService } from "@/app/services/metadata.service";
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
-import { CheckBox } from "devextreme-react";
+import { CheckIcon, CrossIcon } from "@repo/icons";
 import MetadataFieldsClient from "@/components/metadata/MetadataFieldsClient";
 import PresentationsTable from "./PresentationsTable";
-import { IFProductFullItem } from "@repo/api-contracts/erp";
+import ItemMediaGallery from "./ItemMediaGallery";
+import ItemHandlingSection from "./ItemHandlingSection";
+import ItemSuppliersSection from "./ItemSuppliersSection";
+import ItemPlatformsSection from "./ItemPlatformsSection";
+import { IFProductFullItem, IFItemMedia } from "@repo/api-contracts/erp";
 
 type IFProductFullItemItem = IFProductFullItem['items'][number];
-
-interface CheckboxContainerProps {
-    children: React.ReactNode;
-    description: string;
-}
-
-const CheckboxContainer = ({ children, description }: CheckboxContainerProps) => {
-    return (
-        <div className="flex flex-col gap-1 p-3 bg-primary-900/40 rounded-dx border border-main/5 hover:border-main/10 transition-colors">
-            <div>
-                {children}
-            </div>
-            <p className="text-[11px] text-main/50 pl-6 leading-normal">
-                {description}
-            </p>
-        </div>
-    );
-};
 
 interface ItemDetailContentProps {
     item: IFProductFullItemItem;
     uoms: any[];
     packagingLevels: any[];
     getUomName: (id: string) => string;
+    onMediaChange?: (updatedMedia: IFItemMedia[]) => void;
 }
 
 export default function ItemDetailContent({
     item,
     uoms,
     packagingLevels,
-    getUomName
+    getUomName,
+    onMediaChange
 }: ItemDetailContentProps) {
     const { token } = useAuth();
     const [metadataState, setMetadataState] = useState<{
@@ -54,6 +42,39 @@ export default function ItemDetailContent({
         loading: false,
         visible: false,
     });
+
+    const operationalFlags = useMemo(() => [
+        {
+            key: 'isDualUom',
+            label: 'U.Medida Doble',
+            value: Boolean(item.isDualUom),
+            description: 'Permite el registro de dos unidades de medida diferentes para el mismo artículo.',
+        },
+        {
+            key: 'isInventoryItem',
+            label: 'Controla Stock',
+            value: Boolean(item.isInventoryItem),
+            description: 'Determina si el artículo se almacena en inventario y realiza movimientos de stock.',
+        },
+        {
+            key: 'requiresExpiry',
+            label: 'Requiere Vencimiento',
+            value: Boolean(item.requiresExpiry),
+            description: 'Exige el registro de fecha de caducidad para este lote de artículos.',
+        },
+        {
+            key: 'isSerializable',
+            label: 'Es Serializable',
+            value: Boolean(item.isSerializable),
+            description: 'Permite realizar el seguimiento individual de cada unidad mediante un número de serie único.',
+        },
+        {
+            key: 'isConsignmentItem',
+            label: 'Admite Consignación',
+            value: Boolean(item.isConsignmentItem),
+            description: 'Habilita la recepción y entrega de mercadería bajo la modalidad de consignación.',
+        },
+    ], [item.isConsignmentItem, item.isDualUom, item.isInventoryItem, item.isSerializable, item.requiresExpiry]);
 
     const handleToggleMetadata = useCallback(async (forceRefresh?: boolean) => {
         const hasNoAttributes = metadataState.attributes && metadataState.attributes.filter(a => a.isVisible && !a.isSystemInternal).length === 0;
@@ -106,7 +127,7 @@ export default function ItemDetailContent({
                     weight: item.weight,
                     volume: item.volume,
                     palletUnits: item.palletUnits,
-                    palletUomId: getUomName(item.palletUomId),
+                    palletUomId: item.palletUomId ? getUomName(item.palletUomId) : '-',
                     uomRatio: item.uomRatio
                 }}
                 readOnly={true}
@@ -167,52 +188,70 @@ export default function ItemDetailContent({
                 </GroupItem>
             </Form>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-2 border-t border-main/10 pt-4">
-                <CheckboxContainer description="Permite el registro de dos unidades de medida diferentes para el mismo artículo.">
-                    <CheckBox
-                        text="U.Medida Doble"
-                        value={item.isDualUom || false}
-                        readOnly
-                        disabled
-                    />
-                </CheckboxContainer>
-
-                <CheckboxContainer description="Determina si el artículo se almacena en inventario y realiza movimientos de stock.">
-                    <CheckBox
-                        text="Controla Stock"
-                        value={item.isInventoryItem || false}
-                        readOnly
-                        disabled
-                    />
-                </CheckboxContainer>
-
-                <CheckboxContainer description="Exige el registro de fecha de caducidad para este lote de artículos.">
-                    <CheckBox
-                        text="Requiere Vencimiento"
-                        value={item.requiresExpiry || false}
-                        readOnly
-                        disabled
-                    />
-                </CheckboxContainer>
-
-                <CheckboxContainer description="Permite realizar el seguimiento individual de cada unidad mediante un número de serie único.">
-                    <CheckBox
-                        text="Es Serializable"
-                        value={item.isSerializable || false}
-                        readOnly
-                        disabled
-                    />
-                </CheckboxContainer>
-
-                <CheckboxContainer description="Habilita la recepción y entrega de mercadería bajo la modalidad de consignación.">
-                    <CheckBox
-                        text="Admite Consignación"
-                        value={item.isConsignmentItem || false}
-                        readOnly
-                        disabled
-                    />
-                </CheckboxContainer>
+            {/* Políticas y Controles Operativos */}
+            <div className="flex flex-col gap-1.5 w-full mt-1 border-t border-main/10 pt-3">
+                <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-main/40 uppercase tracking-wider">
+                        Políticas y Controles Operativos
+                    </span>
+                    <span className="text-[11px] text-main/40">
+                        {operationalFlags.filter(f => f.value).length} de {operationalFlags.length} activos
+                    </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                    {operationalFlags.map(flag => (
+                        <div
+                            key={flag.key}
+                            title={flag.description}
+                            className={`flex items-center gap-2 p-2 rounded-dx border transition-all cursor-default select-none ${
+                                flag.value
+                                    ? 'bg-primary-0/25 border-focus-500/30 shadow-xs'
+                                    : 'bg-primary-950/20 border-main/5 opacity-55 hover:opacity-85'
+                            }`}
+                        >
+                            <span
+                                className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                                    flag.value
+                                        ? 'bg-focus-500/15 text-focus-300 border border-focus-500/30'
+                                        : 'bg-main/5 text-main/40 border border-main/10'
+                                }`}
+                            >
+                                {flag.value ? (
+                                    <CheckIcon size={11} className="text-focus-300" />
+                                ) : (
+                                    <CrossIcon size={11} className="text-main/40" />
+                                )}
+                            </span>
+                            <div className="flex flex-col min-w-0 flex-1">
+                                <span className={`text-xs font-semibold truncate ${flag.value ? 'text-main' : 'text-main/60'}`}>
+                                    {flag.label}
+                                </span>
+                                <span className={`text-[10px] truncate ${flag.value ? 'text-focus-300 font-medium' : 'text-main/40'}`}>
+                                    {flag.value ? 'Habilitado' : 'No configurado'}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
+
+            {/* Manejo y Logística del Item */}
+            <ItemHandlingSection
+                logisticsProfileId={item.logisticsProfileId || (item as any).logistics_profile_id}
+                temperatureClassId={item.temperatureClassId || (item as any).temperature_class_id}
+                hazardClassId={item.hazardClassId || (item as any).hazard_class_id}
+                segregationGroupId={item.segregationGroupId || (item as any).segregation_group_id}
+            />
+
+            {/* Proveedores del Item */}
+            <ItemSuppliersSection
+                suppliers={item.suppliers}
+            />
+
+            {/* Plataformas Comerciales del Item */}
+            <ItemPlatformsSection
+                platforms={item.platforms || (item as any).platformIds}
+            />
 
             {/* Metadatos Dinámicos */}
             <MetadataFieldsClient
@@ -235,6 +274,15 @@ export default function ItemDetailContent({
                 uoms={uoms}
                 packagingLevels={packagingLevels}
                 getUomName={getUomName}
+            />
+
+            {/* Galería Multimedia */}
+            <ItemMediaGallery
+                itemId={item.id}
+                itemSku={item.sku}
+                itemName={item.itemName}
+                initialMedia={item.media || []}
+                onMediaChange={onMediaChange}
             />
         </div>
     );

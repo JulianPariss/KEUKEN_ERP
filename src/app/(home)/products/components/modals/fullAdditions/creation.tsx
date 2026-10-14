@@ -2,6 +2,7 @@
 
 import { productsService } from "@/app/services/product_services/products.service";
 import { saleBillingModesService } from "@/app/services/product_services/saleBillingModes.service";
+import { itemMediaService } from "@/app/services/product_services/itemMedia.service";
 import { IFBrand } from "@repo/api-contracts/erp";
 import { IFCategory } from "@repo/api-contracts/erp";
 import { IFProduct, IFProductFull, IFProductClassification, TFProcurementType } from "@repo/api-contracts/erp";
@@ -12,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Stepper from "devextreme-react/stepper";
 
 import { Button } from '@repo/devextreme';
+import { CheckOutlinedIcon } from "@repo/icons";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { Popover } from "devextreme-react/popover";
 import notify from "devextreme/ui/notify";
@@ -19,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ItemsSection from "./itemCreation";
 import PreviewSection from "./previewSection";
 import ProductSection from "./productSection";
+import { ICachedItemMedia } from "./itemMediaUploadSection";
 
 import { IFTax } from "@repo/api-contracts/erp";
 
@@ -40,7 +43,8 @@ interface ItemsModalProps {
 const steps = [
     { label: "Producto" },
     { label: "Ítems" },
-    { label: "Vista Previa" }
+    { label: "Vista Previa" },
+    { label: "Resultado" }
 ];
 
 export const createEmptyItem = (companyId: string = "", currencyId: string | null = null) => ({
@@ -61,9 +65,10 @@ export const createEmptyItem = (companyId: string = "", currencyId: string | nul
     isSerializable: false,
     isConsignmentItem: false,
     currencyId,
-    suppliers: [] as string[],
+    suppliers: [] as any[],
     platformIds: [] as string[],
     presentations: [] as any[],
+    media: [] as ICachedItemMedia[],
 });
 
 export const createEmptyProduct = (companyId: string = "", currencyId: string | null = null) => ({
@@ -91,6 +96,8 @@ export const createEmptyProduct = (companyId: string = "", currencyId: string | 
 const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, categories, brands, taxes, initialData, canCreatePresentation = true, packagingLevels }: ItemsModalProps) => {
     const { currentCompany } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [loadingStatusText, setLoadingStatusText] = useState("");
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     const [currentStep, setCurrentStep] = useState(0);
@@ -121,6 +128,13 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         fetchClassifications();
     }, [isOpen, token, currentCompany?.id]);
 
+    const [createdResult, setCreatedResult] = useState<{
+        id: string;
+        name: string;
+        itemsCount: number;
+        totalImages: number;
+    } | null>(null);
+
     const [productData, setProductData] = useState(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
 
     const [itemsData, setItemsData] = useState<any[]>([]);
@@ -141,16 +155,31 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
     }, [isOpen, token]);
 
     const handleHidden = useCallback(() => {
+        // Revocar URLs de objetos cacheados
+        itemsData.forEach(item => {
+            item.media?.forEach((m: ICachedItemMedia) => {
+                if (m.previewUrl) URL.revokeObjectURL(m.previewUrl);
+            });
+        });
+        if (currentItem.media) {
+            currentItem.media.forEach((m: ICachedItemMedia) => {
+                if (m.previewUrl) URL.revokeObjectURL(m.previewUrl);
+            });
+        }
+
         setCurrentStep(0);
         setIsAddingItem(true);
         setShowCancelConfirm(false);
         setItemsData([]);
         setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
         setProductData(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
+        setCreatedResult(null);
+        setLoadingProgress(0);
+        setLoadingStatusText("");
         if (onHidden) {
             onHidden();
         }
-    }, [onHidden, currentCompany?.id]);
+    }, [onHidden, currentCompany?.id, itemsData, currentItem]);
 
     useEffect(() => {
         if (isOpen) {
@@ -159,6 +188,9 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             setShowCancelConfirm(false);
             setItemsData([]);
             setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
+            setCreatedResult(null);
+            setLoadingProgress(0);
+            setLoadingStatusText("");
 
             if (initialData) {
                 setProductData({
@@ -231,6 +263,8 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
 
     const handleSubmit = useCallback(async () => {
         setLoading(true);
+        setLoadingProgress(0);
+        setLoadingStatusText("Iniciando creación del producto...");
         try {
             const formatedData: IFProductFull = {
                 product: {
@@ -270,7 +304,21 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     isSerializable: item.isSerializable,
                     isConsignmentItem: item.isConsignmentItem,
                     currencyId: item.currencyId,
-                    suppliers: item.suppliers,
+                    suppliers: (item.suppliers || []).map((s: any, idx: number) => {
+                        if (typeof s === 'string') {
+                            return {
+                                supplier_id: s,
+                                priority: idx + 1,
+                                active: true
+                            };
+                        }
+                        return {
+                            supplier_id: s.supplier_id || s.id || s.supplierId,
+                            supplier_sku: s.supplier_sku || s.supplierSku || undefined,
+                            priority: s.priority !== undefined ? Number(s.priority) : (idx + 1),
+                            active: s.active !== undefined ? s.active : true
+                        };
+                    }).filter((s: any) => !!s.supplier_id),
                     platformIds: item.platformIds,
                     presentations: item.presentations.map((presentation: any) => ({
                         name: presentation.name,
@@ -283,11 +331,102 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                         isPrimary: presentation.isPrimary ?? false,
                     }))
                 }))
+            };
+
+            setLoadingStatusText("Registrando producto e ítems en el servidor...");
+            const createdProduct = await productsService.createFull(formatedData, token, currentCompany?.id);
+
+            // Creación del producto completada: asigna exactamente 5%
+            let currentProgress = 5;
+            setLoadingProgress(currentProgress);
+            setLoadingStatusText("Producto e ítems registrados (5%). Procesando multimedia...");
+
+            // Subir imágenes cacheadas para cada ítem creado (el 95% restante)
+            let uploadedImagesCount = 0;
+            const totalItems = itemsData.length;
+            const itemWeight = totalItems > 0 ? (95 / totalItems) : 95;
+
+            if (totalItems > 0 && createdProduct?.id) {
+                try {
+                    const fullProduct = await productsService.getFullById(createdProduct.id, token, currentCompany?.id);
+                    const serverItems = fullProduct?.items || [];
+
+                    for (let itemIdx = 0; itemIdx < totalItems; itemIdx++) {
+                        const clientItem = itemsData[itemIdx];
+                        const mediaList = Array.isArray(clientItem.media) ? clientItem.media : [];
+                        const mediaCount = mediaList.length;
+
+                        if (mediaCount === 0) {
+                            // Este ítem no tiene imágenes: completa su porcentaje asignado directamente
+                            currentProgress += itemWeight;
+                            setLoadingProgress(Math.min(100, currentProgress));
+                            setLoadingStatusText(`Ítem ${itemIdx + 1} de ${totalItems} (${clientItem.sku || clientItem.itemName || 'Sin SKU'}): completado`);
+                            continue;
+                        }
+
+                        // El ítem tiene imágenes: cada imagen suma su porcentaje proporcional al peso del ítem
+                        const imageStep = itemWeight / mediaCount;
+                        const matchedServerItem = serverItems.find(
+                            (si: any) => si.sku?.trim().toLowerCase() === clientItem.sku?.trim().toLowerCase()
+                        );
+
+                        if (matchedServerItem?.id) {
+                            for (let imgIdx = 0; imgIdx < mediaCount; imgIdx++) {
+                                const m = mediaList[imgIdx];
+                                setLoadingStatusText(
+                                    `Ítem ${itemIdx + 1}/${totalItems} (${clientItem.sku}): subiendo imagen ${imgIdx + 1} de ${mediaCount}...`
+                                );
+                                try {
+                                    await itemMediaService.uploadItemMedia(
+                                        matchedServerItem.id,
+                                        {
+                                            file: m.file,
+                                            kindCode: m.kindCode || (imgIdx === 0 ? "main" : undefined),
+                                            altText: m.altText || undefined,
+                                            sortOrder: imgIdx,
+                                        },
+                                        token,
+                                        currentCompany?.id
+                                    );
+                                    uploadedImagesCount++;
+                                } catch (uploadError) {
+                                    console.error(`Error al subir imagen ${imgIdx + 1} para el ítem ${clientItem.sku}:`, uploadError);
+                                } finally {
+                                    currentProgress += imageStep;
+                                    setLoadingProgress(Math.min(100, currentProgress));
+                                }
+                            }
+                        } else {
+                            console.warn(`No se encontró en el servidor el ítem con SKU ${clientItem.sku}`);
+                            currentProgress += itemWeight;
+                            setLoadingProgress(Math.min(100, currentProgress));
+                        }
+                    }
+                } catch (mediaError) {
+                    console.error("Error al procesar la subida de imágenes:", mediaError);
+                    notify("El producto se creó, pero ocurrió un problema al cargar algunas imágenes", "warning", 4000);
+                }
+            } else {
+                currentProgress = 100;
+                setLoadingProgress(100);
             }
-            await productsService.createFull(formatedData, token, currentCompany?.id);
+
+            setLoadingProgress(100);
+            setLoadingStatusText("¡Creación finalizada con éxito!");
+
+            // Breve pausa para que se aprecie la barra al 100% antes de avanzar a Resultado
+            await new Promise((resolve) => setTimeout(resolve, 350));
+
+            setCreatedResult({
+                id: createdProduct.id,
+                name: productData.name || createdProduct.name,
+                itemsCount: itemsData.length,
+                totalImages: uploadedImagesCount,
+            });
+
             notify("Producto creado exitosamente", "success", 3000);
             onSuccess();
-            onClose();
+            setCurrentStep(3);
         } catch (error: any) {
             console.error("Error saving items:", error);
             const errorMessage = error instanceof Error && error.message ? error.message : "Error al intentar guardar";
@@ -295,18 +434,28 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         } finally {
             setLoading(false);
         }
-    }, [itemsData, productData, onClose, onSuccess, token, currentCompany?.id, packagingLevels]);
+    }, [itemsData, productData, onSuccess, token, currentCompany?.id, packagingLevels]);
 
+    const displayProgress = Math.min(100, Math.max(0, loadingProgress));
+    const progressText = displayProgress >= 100
+        ? "100%"
+        : `${Number(displayProgress.toFixed(2))}%`;
 
     return (
         <Popup
             ref={popupRef}
             visible={isOpen}
-            onHiding={onClose}
+            onHiding={(e: any) => {
+                if (loading) {
+                    if (e) e.cancel = true;
+                    return;
+                }
+                onClose();
+            }}
             onHidden={handleHidden}
             dragEnabled={false}
             hideOnOutsideClick={false}
-            showCloseButton={true}
+            showCloseButton={!loading}
             showTitle={true}
             title={"Crear un Producto completo"}
             width={950}
@@ -320,69 +469,132 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                 const content = e.component.content();
                 if (content) {
                     content.style.overflow = "hidden";
+                    content.style.position = "relative";
                 }
             }}
             onContentReady={(e) => {
                 const content = e.component.content();
                 if (content) {
                     content.style.overflow = "hidden";
+                    content.style.position = "relative";
                 }
             }}
         >
             <Position at="center" my="center" />
 
-            {/* Toolbar Buttons */}
-            <ToolbarItem toolbar="bottom" location="after">
-                <Button
-                    id="btn-cancel-product-creation"
-                    text="Cancelar"
-                    onClick={() => {
-                        const hasData = !!productData.name || itemsData.length > 0;
-                        if (hasData) {
-                            setShowCancelConfirm(true);
-                        } else {
-                            onClose();
-                        }
-                    }}
-                    disabled={loading}
-                    type="normal"
-                    stylingMode="text"
-                />
-            </ToolbarItem>
+            {/* Overlay Bloqueador con Spinner y Barra de Progreso */}
+            {loading && (
+                <div
+                    className="absolute inset-0 z-50 bg-primary-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center select-none"
+                    style={{ pointerEvents: "all" }}
+                >
+                    <div className="bg-primary-900/95 border border-main/15 rounded-xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center backdrop-blur-lg relative overflow-hidden">
+                        {/* Destello decorativo ambiental */}
+                        <div className="absolute -top-12 -left-12 w-32 h-32 bg-focus-300/10 rounded-full blur-2xl pointer-events-none" />
+                        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-focus-300/10 rounded-full blur-2xl pointer-events-none" />
 
-            {currentStep > 0 && (
-                <ToolbarItem toolbar="bottom" location="after">
-                    <Button
-                        text="Atrás"
-                        icon="arrowleft"
-                        onClick={handleBack}
-                        disabled={loading}
-                        type="normal"
-                        stylingMode="outlined"
-                    />
-                </ToolbarItem>
+                        {/* Spinner animado concéntrico en el centro */}
+                        <div className="relative mb-6 flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full border-4 border-focus-300/20 border-t-focus-300 animate-spin" />
+                            <div className="absolute w-8 h-8 rounded-full bg-focus-300/15 animate-pulse flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full bg-focus-300 shadow-sm shadow-focus-300/50" />
+                            </div>
+                        </div>
+
+                        {/* Título de estado */}
+                        <h3 className="text-lg font-bold text-main tracking-tight mb-1">
+                            Guardando producto
+                        </h3>
+
+                        {/* Descripción dinámica del paso actual */}
+                        <p className="text-xs text-main/70 min-h-[1.25rem] mb-5 truncate max-w-full px-2" title={loadingStatusText}>
+                            {loadingStatusText || "Procesando información..."}
+                        </p>
+
+                        {/* Barra de progreso */}
+                        <div className="w-full mb-3">
+                            <div className="flex items-center justify-between text-xs font-semibold mb-2 px-0.5">
+                                <span className="text-main/60 font-medium">Progreso general</span>
+                                <span className="text-focus-300 font-bold tabular-nums text-sm">
+                                    {progressText}
+                                </span>
+                            </div>
+
+                            {/* Pista de la barra */}
+                            <div className="w-full h-3.5 bg-main/10 rounded-full p-0.5 border border-main/15 shadow-inner overflow-hidden relative">
+                                {/* Relleno dinámico */}
+                                <div
+                                    className="h-full rounded-full bg-gradient-to-r from-focus-300 via-focus-300 to-focus-100 transition-all duration-300 ease-out relative shadow-sm"
+                                    style={{ width: `${displayProgress}%` }}
+                                >
+                                    <div className="absolute inset-0 bg-white/20 rounded-full opacity-60 animate-pulse" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <span className="text-[11px] text-main/50">
+                            Por favor, no cierre esta ventana mientras se procesan los datos.
+                        </span>
+                    </div>
+                </div>
             )}
 
-            {currentStep < 2 ? (
-                <ToolbarItem toolbar="bottom" location="after">
-                    <Button
-                        text="Siguiente"
-                        type="default"
-                        stylingMode="contained"
-                        onClick={handleNext}
-                        disabled={loading}
-                    />
-                </ToolbarItem>
-            ) : (
-                <ToolbarItem toolbar="bottom" location="after">
-                    <Button
-                        text="Confirmar"
-                        type="default"
-                        stylingMode="contained"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    />
-                </ToolbarItem>
+            {/* Toolbar Buttons (Ocultos en el paso de Resultado o mientras carga) */}
+            {currentStep < 3 && !loading && (
+                <>
+                    <ToolbarItem toolbar="bottom" location="after">
+                        <Button
+                            id="btn-cancel-product-creation"
+                            text="Cancelar"
+                            onClick={() => {
+                                const hasData = !!productData.name || itemsData.length > 0;
+                                if (hasData) {
+                                    setShowCancelConfirm(true);
+                                } else {
+                                    onClose();
+                                }
+                            }}
+                            disabled={loading}
+                            type="normal"
+                            stylingMode="text"
+                        />
+                    </ToolbarItem>
+
+                    {currentStep > 0 && (
+                        <ToolbarItem toolbar="bottom" location="after">
+                            <Button
+                                text="Atrás"
+                                icon="arrowleft"
+                                onClick={handleBack}
+                                disabled={loading}
+                                type="normal"
+                                stylingMode="outlined"
+                            />
+                        </ToolbarItem>
+                    )}
+
+                    {currentStep < 2 ? (
+                        <ToolbarItem toolbar="bottom" location="after">
+                            <Button
+                                text="Siguiente"
+                                type="default"
+                                stylingMode="contained"
+                                onClick={handleNext}
+                                disabled={loading}
+                            />
+                        </ToolbarItem>
+                    ) : (
+                        <ToolbarItem toolbar="bottom" location="after">
+                            <Button
+                                text={loading ? "Guardando..." : "Confirmar"}
+                                type="default"
+                                stylingMode="contained"
+                                onClick={handleSubmit}
+                                disabled={loading}
+                            />
+                        </ToolbarItem>
+                    )}
+                </>
             )}
 
             {/* Stepper Header */}
@@ -459,6 +671,62 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     />
                 )}
 
+                {/* Step 4: Resultado */}
+                {currentStep === 3 && (
+                    <div className="flex flex-col items-center justify-center min-h-[420px] py-10 px-4 text-center max-w-lg mx-auto">
+                        <div className="w-16 h-16 rounded-full bg-success/15 text-success border border-success/30 flex items-center justify-center mb-5 shadow-lg shadow-success/10">
+                            <CheckOutlinedIcon className="w-8 h-8" />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-main mb-2 tracking-tight">
+                            Éxito al crear el producto &ldquo;{createdResult?.name || productData.name}&rdquo;
+                        </h3>
+
+                        <p className="text-sm text-main/60 mb-6 max-w-md">
+                            El producto y sus ítems han sido registrados correctamente en el sistema{createdResult && createdResult.totalImages > 0 ? ` junto con ${createdResult.totalImages} ${createdResult.totalImages === 1 ? 'imagen asociada' : 'imágenes asociadas'}` : ''}.
+                        </p>
+
+                        <div className="w-full bg-primary-0/40 border border-focus-300/20 rounded-dx p-4 mb-8 flex items-center justify-around text-xs shadow-sm">
+                            <div className="flex flex-col">
+                                <span className="text-main/50 font-medium">Ítems creados</span>
+                                <span className="text-base font-bold text-main mt-0.5">{createdResult?.itemsCount ?? itemsData.length}</span>
+                            </div>
+                            <div className="h-8 w-px bg-main/10" />
+                            <div className="flex flex-col">
+                                <span className="text-main/50 font-medium">Imágenes procesadas</span>
+                                <span className="text-base font-bold text-main mt-0.5">{createdResult?.totalImages ?? 0}</span>
+                            </div>
+                            <div className="h-8 w-px bg-main/10" />
+                            <div className="flex flex-col">
+                                <span className="text-main/50 font-medium">Estado</span>
+                                <span className="text-xs font-semibold text-success bg-success/15 px-2 py-0.5 rounded mt-0.5">Activo</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+                            <Button
+                                text="Ver producto"
+                                type="default"
+                                stylingMode="contained"
+                                className="!bg-focus-300 !text-variant hover:!bg-focus-400 font-semibold !rounded-dx w-full sm:w-auto px-6 py-2.5 shadow-md flex items-center justify-center gap-2"
+                                onClick={() => {
+                                    if (createdResult?.id) {
+                                        window.open(`/products/productDetail?id=${createdResult.id}`, '_blank');
+                                    }
+                                }}
+                            />
+
+                            <Button
+                                text="Volver al listado"
+                                type="normal"
+                                stylingMode="outlined"
+                                className="!border-main/20 text-main hover:!bg-main/5 font-medium !rounded-dx w-full sm:w-auto px-6 py-2.5"
+                                onClick={onClose}
+                            />
+                        </div>
+                    </div>
+                )}
+
             </div>
 
             {/* Confirmation Popover for Cancel Button */}
@@ -489,7 +757,7 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                             text="Sí, cancelar"
                             type="danger"
                             stylingMode="contained"
-                            className="!bg-rose-500 !text-white text-xs !rounded-dx"
+                            className="!bg-error !text-white text-xs !rounded-dx"
                             onClick={() => {
                                 setShowCancelConfirm(false);
                                 onClose();

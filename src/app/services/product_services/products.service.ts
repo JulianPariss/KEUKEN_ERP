@@ -172,13 +172,13 @@ export const productsService = {
         }
     },
 
-    async getFullById(id: string, token: string): Promise<IFProductFullItem> {
+    async getFullById(id: string, token: string, companyId?: string): Promise<IFProductFullItem> {
         try {
-            const data: IBProductFullItem = await apiFetch(
+            const data: IBProductFullItem = await apiFetch<IBProductFullItem>(
                 `${PRODUCTS_URL}/${id}/full`,
                 { method: "GET" },
                 "No se pudo obtener el producto completo",
-                { token }
+                { token, companyId }
             );
 
             return mapProductFull(data);

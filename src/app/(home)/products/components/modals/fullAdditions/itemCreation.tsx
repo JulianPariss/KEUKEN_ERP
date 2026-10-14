@@ -19,6 +19,7 @@ import { generateUUID } from "@/lib/utils/id.helper";
 import { createEmptyItem } from "./creation";
 import ItemsCreatedList from "./itemsCreatedList";
 import PresentationsManagement from "./presentationsManagement";
+import ItemMediaUploadSection, { ICachedItemMedia } from "./itemMediaUploadSection";
 
 interface CheckboxContainerProps {
     children: React.ReactNode;
@@ -141,9 +142,9 @@ const ItemsSection = (props: IItemsSectionProps) => {
 
     useEffect(() => {
         if (!token) return;
-        currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
-        providerService.getAll(token, currentCompany).then(res => setSuppliers(res.items)).catch(console.error);
-        commercialPlatformsService.getAll({ companyId: currentCompany, limit: 500, offset: 0 }, token).then(res => setPlatforms(res.items)).catch(console.error);
+        currenciesService.getAll(token).then(res => setCurrencies(res?.items || [])).catch(console.error);
+        providerService.getAll(token, currentCompany).then(res => setSuppliers(res?.items || [])).catch(console.error);
+        commercialPlatformsService.getAll({ companyId: currentCompany, limit: 500, offset: 0 }, token).then(res => setPlatforms(res?.items || [])).catch(console.error);
     }, [token, currentCompany]);
 
     const hasItems = itemsData.length > 0;
@@ -170,7 +171,8 @@ const ItemsSection = (props: IItemsSectionProps) => {
             active: currentItem.active !== undefined ? currentItem.active : true,
             isDualUom: requiresSecondaryUom,
             tempId: generateUUID(),
-            presentations: [...(currentItem.presentations || [])]
+            presentations: [...(currentItem.presentations || [])],
+            media: [...(currentItem.media || [])]
         }]);
         clearAll();
     };
@@ -504,12 +506,32 @@ const ItemsSection = (props: IItemsSectionProps) => {
                                 />
                             </SimpleItem>
                         </GroupItem>
+
+                        {/* Imágenes del Ítem */}
+                        <GroupItem
+                            caption="Imágenes del Ítem"
+                            colSpan={4}
+                            colCount={4}
+                            cssClass="!bg-primary-300 px-4 rounded-dx shadow-inner shadow-black/25 mt-4"
+                        >
+                            <SimpleItem colSpan={4} cssClass="!p-0" label={{ visible: false }}>
+                                <ItemMediaUploadSection
+                                    media={currentItem.media || []}
+                                    onChange={(newMedia) => {
+                                        setCurrentItem((prev: any) => ({
+                                            ...prev,
+                                            media: newMedia
+                                        }));
+                                    }}
+                                />
+                            </SimpleItem>
+                        </GroupItem>
                     </Form>
                     <div className="flex justify-end mt-4">
                         <Button
                             type="default"
                             stylingMode="contained"
-                            text="Añadir Item con sus Presentaciones"
+                            text="Añadir Ítem con sus Presentaciones"
                             onClick={addItem}
                             className="!bg-focus-300 shadow-lg shadow-black/20 !text-variant"
                         />
@@ -530,6 +552,10 @@ const ItemsSection = (props: IItemsSectionProps) => {
                     setItemsData={setItemsData}
                     setIsAddingItem={setIsAddingItem}
                     packagingLevels={packagingLevels}
+                    productData={productData}
+                    currencies={currencies}
+                    suppliers={suppliers}
+                    platforms={platforms}
                 />
                 :
                 <div className="mt-2 p-4 bg-main/5 rounded-dx">

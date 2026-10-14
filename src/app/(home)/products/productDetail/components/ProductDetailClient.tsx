@@ -63,7 +63,7 @@ const ProductDetailClient = ({ product }: IProductDetailClientProps) => {
                 if (!currentCompany?.id) return [];
                 try {
                     const response = await productsService.getOptions(currentCompany.id, {
-                        limit: 30,
+                        limit: 200,
                         offset: 0,
                         q: loadOptions.searchValue || "",
                         active: true
@@ -126,7 +126,7 @@ const ProductDetailClient = ({ product }: IProductDetailClientProps) => {
             {/* Detalles del producto */}
             {product ? (
                 <div className="flex-1 flex flex-col lg:flex-row gap-2 min-h-0 w-full">
-                    <div className="w-full lg:w-[35%] shrink-0">
+                    <div className="w-full lg:w-[25%] shrink-0">
                         <ProductInfoSection product={product} brands={brands} />
                     </div>
                     <div className="flex-1 min-h-0">
