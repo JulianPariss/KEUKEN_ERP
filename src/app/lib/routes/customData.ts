@@ -18,7 +18,7 @@ export type TRouteKey =
     'salebillingmodes' | 'uom-categories' | 'sales-channels' | 'productdetail' | 'taxes' |
     'serial-numbers' | 'consignments' | 'partners' | 'customers' | 'commercial-platforms' |
     'articlehandling' | 'metadata' | 'pricelistdetail' | 'saleorderdetail' | 'system' |
-    'audit' | 'localization' | 'structure' | 'branches' | 'establishments' | 'logisticcenters' | 'audiences' | 'details' | 'mapa' | 'companies';
+    'audit' | 'localization' | 'structure' | 'branches' | 'establishments' | 'logisticcenters' | 'audiences' | 'details' | 'mapa' | 'companies' | 'combos';
 
 export type TCustomDataRoutes = Record<TRouteKey, ICustomDataRoute>;
 
@@ -127,6 +127,12 @@ export const CustomDataRoutes: TCustomDataRoutes = {
         icon: 'card',
         text: 'Detalle de Producto',
         position: 10
+    },
+    combos: {
+        icon: 'gift',
+        text: 'Combos',
+        position: 15,
+        parentSubText: 'Gestión de Combos'
     },
     categories: {
         icon: 'tags',

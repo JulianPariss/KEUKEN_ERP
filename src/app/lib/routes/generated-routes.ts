@@ -184,6 +184,12 @@ export const ROUTES = [
     "routeKey": "categories"
   },
   {
+    "id": "products/combos",
+    "parentId": "products",
+    "path": "/products/combos",
+    "routeKey": "combos"
+  },
+  {
     "id": "products/productDetail",
     "parentId": "products",
     "path": "/products/productDetail",

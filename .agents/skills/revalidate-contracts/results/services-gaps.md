@@ -1,9 +1,9 @@
 # Reporte de Auditoria y Revalidacion de Contratos (Frontend vs Backend)
 
-- **Fecha:** 2026-10-02 17:57:42
+- **Fecha:** 2026-10-14 13:02:49
 - **Especificacion OpenAPI (Backend):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\contracts.json`
 - **Mapeos Utilizados:** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\audit-pairs.json`
-- **Total Modelos Auditados:** 188
+- **Total Modelos Auditados:** 190
 
 ---
 
@@ -96,7 +96,9 @@
 | userContext | Centros Logísticos - Maestro | `IBLogisticsCenter` | `LogisticsCenterResponse` | [OK] |
 | userContext | Centros Logísticos - Alta | `IBLogisticsCenterCreate` | `LogisticsCenterCreateRequest` | [OK] |
 | userContext | Centros Logísticos - Edición | `IBLogisticsCenterUpdate` | `LogisticsCenterUpdateRequest` | [OK] |
-| userContext | Empresas - Maestro | `ICompanyResponse` | `CompanyResponse` | [OK] |
+| userContext | Empresas - Maestro | `IBCompany` | `CompanyResponse` | [OK] |
+| userContext | Empresas - Alta | `IBCompanyCreate` | `CompanyCreateRequest` | [OK] |
+| userContext | Empresas - Edición | `IBCompanyUpdate` | `CompanyUpdateRequest` | [OK] |
 | userContext | Roles y Claves API - Lista | `IBRole` | `ApiKeyListItem` | [OK] |
 | userContext | Autenticación - Login | `IBAuth` | `LoginResponse` | [OK] |
 | userContext | Autenticación - Perfil | `IBProfile` | `MeResponse` | [OK] |

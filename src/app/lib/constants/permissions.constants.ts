@@ -3,6 +3,8 @@ import { TBackendPermissionKey } from "../permissions/getPermissions";
 const PERMISSIONS_CONSTANTS: Record<string, TBackendPermissionKey[]> = {
     modifyKeysManager: ['keysManager'],
     modifyProducts: ['products', 'items', 'presentations'],
+    modifyCombos: ['products', 'items'],
+    viewCombos: ['products', 'items'],
     modifyItems: ['items'],
     modifyPresentations: ['presentations'],
     categories: ['categories'],

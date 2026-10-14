@@ -12,6 +12,14 @@ export const MASTER_PERMISSIONS = {
             extract: [] as string[],
         }
     },
+    combos: {
+        label: 'Gestión de Combos',
+        backendMap: {
+            view: ['products:products:read', 'products:items:read'],
+            modify: ['products:products:write', 'products:items:write'],
+            extract: [] as string[],
+        }
+    },
     items: {
         label: 'Gestión de Items',
         backendMap: {
@@ -289,6 +297,7 @@ export const MASTER_PERMISSIONS = {
 export const VIEW_TO_MODULE_MAP: Record<TViewPermissionKey, TModuleKey> = {
     companiesView: 'common',
     productosView: 'products',
+    combosView: 'products',
     warehousesView: 'wms',
     defaultView: 'users',
     keysManagerView: 'common',
@@ -361,6 +370,7 @@ export const permissionsConfig: TFPermissionsConfig = Object.entries(MASTER_PERM
 
 export type TViewPermissionKey =
     | 'productosView'
+    | 'combosView'
     | 'warehousesView'
     | 'defaultView'
     | 'keysManagerView'
@@ -402,6 +412,10 @@ export const viewPermissionsRequireds: TViewPermissionsRequireds = {
         "uoms",
         "brands",
         "saleBillingModes",
+    ],
+    combosView: [
+        "products",
+        "items",
     ],
     warehousesView: [
         "warehouses",
@@ -489,6 +503,7 @@ export const viewPermissionsRequireds: TViewPermissionsRequireds = {
 
 export const ROUTE_VIEW_MAP: Record<string, TViewPermissionKey> = {
     '/products': 'productosView',
+    '/products/combos': 'combosView',
     '/products/uom-categories': 'productosView',
     '/warehouses': 'warehousesView',
     '/users': 'defaultView',

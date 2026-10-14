@@ -33,6 +33,10 @@ const emptyPresentationData = {
     packagingLevelId: "",
     active: true,
     isPrimary: false,
+    magnitude: null as number | null,
+    magnitudeUomId: null as string | null,
+    magnitudeCategoryId: null as string | null,
+    fragilityClassId: null as string | null,
 };
 
 const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], uoms, packagingLevels, initialData, isEditing = false }: PresentationsModalProps) => {
@@ -55,6 +59,10 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
                     packagingLevelId: initialData.packagingLevelId || "",
                     active: initialData.active ?? true,
                     isPrimary: initialData.isPrimary ?? false,
+                    magnitude: initialData.magnitude ?? null,
+                    magnitudeUomId: initialData.magnitudeUomId ?? null,
+                    magnitudeCategoryId: initialData.magnitudeCategoryId ?? null,
+                    fragilityClassId: initialData.fragilityClassId ?? null,
                 }
                 : { ...emptyPresentationData };
 
@@ -91,7 +99,8 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
         setLoading(true);
         try {
             const code = packagingLevels.find(pl => pl.id === currentFormData.packagingLevelId)?.code;
-            if (isEditing && initialData?.id) {
+            const isEditMode = isEditing || !!initialData?.id;
+            if (isEditMode && initialData?.id) {
                 await presentationsService.update({ ...currentFormData, packagingLevelCode: code }, initialData.id, token);
                 notify("Presentación actualizada exitosamente", "success", 3000);
             } else {

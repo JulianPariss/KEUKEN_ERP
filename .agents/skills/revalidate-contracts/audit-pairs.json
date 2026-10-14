@@ -673,10 +673,28 @@
       "domain": "userContext",
       "label": "Empresas - Maestro",
       "ts_file": "userContext/company.types.ts",
-      "ts_interface": "ICompanyResponse",
+      "ts_interface": "IBCompany",
       "backend_schema": "CompanyResponse",
-      "service_method": "companiesService.getAll",
-      "endpoint": "GET /api/v1/common/companies"
+      "service_method": "companiesService.getAll / getById",
+      "endpoint": "GET /api/v1/common/companies | GET /api/v1/common/companies/{company_id}"
+    },
+    {
+      "domain": "userContext",
+      "label": "Empresas - Alta",
+      "ts_file": "userContext/company.types.ts",
+      "ts_interface": "IBCompanyCreate",
+      "backend_schema": "CompanyCreateRequest",
+      "service_method": "companiesService.create",
+      "endpoint": "POST /api/v1/common/companies"
+    },
+    {
+      "domain": "userContext",
+      "label": "Empresas - Edición",
+      "ts_file": "userContext/company.types.ts",
+      "ts_interface": "IBCompanyUpdate",
+      "backend_schema": "CompanyUpdateRequest",
+      "service_method": "companiesService.update",
+      "endpoint": "PATCH /api/v1/common/companies/{company_id}"
     },
     {
       "domain": "userContext",

@@ -142,7 +142,7 @@ const ItemsModal = ({ isOpen, onClose, onSuccess, onHidden, uoms, products = [],
         if (isOpen) {
             const nextData = initialData
                 ? {
-                    productId: initialData.productId || initialData.id || "",
+                    productId: initialData.productId || initialData.product_id || (!isEditing && !initialData.sku ? initialData.id : "") || "",
                     sku: initialData.sku || "",
                     itemName: initialData.itemName || "",
                     costMethod: initialData.costMethod || "average",

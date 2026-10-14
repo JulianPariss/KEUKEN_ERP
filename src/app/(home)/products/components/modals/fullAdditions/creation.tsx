@@ -290,8 +290,9 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     itemName: item.itemName,
                     costMethod: item.costMethod,
                     isDualUom: !!item.uomRatio,
+                    secUomId: item.secUomId || productData.defaultSecUomId || undefined,
                     uomRatio: item.uomRatio || undefined,
-                    attributes: {},
+                    attributes: item.attributes || {},
                     weight: item.weight,
                     volume: item.volume,
                     palletUnits: item.palletUnits,
@@ -304,6 +305,13 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     isSerializable: item.isSerializable,
                     isConsignmentItem: item.isConsignmentItem,
                     currencyId: item.currencyId,
+                    costInfo: item.costInfo || undefined,
+                    logisticsProfileId: item.logisticsProfileId || undefined,
+                    temperatureClassId: item.temperatureClassId || undefined,
+                    hazardClassId: item.hazardClassId || undefined,
+                    segregationGroupId: item.segregationGroupId || undefined,
+                    recipeData: item.recipeData || undefined,
+                    compositionData: item.compositionData || undefined,
                     suppliers: (item.suppliers || []).map((s: any, idx: number) => {
                         if (typeof s === 'string') {
                             return {
@@ -329,6 +337,10 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                         packagingLevelCode: presentation.packagingLevelCode || packagingLevels.find(pl => pl.id === presentation.packagingLevelId)?.code,
                         active: presentation.active !== undefined ? presentation.active : true,
                         isPrimary: presentation.isPrimary ?? false,
+                        magnitude: presentation.magnitude !== undefined ? presentation.magnitude : undefined,
+                        magnitudeUomId: presentation.magnitudeUomId || undefined,
+                        magnitudeCategoryId: presentation.magnitudeCategoryId || undefined,
+                        fragilityClassId: presentation.fragilityClassId || undefined,
                     }))
                 }))
             };

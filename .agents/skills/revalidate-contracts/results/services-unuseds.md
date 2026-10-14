@@ -1,6 +1,6 @@
 # Reporte de Endpoints Backend No Consumidos en Frontend (Unused Services)
 
-- **Fecha de Generación:** 2026-10-02 17:57:42
+- **Fecha de Generación:** 2026-10-14 13:02:49
 - **Especificación OpenAPI (Backend):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\contracts.json`
 - **Mapeo Frontend (Pares Auditados):** `C:\Users\julia\Desktop\Proyectos\KEUKEN_UWS\apps\erp-next\.agents\skills\revalidate-contracts\audit-pairs.json`
 
@@ -11,9 +11,9 @@
 | Métrica | Valor |
 | :--- | :---: |
 | **Total Endpoints en Backend (OpenAPI)** | **608** |
-| **Endpoints Mapeados/Consumidos en Frontend** | **201** |
-| **Endpoints Backend No Consumidos (`unused`)** | **408** |
-| **Cobertura de Consumo en Frontend** | **33.06%** |
+| **Endpoints Mapeados/Consumidos en Frontend** | **204** |
+| **Endpoints Backend No Consumidos (`unused`)** | **405** |
+| **Cobertura de Consumo en Frontend** | **33.55%** |
 
 ---
 
@@ -72,8 +72,6 @@
 | Comercial - Descuentos | **3** |
 | Entidades - Options | **3** |
 | Entidades - Proveedores | **3** |
-| Storage - Retention policies | **3** |
-| Configuración - Empresas | **3** |
 | Admin - Recovery / Papelera | **2** |
 | WMS - Master (Ubicaciones - Masivo) | **2** |
 | WMS - Stock (Operaciones) | **2** |
@@ -90,6 +88,7 @@
 | Comercial - Precios Items | **2** |
 | Comercial - Rutas de venta | **2** |
 | Configuración - Zonas | **2** |
+| Storage - Retention policies | **2** |
 | WMS - Master (Almacenes) | **1** |
 | WMS - Options | **1** |
 | WMS - Inventario | **1** |
@@ -103,11 +102,12 @@
 | Comercial - Options | **1** |
 | Comercial - Política de precios por canal | **1** |
 | Configuración - Options | **1** |
+| Configuración - Empresas | **1** |
 | Configuración - Establecimientos | **1** |
 | Configuración - Centros Logísticos | **1** |
 | Configuración - Sucursales | **1** |
 | Configuración - API Keys | **1** |
-| **TOTAL** | **408** |
+| **TOTAL** | **405** |
 
 ---
 
@@ -320,13 +320,11 @@
 | :---: | :--- | :--- | :--- |
 | `DELETE` | `/api/v1/common/logistics-centers/{logistics_center_id}` | Delete Logistics Center | `delete_logistics_center_api_v1_common_logistics_centers__logistics_center_id__delete` |
 
-### Configuración - Empresas (3 endpoints)
+### Configuración - Empresas (1 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
 | `DELETE` | `/api/v1/common/companies/{company_id}` | Delete Company | `delete_company_api_v1_common_companies__company_id__delete` |
-| `GET` | `/api/v1/common/companies/{company_id}` | Get Company | `get_company_api_v1_common_companies__company_id__get` |
-| `PATCH` | `/api/v1/common/companies/{company_id}` | Update Company | `update_company_api_v1_common_companies__company_id__patch` |
 
 ### Configuración - Establecimientos (1 endpoints)
 
@@ -744,11 +742,10 @@
 | `GET` | `/api/v1/storage/me/documents/{document_id}/download` | Descargar binario de un documento propio | `download_my_document_api_v1_storage_me_documents__document_id__download_get` |
 | `POST` | `/api/v1/storage/me/exports` | Generar export en servidor y persistirlo en users/{code}/exports/ | `export_my_document_api_v1_storage_me_exports_post` |
 
-### Storage - Retention policies (3 endpoints)
+### Storage - Retention policies (2 endpoints)
 
 | Método | Ruta de API | Resumen / Descripción | Operation ID |
 | :---: | :--- | :--- | :--- |
-| `POST` | `/api/v1/common/companies` | Crear política de retención para la compañía (con override opcional por user) | `create_policy_api_v1_common_companies_post` |
 | `DELETE` | `/api/v1/common/companies/{policy_id}` | Eliminar una política de retención | `delete_policy_api_v1_common_companies__policy_id__delete` |
 | `PUT` | `/api/v1/common/companies/{policy_id}` | Editar TTL/active de una política existente | `update_policy_api_v1_common_companies__policy_id__put` |
 

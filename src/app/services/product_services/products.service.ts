@@ -1,17 +1,28 @@
-import { IBListV2 } from "@repo/api-contracts/erp";
+import { IBListV2, IBPackagingLevel } from "@repo/api-contracts/erp";
 import { IBProduct, IBProductFullItem, IBProductClassification } from "@repo/api-contracts/erp";
-import { IFListBasicParams, IFListV2 } from "@repo/api-contracts/erp";
-import { IFProduct, IFProductFull, IFProductFullItem, IFProductClassification } from "@repo/api-contracts/erp";
+import { IFListBasicParams, IFListV2, IFPackagingLevel } from "@repo/api-contracts/erp";
+import {
+    IFProduct,
+    IFProductCreate,
+    IFProductUpdate,
+    IFProductFull,
+    IFProductFullCreate,
+    IFProductFullUpdate,
+    IFProductFullItem,
+    IFProductClassification
+} from "@repo/api-contracts/erp";
 import {
     mapProduct,
     mapProductFull,
     mapProductFullListV2,
     mapProductFullToCreate,
+    mapProductFullToUpdate,
     mapProductListV2,
     mapProductSearchParams,
     mapProductToCreate,
     mapProductToUpdate,
-    mapProductClassificationList
+    mapProductClassificationList,
+    mapPackagingLevelList
 } from "@repo/api-contracts/erp";
 import { IFOptionItem, IFOptionsListParams } from "@repo/api-contracts/erp";
 import { mapOptionsList } from "@repo/api-contracts/erp";
@@ -65,7 +76,29 @@ export const productsService = {
         }
     },
 
-    async create(companyId: string, data: Partial<IFProduct>, token: string): Promise<IFProduct> {
+    async getById(id: string, token: string, companyId?: string): Promise<IFProduct> {
+        try {
+            const queryParams = new URLSearchParams();
+            if (companyId) queryParams.set("company_id", companyId);
+            const url = queryParams.toString()
+                ? `${PRODUCTS_URL}/${id}?${queryParams.toString()}`
+                : `${PRODUCTS_URL}/${id}`;
+
+            const data: IBProduct = await apiFetch<IBProduct>(
+                url,
+                { method: "GET" },
+                "No se pudo obtener el producto",
+                { token, companyId }
+            );
+
+            return mapProduct(data);
+        } catch (error) {
+            console.error("Error en getProductById:", error);
+            throw error;
+        }
+    },
+
+    async create(companyId: string, data: Partial<IFProduct> | IFProductCreate, token: string): Promise<IFProduct> {
         try {
             const mappedData = mapProductToCreate(data);
             const itemResponse: IBProduct = await apiFetch(
@@ -85,7 +118,7 @@ export const productsService = {
         }
     },
 
-    async update(data: Partial<IFProduct>, id: string, token: string): Promise<IFProduct> {
+    async update(data: Partial<IFProduct> | IFProductUpdate, id: string, token: string): Promise<IFProduct> {
         try {
             const mappedData = mapProductToUpdate(data);
             const itemResponse: IBProduct = await apiFetch(
@@ -121,7 +154,7 @@ export const productsService = {
         }
     },
 
-    async createFull(data: IFProductFull, token: string, companyId?: string): Promise<IFProduct> {
+    async createFull(data: IFProductFull | IFProductFullCreate, token: string, companyId?: string): Promise<IFProduct> {
         try {
             const mappedData = mapProductFullToCreate(data);
             const queryParams = new URLSearchParams();
@@ -144,7 +177,35 @@ export const productsService = {
 
             return mapProduct(itemResponse);
         } catch (error) {
-            console.error("Error en createProduct:", error);
+            console.error("Error en createProduct (full):", error);
+            throw error;
+        }
+    },
+
+    async updateFull(id: string, data: IFProductFullUpdate, token: string, companyId?: string): Promise<IFProductFullItem> {
+        try {
+            const mappedData = mapProductFullToUpdate(data);
+            const queryParams = new URLSearchParams();
+            if (companyId) {
+                queryParams.set("company_id", companyId);
+            }
+            const url = queryParams.toString()
+                ? `${PRODUCTS_URL}/${id}/full?${queryParams.toString()}`
+                : `${PRODUCTS_URL}/${id}/full`;
+
+            const itemResponse: IBProductFullItem = await apiFetch(
+                url,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify(mappedData),
+                },
+                "No se pudo actualizar el producto (full)",
+                { token, companyId }
+            );
+
+            return mapProductFull(itemResponse);
+        } catch (error) {
+            console.error("Error en updateProduct (full):", error);
             throw error;
         }
     },
@@ -207,16 +268,16 @@ export const productsService = {
         }
     },
 
-    async getPackagingLevels(token: string): Promise<any[]> {
+    async getPackagingLevels(token: string): Promise<IFPackagingLevel[]> {
         try {
-            const data: any[] = await apiFetch(
+            const data: IBPackagingLevel[] = await apiFetch(
                 `${PRODUCTS_URL}/packaging-levels`,
                 { method: "GET" },
                 "No se pudieron obtener los niveles de empaque",
                 { token }
             );
 
-            return data;
+            return mapPackagingLevelList(data);
         } catch (error) {
             console.error("Error en getPackagingLevels:", error);
             throw error;
