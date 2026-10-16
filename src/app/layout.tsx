@@ -2,7 +2,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { DxConfigProvider } from "@/contexts/DxConfigProvider";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import type { Metadata } from "next";
-import '@repo/ui/styles.css';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: "ERP Keuken",
