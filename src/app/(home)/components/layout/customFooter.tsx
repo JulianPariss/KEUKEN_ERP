@@ -1,9 +1,11 @@
 'use client';
 
 import { useRecovery } from '@/contexts/RecoveryContext';
+import { useBrand } from '@repo/ui/brand';
 import Switch from 'devextreme-react/switch';
 
 export default function CustomFooter() {
+  const { brand } = useBrand();
   const { isRecoveryMode, recoveryVisibility, canUseRecovery, toggleRecoveryMode, setRecoveryVisibility } = useRecovery();
 
   return (
@@ -54,7 +56,14 @@ export default function CustomFooter() {
       </div>
 
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-        <h2 className="text-xs text-dx-text font-medium select-none">Keuken</h2>
+        <h2 className="text-xs text-dx-text font-medium select-none flex items-center gap-1.5 whitespace-nowrap">
+          <span>{brand.name}</span>
+          {(brand.id?.toUpperCase() !== 'KEUKEN' && brand.name?.toUpperCase() !== 'KEUKEN') && (
+            <span className="opacity-70 text-[11px] font-normal">
+              — Powered by Keuken
+            </span>
+          )}
+        </h2>
       </div>
 
       <div className="flex items-center gap-2 h-full z-10" />

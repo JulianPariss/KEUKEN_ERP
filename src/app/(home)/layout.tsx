@@ -2,6 +2,7 @@ import { CompanyProvider } from '@/contexts/CompanyContext';
 import { BranchProvider } from '@/contexts/BranchContext';
 import { RecoveryProvider } from '@/contexts/RecoveryContext';
 import { ThemeProvider } from '@repo/ui/theme';
+import { DeployBadge } from '@repo/ui/brand';
 import { Box, Item } from 'devextreme-react/box';
 import DevExtremeIntlBridge from '../lib/locale/localeHandler';
 import { getAppRoutes } from '../lib/routes/getRoutes';
@@ -49,9 +50,7 @@ export default function HomeLayout({
                     <Item ratio={0} baseSize="31px">
                       <div className="h-full w-full relative flex items-center">
                         <Footer />
-                        <div className="absolute right-4 z-50 bg-focus-300 text-variant text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase">
-                          {environment}{` v${APP_VERSION}`}
-                        </div>
+                        <DeployBadge className="absolute right-4 z-50" />
                       </div>
                     </Item>
                   </Box>

@@ -9,7 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 
-import { LogoIcon } from '@repo/icons';
+import { BrandLogo, useBrand } from '@repo/ui/brand';
 
 const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
@@ -18,6 +18,7 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
   const searchRef = useRef(null)
 
   const { user } = useAuth();
+  const { brand } = useBrand();
   const userPermissions: string[] = user?.roles || [];
 
   const pathname = usePathname();
@@ -276,34 +277,44 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
     <aside className={`flex flex-col h-screen max-h-screen bg-linear-to-b from-primary-500 to-primary-900 transition-[width] shadow-r-lg z-60 duration-300 ease-in-out overflow-hidden ${isCollapsed ? 'w-16' : 'w-60'}`} >
       {/* HEADER */}
       <div className={`flex items-center justify-between border-b border-main/10 min-h-14 shrink-0 ${isCollapsed ? 'px-1 py-3' : 'py-3 px-4'}`}>
-        <div className="flex items-center justify-center cursor-pointer w-full" onClick={handleLogoClick}>
+        <div className="flex items-center cursor-pointer w-full min-w-0" onClick={handleLogoClick}>
           {isCollapsed ? (
-            <LogoIcon
-              size={32}
-              className="w-8 h-8 flex items-center justify-center p-0"
-              style={{
-                '--logo-grad-start': 'var(--focus-500)',
-                '--logo-grad-end': 'var(--focus-100)',
-                '--logo-main': 'white',
-                '--logo-dark': 'white',
-                '--logo-stroke': 'white',
-                '--logo-accent-1': 'white',
-                '--logo-accent-2': 'white',
-                '--logo-accent-3': 'white',
-                '--logo-accent-4': 'white',
-              } as React.CSSProperties}
-            />
+            <div className="w-full flex items-center justify-center">
+              <BrandLogo
+                size={32}
+                variant="icon"
+                className="w-8 h-8 flex items-center justify-center p-0 text-main"
+              />
+            </div>
           ) : (
-            <>
-              <p className="text-[15px] text-left font-semibold tracking-[2px] whitespace-nowrap w-full">KEUKEN</p>
-            </>
+            <div className="flex items-center w-full min-w-0 pr-1 overflow-hidden">
+              {brand.logo.component === brand.icon.component ? (
+                <div className="flex items-center gap-2.5 w-full min-w-0 overflow-hidden">
+                  <BrandLogo
+                    size={28}
+                    variant="logo"
+                    className="h-7 w-auto shrink-0 text-main"
+                  />
+                  <p className="text-[15px] text-left font-semibold tracking-[2px] whitespace-nowrap text-main">
+                    {brand.shortName}
+                  </p>
+                </div>
+              ) : (
+                <BrandLogo
+                  variant="logo"
+                  width="100%"
+                  height="auto"
+                  className="w-full h-auto max-h-9 object-contain text-main"
+                />
+              )}
+            </div>
           )}
         </div>
 
         {!isCollapsed && (
-          <div>
-            <button onClick={toggleSidebar} className="transition-colors p-1.5 hover:bg-main/10 rounded-dx">
-              <i className="dx-icon dx-icon-hidepanel text-xl" />
+          <div className="ml-2 shrink-0">
+            <button onClick={toggleSidebar} className="transition-colors p-1.5 hover:bg-main/10 rounded-dx" aria-label="Colapsar menú">
+              <i className="dx-icon dx-icon-hidepanel text-xl text-main" />
             </button>
           </div>
         )}

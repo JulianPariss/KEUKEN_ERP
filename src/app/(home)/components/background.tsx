@@ -9,7 +9,8 @@ interface Particle {
     id: number;
     x: number;
     y: number;
-    speed: number;
+    speedX: number;
+    speedY: number;
     scale: number;
     icon: string;
     initialOpacity: number;
@@ -18,7 +19,7 @@ interface Particle {
 interface BackgroundProps {
     density?: number; // 1 to 10
     opacity?: number; // 0 to 1
-    direction?: "left" | "right";
+    direction?: "left" | "right" | "up" | "down";
     icons?: (keyof typeof DX_ICON_MAP)[];
     color?: string;
 }
@@ -60,26 +61,51 @@ const DynamicBackground: React.FC<BackgroundProps> = ({
         const newParticles: Particle[] = [];
         for (let i = 0; i < count; i++) {
             const iconName = icons[Math.floor(Math.random() * icons.length)];
+            const baseSpeed = Math.random() * 0.5 + 0.2;
+
+            let speedX = 0;
+            let speedY = 0;
+
+            if (direction === "right") {
+                speedX = baseSpeed;
+                speedY = Math.random() * 0.1 - 0.05;
+            } else if (direction === "left") {
+                speedX = -baseSpeed;
+                speedY = Math.random() * 0.1 - 0.05;
+            } else if (direction === "up") {
+                speedX = Math.random() * 0.1 - 0.05;
+                speedY = -baseSpeed;
+            } else if (direction === "down") {
+                speedX = Math.random() * 0.1 - 0.05;
+                speedY = baseSpeed;
+            }
+
             newParticles.push({
                 id: i,
                 x: Math.random() * dimensions.width,
                 y: Math.random() * dimensions.height,
-                speed: (Math.random() * 0.5 + 0.2) * (direction === "right" ? 1 : -1),
+                speedX,
+                speedY,
                 icon: DX_ICON_MAP[iconName] || DX_ICON_MAP["box"],
                 scale: Math.random() * 20 + 10,
                 initialOpacity: Math.random() * 0.5 + 0.5,
             });
         }
         setParticles(newParticles);
-    }, [dimensions, density, direction]);
+    }, [dimensions, density, direction, icons]);
 
     const animate = (time: number) => {
         setParticles((prev) =>
             prev.map((p) => {
-                let newX = p.x + p.speed;
+                let newX = p.x + p.speedX;
                 if (newX > dimensions.width + 50) newX = -50;
                 if (newX < -50) newX = dimensions.width + 50;
-                return { ...p, x: newX };
+
+                let newY = p.y + p.speedY;
+                if (newY > dimensions.height + 50) newY = -50;
+                if (newY < -50) newY = dimensions.height + 50;
+
+                return { ...p, x: newX, y: newY };
             })
         );
         requestRef.current = requestAnimationFrame(animate);
@@ -90,7 +116,7 @@ const DynamicBackground: React.FC<BackgroundProps> = ({
         return () => {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [dimensions.width, direction]);
+    }, [dimensions.width, dimensions.height, direction]);
 
     if (dimensions.width === 0) return null;
 

@@ -1,16 +1,24 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DxConfigProvider } from "@/contexts/DxConfigProvider";
 import { LocaleProvider } from "@/contexts/LocaleContext";
+import { BrandProvider, getBrandConfig } from "@repo/ui/brand";
 import type { Metadata } from "next";
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: "ERP Keuken",
-  description: "Sistema de gestión empresarial",
-  icons: {
-    icon: '/logo.svg',
-  },
-};
+export function generateMetadata(): Metadata {
+  const brand = getBrandConfig();
+  const iconHref = brand.icon?.dataUri || brand.icon?.url || brand.favicon || '/logo.svg';
+
+  return {
+    title: `ERP ${brand.name}`,
+    description: `Sistema de gestión empresarial ${brand.name}`,
+    icons: {
+      icon: iconHref,
+      shortcut: iconHref,
+      apple: iconHref,
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -25,7 +33,9 @@ export default function RootLayout({
         <DxConfigProvider>
           <LocaleProvider>
             <AuthProvider>
-              {children}
+              <BrandProvider>
+                {children}
+              </BrandProvider>
             </AuthProvider>
           </LocaleProvider>
         </DxConfigProvider>
