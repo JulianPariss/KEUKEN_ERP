@@ -3,6 +3,7 @@
 import { productsService } from "@/app/services/product_services/products.service";
 import { saleBillingModesService } from "@/app/services/product_services/saleBillingModes.service";
 import { itemMediaService } from "@/app/services/product_services/itemMedia.service";
+import { mapProductFullCreateError } from "@/app/lib/utils/apiError.helper";
 import { IFBrand } from "@repo/api-contracts/erp";
 import { IFCategory } from "@repo/api-contracts/erp";
 import { IFProduct, IFProductFull, IFProductClassification, TFProcurementType } from "@repo/api-contracts/erp";
@@ -17,11 +18,14 @@ import { CheckOutlinedIcon } from "@repo/icons";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { Popover } from "devextreme-react/popover";
 import notify from "devextreme/ui/notify";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ItemsSection from "./itemCreation";
-import PreviewSection from "./previewSection";
+import dynamic from "next/dynamic";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ProductSection from "./productSection";
 import { ICachedItemMedia } from "./itemMediaUploadSection";
+
+/** Steps pesados: se cargan solo al llegar a ellos (evita congelar la apertura en step Producto) */
+const ItemsSection = dynamic(() => import("./itemCreation"), { ssr: false });
+const PreviewSection = dynamic(() => import("./previewSection"), { ssr: false });
 
 import { IFTax } from "@repo/api-contracts/erp";
 
@@ -99,6 +103,8 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [loadingStatusText, setLoadingStatusText] = useState("");
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    /** Monta el Form del step solo después de pintar el shell del Popup (evita freeze al abrir) */
+    const [contentReady, setContentReady] = useState(false);
 
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -114,45 +120,48 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
     const [classifications, setClassifications] = useState<IFProductClassification[]>([]);
     const memoizedClassifications = useMemo(() => classifications, [classifications]);
 
-    useEffect(() => {
-        const fetchClassifications = async () => {
-            if (isOpen && token && currentCompany?.id) {
-                try {
-                    const response = await productsService.getClassifications(currentCompany.id, token);
-                    setClassifications(response);
-                } catch (err) {
-                    console.error("Error loading classifications:", err);
-                }
-            }
-        };
-        fetchClassifications();
-    }, [isOpen, token, currentCompany?.id]);
-
     const [createdResult, setCreatedResult] = useState<{
         id: string;
         name: string;
         itemsCount: number;
+        presentationsCount: number;
         totalImages: number;
     } | null>(null);
 
     const [productData, setProductData] = useState(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
+    /** Misma referencia que alimenta Form.formData (mutación DX sin setState en escritura) */
+    const productDataRef = useRef(productData);
+    productDataRef.current = productData;
 
     const [itemsData, setItemsData] = useState<any[]>([]);
     const [currentItem, setCurrentItem] = useState(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
 
+    // Catálogos del step Producto en paralelo (un solo ciclo de setState batchable)
     useEffect(() => {
-        const fetchModes = async () => {
-            if (isOpen && token) {
-                try {
-                    const response = await saleBillingModesService.getAll(token);
-                    setSaleBillingModes(response);
-                } catch (err) {
-                    console.error("Error loading sale billing modes:", err);
-                }
-            }
+        if (!isOpen || !token) return;
+        let cancelled = false;
+        const companyId = currentCompany?.id;
+
+        Promise.all([
+            saleBillingModesService.getAll(token),
+            companyId ? productsService.getClassifications(companyId, token) : Promise.resolve([] as IFProductClassification[]),
+        ])
+            .then(([modes, classificationList]) => {
+                if (cancelled) return;
+                setSaleBillingModes(modes);
+                setClassifications(classificationList);
+            })
+            .catch((err) => {
+                console.error("Error loading product creation catalogs:", err);
+            });
+
+        // Precargar chunk del step Ítems mientras el usuario completa el producto
+        void import("./itemCreation");
+
+        return () => {
+            cancelled = true;
         };
-        fetchModes();
-    }, [isOpen, token]);
+    }, [isOpen, token, currentCompany?.id]);
 
     const handleHidden = useCallback(() => {
         // Revocar URLs de objetos cacheados
@@ -170,6 +179,7 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         setCurrentStep(0);
         setIsAddingItem(true);
         setShowCancelConfirm(false);
+        setContentReady(false);
         setItemsData([]);
         setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
         setProductData(createEmptyProduct(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
@@ -181,74 +191,111 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         }
     }, [onHidden, currentCompany?.id, itemsData, currentItem]);
 
+    const buildInitialProductData = useCallback(() => {
+        if (initialData) {
+            return {
+                id: initialData.id,
+                name: initialData.name || "",
+                classification: initialData.classification || "",
+                prefix: initialData.skuPrefix || initialData.prefix || "",
+                uomId: initialData.uomId || "",
+                categoryId: initialData.categoryId || "",
+                brandId: initialData.brandId || "",
+                companyId: initialData.companyId || (currentCompany?.id ?? ''),
+                active: initialData.active ?? true,
+                procurementType: initialData.procurementType || "BUY",
+                saleBillingModeCode: initialData.saleBillingModeCode || "",
+                defaultSecUomId: initialData.defaultSecUomId || "",
+                taxIds: initialData.taxIds || [],
+                currencyId: initialData.currencyId || currentCompany?.currencyId || null,
+                defaultLogisticsProfileId: initialData.defaultLogisticsProfileId || null,
+                defaultTemperatureClassId: initialData.defaultTemperatureClassId || null,
+                defaultHazardClassId: initialData.defaultHazardClassId || null,
+                defaultSegregationGroupId: initialData.defaultSegregationGroupId || null,
+                handlingNotes: initialData.handlingNotes || "",
+            };
+        }
+        return createEmptyProduct(currentCompany?.id ?? '', currentCompany?.currencyId ?? null);
+    }, [initialData, currentCompany?.id, currentCompany?.currencyId]);
+
+    /** Dxdocs: enlazar la misma ref de formData + reset(editorsData) al abrir */
+    const syncProductFormInstance = useCallback((nextData: any) => {
+        const form = productFormRef.current?.instance?.();
+        if (!form || !nextData) return;
+        form.option("formData", nextData);
+        if (typeof form.reset === "function") {
+            form.reset({ ...nextData });
+        }
+        form.updateDimensions?.();
+    }, []);
+
     useEffect(() => {
         if (isOpen) {
+            const nextProduct = buildInitialProductData();
+            productDataRef.current = nextProduct;
             setCurrentStep(0);
             setIsAddingItem(true);
             setShowCancelConfirm(false);
+            setContentReady(false);
             setItemsData([]);
             setCurrentItem(createEmptyItem(currentCompany?.id ?? "", currentCompany?.currencyId ?? null));
             setCreatedResult(null);
             setLoadingProgress(0);
             setLoadingStatusText("");
-
-            if (initialData) {
-                setProductData({
-                    id: initialData.id,
-                    name: initialData.name || "",
-                    classification: initialData.classification || "",
-                    prefix: initialData.skuPrefix || initialData.prefix || "",
-                    uomId: initialData.uomId || "",
-                    categoryId: initialData.categoryId || "",
-                    brandId: initialData.brandId || "",
-                    companyId: initialData.companyId || (currentCompany?.id ?? ''),
-                    active: initialData.active ?? true,
-                    procurementType: initialData.procurementType || "BUY",
-                    saleBillingModeCode: initialData.saleBillingModeCode || "",
-                    defaultSecUomId: initialData.defaultSecUomId || "",
-                    taxIds: initialData.taxIds || [],
-                    currencyId: initialData.currencyId || currentCompany?.currencyId || null,
-                    defaultLogisticsProfileId: initialData.defaultLogisticsProfileId || null,
-                    defaultTemperatureClassId: initialData.defaultTemperatureClassId || null,
-                    defaultHazardClassId: initialData.defaultHazardClassId || null,
-                    defaultSegregationGroupId: initialData.defaultSegregationGroupId || null,
-                    handlingNotes: initialData.handlingNotes || "",
-                });
-            } else {
-                setProductData(createEmptyProduct(currentCompany?.id ?? '', currentCompany?.currencyId ?? null));
-            }
-
-            setTimeout(() => {
-                formRef.current?.instance()?.reset();
-                productFormRef.current?.instance()?.reset();
-            }, 0);
+            setProductData(nextProduct);
+        } else {
+            setContentReady(false);
         }
-    }, [isOpen, currentCompany?.id, initialData]);
+    }, [isOpen, currentCompany?.id, currentCompany?.currencyId, buildInitialProductData]);
 
+    // Al cambiar de step: updateDimensions (no repaint completo del Popup en cada paso)
     useEffect(() => {
-        if (isOpen && popupRef.current) {
-            const timer = setTimeout(() => {
-                popupRef.current?.instance().repaint();
-            }, 50);
-            return () => clearTimeout(timer);
+        if (!isOpen || !contentReady) return;
+        const timer = setTimeout(() => {
+            productFormRef.current?.instance?.()?.updateDimensions?.();
+            formRef.current?.instance?.()?.updateDimensions?.();
+            popupRef.current?.instance?.()?.repaint?.();
+        }, 40);
+        return () => clearTimeout(timer);
+    }, [currentStep, isOpen, contentReady]);
+
+    const notifyBrokenRules = (result: any, fallback: string) => {
+        const messages = [...new Set(
+            (result?.brokenRules || [])
+                .map((r: any) => r?.message)
+                .filter((m: unknown): m is string => typeof m === "string" && m.trim().length > 0)
+        )];
+        if (messages.length === 0) {
+            notify(fallback, "warning", 3500);
+            return;
         }
-    }, [currentStep, isOpen, isAddingItem, itemsData.length]);
+        if (messages.length === 1) {
+            notify(messages[0], "warning", 3500);
+            return;
+        }
+        notify(`Complete o corrija: ${messages.slice(0, 4).join(" · ")}${messages.length > 4 ? "…" : ""}`, "warning", 5000);
+    };
 
     const handleNext = () => {
         if (currentStep === 0) {
-            const productFormValid = productFormRef.current?.instance().validate().isValid;
-            if (productFormValid) {
+            const validationResult = productFormRef.current?.instance().validate();
+            if (validationResult?.isValid) {
                 setCurrentStep(1);
             } else {
-                notify("Por favor, complete correctamente la información del producto y su modo de venta", "warning", 3000);
+                notifyBrokenRules(
+                    validationResult,
+                    "Complete los campos obligatorios del producto (nombre, clasificación, prefijo, categoría, marca y modo de venta)"
+                );
+                const firstBroken = validationResult?.brokenRules?.[0];
+                firstBroken?.validator?.focus?.();
             }
         } else if (currentStep === 1) {
             if (itemsData.length === 0) {
-                notify("Debe añadir al menos un ítem antes de continuar", "warning", 3000);
+                notify("Antes de continuar, confirme al menos un ítem con el botón «Confirmar item y sus presentaciones»", "warning", 4000);
                 return;
             }
             if (isAddingItem && (currentItem.itemName || currentItem.sku)) {
-                notify("Tiene un ítem en edición. Añádalo a la lista o limpie el formulario antes de continuar", "warning", 3000);
+                notify("Hay un ítem sin confirmar. Úselo con «Confirmar item…» o deséchelo con el ícono de papelera", "warning", 4500);
                 return;
             }
             setCurrentStep(2);
@@ -266,6 +313,34 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
         setLoadingProgress(0);
         setLoadingStatusText("Iniciando creación del producto...");
         try {
+            // BE no auto-promueve is_primary: garantizar ≥1 primary por packaging_level en el wire
+            const presentationsForWire = (raw: any[]) => {
+                const list = (raw || []).map((presentation: any) => ({
+                    name: presentation.name,
+                    barcode: presentation.barcode,
+                    uomId: presentation.uomId,
+                    uomRatio: presentation.uomRatio,
+                    packagingLevelId: presentation.packagingLevelId,
+                    packagingLevelCode:
+                        presentation.packagingLevelCode ||
+                        packagingLevels.find((pl) => pl.id === presentation.packagingLevelId)?.code,
+                    active: presentation.active !== undefined ? presentation.active : true,
+                    isPrimary: !!presentation.isPrimary,
+                    magnitude: presentation.magnitude !== undefined ? presentation.magnitude : undefined,
+                    magnitudeUomId: presentation.magnitudeUomId || undefined,
+                    magnitudeCategoryId: presentation.magnitudeCategoryId || undefined,
+                    fragilityClassId: presentation.fragilityClassId || undefined,
+                }));
+                const levelIds = [...new Set(list.map((p) => p.packagingLevelId).filter(Boolean))];
+                for (const levelId of levelIds) {
+                    const ofLevel = list.filter((p) => p.packagingLevelId === levelId);
+                    if (!ofLevel.some((p) => p.isPrimary) && ofLevel[0]) {
+                        ofLevel[0].isPrimary = true;
+                    }
+                }
+                return list;
+            };
+
             const formatedData: IFProductFull = {
                 product: {
                     name: productData.name,
@@ -274,75 +349,75 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                     uomId: productData.uomId,
                     categoryId: productData.categoryId,
                     brandId: productData.brandId,
-                    procurementType: productData.procurementType || undefined,
+                    // No omitir: omit → NULL en sync y el DEFAULT DB 'BUY' no aplica
+                    procurementType: productData.procurementType || "BUY",
                     saleBillingModeCode: productData.saleBillingModeCode || undefined,
                     defaultSecUomId: productData.defaultSecUomId || undefined,
                     taxIds: productData.taxIds || [],
+                    // null/omit → BE resuelve moneda base de la compañía
                     currencyId: productData.currencyId || null,
+                    active: true,
                     defaultLogisticsProfileId: productData.defaultLogisticsProfileId || null,
                     defaultTemperatureClassId: productData.defaultTemperatureClassId || null,
                     defaultHazardClassId: productData.defaultHazardClassId || null,
                     defaultSegregationGroupId: productData.defaultSegregationGroupId || null,
-                    handlingNotes: productData.handlingNotes || "",
+                    handlingNotes: (productData.handlingNotes || "").trim() || null,
                 },
-                items: itemsData.map((item) => ({
-                    sku: item.sku,
-                    itemName: item.itemName,
-                    costMethod: item.costMethod,
-                    isDualUom: !!item.uomRatio,
-                    secUomId: item.secUomId || productData.defaultSecUomId || undefined,
-                    uomRatio: item.uomRatio || undefined,
-                    attributes: item.attributes || {},
-                    weight: item.weight,
-                    volume: item.volume,
-                    palletUnits: item.palletUnits,
-                    palletUomId: item.palletUomId,
-                    minDaysToExpiryReception: item.minDaysToExpiryReception,
-                    minDaysToExpiryOrder: item.minDaysToExpiryOrder,
-                    active: item.active !== undefined ? item.active : true,
-                    isInventoryItem: item.isInventoryItem,
-                    requiresExpiry: item.requiresExpiry,
-                    isSerializable: item.isSerializable,
-                    isConsignmentItem: item.isConsignmentItem,
-                    currencyId: item.currencyId,
-                    costInfo: item.costInfo || undefined,
-                    logisticsProfileId: item.logisticsProfileId || undefined,
-                    temperatureClassId: item.temperatureClassId || undefined,
-                    hazardClassId: item.hazardClassId || undefined,
-                    segregationGroupId: item.segregationGroupId || undefined,
-                    recipeData: item.recipeData || undefined,
-                    compositionData: item.compositionData || undefined,
-                    suppliers: (item.suppliers || []).map((s: any, idx: number) => {
-                        if (typeof s === 'string') {
-                            return {
-                                supplier_id: s,
-                                priority: idx + 1,
-                                active: true
-                            };
-                        }
-                        return {
-                            supplier_id: s.supplier_id || s.id || s.supplierId,
-                            supplier_sku: s.supplier_sku || s.supplierSku || undefined,
-                            priority: s.priority !== undefined ? Number(s.priority) : (idx + 1),
-                            active: s.active !== undefined ? s.active : true
-                        };
-                    }).filter((s: any) => !!s.supplier_id),
-                    platformIds: item.platformIds,
-                    presentations: item.presentations.map((presentation: any) => ({
-                        name: presentation.name,
-                        barcode: presentation.barcode,
-                        uomId: presentation.uomId,
-                        uomRatio: presentation.uomRatio,
-                        packagingLevelId: presentation.packagingLevelId,
-                        packagingLevelCode: presentation.packagingLevelCode || packagingLevels.find(pl => pl.id === presentation.packagingLevelId)?.code,
-                        active: presentation.active !== undefined ? presentation.active : true,
-                        isPrimary: presentation.isPrimary ?? false,
-                        magnitude: presentation.magnitude !== undefined ? presentation.magnitude : undefined,
-                        magnitudeUomId: presentation.magnitudeUomId || undefined,
-                        magnitudeCategoryId: presentation.magnitudeCategoryId || undefined,
-                        fragilityClassId: presentation.fragilityClassId || undefined,
-                    }))
-                }))
+                items: itemsData.map((item) => {
+                    const isDual = !!(item.uomRatio || item.isDualUom);
+                    return {
+                        sku: (item.sku || "").trim(),
+                        // vacío/null = hereda nombre producto en lectura BE
+                        itemName: (item.itemName || "").trim() || (null as unknown as string),
+                        // Enviar siempre: omitir ≠ average (schema default standard)
+                        costMethod: item.costMethod || "average",
+                        isDualUom: isDual,
+                        secUomId: isDual
+                            ? (item.secUomId || productData.defaultSecUomId || undefined)
+                            : undefined,
+                        uomRatio: isDual ? (item.uomRatio || undefined) : undefined,
+                        attributes: item.attributes || {},
+                        weight: item.weight ?? 0,
+                        volume: item.volume ?? 0,
+                        palletUnits: item.palletUnits ?? 0,
+                        palletUomId: item.palletUomId,
+                        minDaysToExpiryReception: item.minDaysToExpiryReception ?? 0,
+                        minDaysToExpiryOrder: item.minDaysToExpiryOrder ?? 0,
+                        active: item.active !== undefined ? item.active : true,
+                        isInventoryItem: item.isInventoryItem,
+                        requiresExpiry: item.requiresExpiry,
+                        isSerializable: item.isSerializable,
+                        isConsignmentItem: item.isConsignmentItem,
+                        currencyId: item.currencyId || null,
+                        costInfo: item.costInfo || undefined,
+                        logisticsProfileId: item.logisticsProfileId || undefined,
+                        temperatureClassId: item.temperatureClassId || undefined,
+                        hazardClassId: item.hazardClassId || undefined,
+                        segregationGroupId: item.segregationGroupId || undefined,
+                        recipeData: item.recipeData || undefined,
+                        compositionData: item.compositionData || undefined,
+                        // BE usa el campo priority; no infiere por posición del array
+                        suppliers: (item.suppliers || [])
+                            .map((s: any, idx: number) => {
+                                const supplierId =
+                                    typeof s === "string" ? s : s.supplier_id || s.id || s.supplierId;
+                                const supplierSku =
+                                    typeof s === "string"
+                                        ? ""
+                                        : (s.supplier_sku || s.supplierSku || "").trim();
+                                return {
+                                    supplier_id: supplierId,
+                                    supplier_sku: supplierSku,
+                                    priority: idx + 1,
+                                    active: s.active !== undefined ? s.active : true,
+                                };
+                            })
+                            .filter((s: any) => !!s.supplier_id && !!s.supplier_sku),
+                        // [] = sin platforms; omitir en wire = auto-assign compañía → enviamos []
+                        platformIds: Array.isArray(item.platformIds) ? item.platformIds : [],
+                        presentations: presentationsForWire(item.presentations),
+                    };
+                }),
             };
 
             setLoadingStatusText("Registrando producto e ítems en el servidor...");
@@ -429,10 +504,15 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             // Breve pausa para que se aprecie la barra al 100% antes de avanzar a Resultado
             await new Promise((resolve) => setTimeout(resolve, 350));
 
+            const presentationsCount = itemsData.reduce(
+                (acc, item) => acc + (Array.isArray(item.presentations) ? item.presentations.length : 0),
+                0
+            );
             setCreatedResult({
                 id: createdProduct.id,
                 name: productData.name || createdProduct.name,
                 itemsCount: itemsData.length,
+                presentationsCount,
                 totalImages: uploadedImagesCount,
             });
 
@@ -441,8 +521,7 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             setCurrentStep(3);
         } catch (error: any) {
             console.error("Error saving items:", error);
-            const errorMessage = error instanceof Error && error.message ? error.message : "Error al intentar guardar";
-            notify(errorMessage, "error", 3000);
+            notify(mapProductFullCreateError(error), "error", 5000);
         } finally {
             setLoading(false);
         }
@@ -470,19 +549,30 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             showCloseButton={!loading}
             showTitle={true}
             title={"Crear un Producto completo"}
-            width={950}
-            height={680}
-            maxWidth="95%"
+            width={1180}
+            height="90vh"
+            maxWidth="96vw"
             enableBodyScroll={false}
-            maxHeight="95%"
+            maxHeight="94vh"
             className="custom-popup"
             onShown={(e) => {
+                // Geometría del shell (Dxdocs: Popup.repaint recalcula tamaño/posición)
                 e.component.repaint();
                 const content = e.component.content();
                 if (content) {
                     content.style.overflow = "hidden";
                     content.style.position = "relative";
                 }
+                // Primero shell; Form en el siguiente frame (evita freeze)
+                requestAnimationFrame(() => {
+                    startTransition(() => {
+                        setContentReady(true);
+                    });
+                    requestAnimationFrame(() => {
+                        syncProductFormInstance(productDataRef.current);
+                        e.component.repaint();
+                    });
+                });
             }}
             onContentReady={(e) => {
                 const content = e.component.content();
@@ -496,57 +586,42 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
 
             {/* Overlay Bloqueador con Spinner y Barra de Progreso */}
             {loading && (
-                <div
-                    className="absolute inset-0 z-50 bg-primary-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center select-none"
-                    style={{ pointerEvents: "all" }}
-                >
-                    <div className="bg-primary-900/95 border border-main/15 rounded-xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center backdrop-blur-lg relative overflow-hidden">
-                        {/* Destello decorativo ambiental */}
-                        <div className="absolute -top-12 -left-12 w-32 h-32 bg-focus-300/10 rounded-full blur-2xl pointer-events-none" />
-                        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-focus-300/10 rounded-full blur-2xl pointer-events-none" />
-
-                        {/* Spinner animado concéntrico en el centro */}
-                        <div className="relative mb-6 flex items-center justify-center">
-                            <div className="w-16 h-16 rounded-full border-4 border-focus-300/20 border-t-focus-300 animate-spin" />
-                            <div className="absolute w-8 h-8 rounded-full bg-focus-300/15 animate-pulse flex items-center justify-center">
-                                <div className="w-3 h-3 rounded-full bg-focus-300 shadow-sm shadow-focus-300/50" />
-                            </div>
+                <div className="absolute inset-0 z-50 pointer-events-auto select-none flex flex-col items-center justify-center p-6 bg-primary-0/75 backdrop-blur-[2px]">
+                    <div className="w-full max-w-md p-4 rounded-dx bg-primary-0/40 border border-focus-100/40 shadow-sm">
+                        <div className="mb-3 border-b border-main/10 pb-2.5 flex items-baseline justify-between gap-3">
+                            <h3 className="text-base font-bold text-dx-primary leading-tight">
+                                Guardando producto
+                            </h3>
+                            <p className="text-[11px] opacity-50 shrink-0 tabular-nums text-focus-300 font-semibold">
+                                {progressText}
+                            </p>
                         </div>
 
-                        {/* Título de estado */}
-                        <h3 className="text-lg font-bold text-main tracking-tight mb-1">
-                            Guardando producto
-                        </h3>
-
-                        {/* Descripción dinámica del paso actual */}
-                        <p className="text-xs text-main/70 min-h-[1.25rem] mb-5 truncate max-w-full px-2" title={loadingStatusText}>
-                            {loadingStatusText || "Procesando información..."}
-                        </p>
-
-                        {/* Barra de progreso */}
-                        <div className="w-full mb-3">
-                            <div className="flex items-center justify-between text-xs font-semibold mb-2 px-0.5">
-                                <span className="text-main/60 font-medium">Progreso general</span>
-                                <span className="text-focus-300 font-bold tabular-nums text-sm">
-                                    {progressText}
-                                </span>
-                            </div>
-
-                            {/* Pista de la barra */}
-                            <div className="w-full h-3.5 bg-main/10 rounded-full p-0.5 border border-main/15 shadow-inner overflow-hidden relative">
-                                {/* Relleno dinámico */}
-                                <div
-                                    className="h-full rounded-full bg-gradient-to-r from-focus-300 via-focus-300 to-focus-100 transition-all duration-300 ease-out relative shadow-sm"
-                                    style={{ width: `${displayProgress}%` }}
+                        <div className="flex items-start gap-3 mb-4">
+                            <div
+                                className="mt-0.5 w-8 h-8 shrink-0 rounded-full border-2 border-focus-300/25 border-t-focus-300 animate-spin"
+                                aria-hidden
+                            />
+                            <div className="min-w-0 flex-1">
+                                <p
+                                    className="text-xs text-main/70 leading-snug min-h-[2.5rem]"
+                                    title={loadingStatusText}
                                 >
-                                    <div className="absolute inset-0 bg-white/20 rounded-full opacity-60 animate-pulse" />
-                                </div>
+                                    {loadingStatusText || "Procesando información..."}
+                                </p>
                             </div>
                         </div>
 
-                        <span className="text-[11px] text-main/50">
-                            Por favor, no cierre esta ventana mientras se procesan los datos.
-                        </span>
+                        <div className="w-full h-2 mb-3 bg-main/10 rounded-dx overflow-hidden border border-main/10">
+                            <div
+                                className="h-full rounded-dx bg-focus-300 transition-[width] duration-300 ease-out"
+                                style={{ width: `${displayProgress}%` }}
+                            />
+                        </div>
+
+                        <p className="text-[11px] text-main/50 leading-snug">
+                            No cierre esta ventana mientras se procesan los datos.
+                        </p>
                     </div>
                 </div>
             )}
@@ -620,8 +695,16 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
             </div>
 
             <div className="pb-4 pr-3 overflow-y-auto" style={{ height: "calc(100% - 90px)" }}>
-                {/* Step 1: Product */}
-                <div style={{ display: currentStep === 0 ? 'block' : 'none' }}>
+                {!contentReady && currentStep < 3 ? (
+                    <div className="flex flex-col gap-4 p-2 animate-pulse" aria-busy="true">
+                        <div className="h-8 w-1/3 rounded-dx bg-main/10" />
+                        <div className="h-40 rounded-dx bg-main/5 border border-main/10" />
+                        <div className="h-40 rounded-dx bg-main/5 border border-main/10" />
+                    </div>
+                ) : null}
+
+                {/* Step 0: Product — único step montado al abrir */}
+                {contentReady && currentStep === 0 ? (
                     <ProductSection
                         productData={productData}
                         setProductData={setProductData}
@@ -635,42 +718,43 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                         saleBillingModes={saleBillingModes}
                         taxes={taxes}
                     />
-                </div>
+                ) : null}
 
-                {/* Step 2: Items */}
-                <div style={{ display: currentStep === 1 ? 'block' : 'none' }}>
-                    {!isAddingItem &&
-                        <Button
-                            width="100%"
-                            text={itemsData.length > 0 ? "Añadir otro ítem y sus presentaciones" : "Añadir nuevo ítem y sus presentaciones"}
-                            icon="add"
-                            type="normal"
-                            stylingMode="outlined"
-                            className="!border-dashed !border-focus-300/40 !text-focus-300 font-semibold !rounded-dx hover:!bg-focus-300/10 !transition-all mb-4 py-2"
-                            onClick={() => setIsAddingItem(true)}
+                {/* Step 1: Items — no montar hasta llegar aquí (antes congelaba la UI al abrir) */}
+                {contentReady && currentStep === 1 ? (
+                    <>
+                        {!isAddingItem ? (
+                            <Button
+                                width="100%"
+                                text={itemsData.length > 0 ? "Añadir otro ítem y sus presentaciones" : "Añadir nuevo ítem y sus presentaciones"}
+                                icon="add"
+                                type="normal"
+                                stylingMode="outlined"
+                                className="!border-dashed !border-focus-300/40 !text-focus-300 font-semibold !rounded-dx hover:!bg-focus-300/10 !transition-all mb-4 py-2"
+                                onClick={() => setIsAddingItem(true)}
+                            />
+                        ) : null}
+
+                        <ItemsSection
+                            uoms={uoms}
+                            formRef={formRef}
+                            itemsData={itemsData}
+                            setItemsData={setItemsData}
+                            currentItem={currentItem}
+                            setCurrentItem={setCurrentItem}
+                            currentCompany={currentCompany?.id ?? ""}
+                            canCreatePresentation={canCreatePresentation}
+                            setIsAddingItem={setIsAddingItem}
+                            isAddingItem={isAddingItem}
+                            productData={productData}
+                            saleBillingModes={saleBillingModes}
+                            packagingLevels={packagingLevels}
                         />
-                    }
+                    </>
+                ) : null}
 
-                    <ItemsSection
-                        key={isOpen ? "open" : "closed"}
-                        uoms={uoms}
-                        formRef={formRef}
-                        itemsData={itemsData}
-                        setItemsData={setItemsData}
-                        currentItem={currentItem}
-                        setCurrentItem={setCurrentItem}
-                        currentCompany={currentCompany?.id ?? ""}
-                        canCreatePresentation={canCreatePresentation}
-                        setIsAddingItem={setIsAddingItem}
-                        isAddingItem={isAddingItem}
-                        productData={productData}
-                        saleBillingModes={saleBillingModes}
-                        packagingLevels={packagingLevels}
-                    />
-                </div>
-
-                {/* Step 3: Preview */}
-                {currentStep === 2 && (
+                {/* Step 2: Preview */}
+                {contentReady && currentStep === 2 ? (
                     <PreviewSection
                         productData={productData}
                         itemsData={itemsData}
@@ -681,63 +765,53 @@ const Creation = ({ isOpen, onClose, onHidden, onSuccess, products, uoms, catego
                         saleBillingModes={saleBillingModes}
                         packagingLevels={packagingLevels}
                     />
-                )}
+                ) : null}
 
-                {/* Step 4: Resultado */}
-                {currentStep === 3 && (
-                    <div className="flex flex-col items-center justify-center min-h-[420px] py-10 px-4 text-center max-w-lg mx-auto">
-                        <div className="w-16 h-16 rounded-full bg-success/15 text-success border border-success/30 flex items-center justify-center mb-5 shadow-lg shadow-success/10">
-                            <CheckOutlinedIcon className="w-8 h-8" />
-                        </div>
-
-                        <h3 className="text-xl font-bold text-main mb-2 tracking-tight">
-                            Éxito al crear el producto &ldquo;{createdResult?.name || productData.name}&rdquo;
-                        </h3>
-
-                        <p className="text-sm text-main/60 mb-6 max-w-md">
-                            El producto y sus ítems han sido registrados correctamente en el sistema{createdResult && createdResult.totalImages > 0 ? ` junto con ${createdResult.totalImages} ${createdResult.totalImages === 1 ? 'imagen asociada' : 'imágenes asociadas'}` : ''}.
-                        </p>
-
-                        <div className="w-full bg-primary-0/40 border border-focus-300/20 rounded-dx p-4 mb-8 flex items-center justify-around text-xs shadow-sm">
-                            <div className="flex flex-col">
-                                <span className="text-main/50 font-medium">Ítems creados</span>
-                                <span className="text-base font-bold text-main mt-0.5">{createdResult?.itemsCount ?? itemsData.length}</span>
+                {/* Step 3: Resultado */}
+                {currentStep === 3 && (() => {
+                    const name = createdResult?.name || productData.name || "—";
+                    const itemsCount = createdResult?.itemsCount ?? itemsData.length;
+                    const presentationsCount = createdResult?.presentationsCount ?? 0;
+                    const itemsLabel = itemsCount === 1 ? "ítem" : "ítems";
+                    const presentationsLabel = presentationsCount === 1 ? "presentación" : "presentaciones";
+                    return (
+                        <div className="flex flex-col items-center justify-center min-h-[420px] py-10 px-6 text-center">
+                            <div className="text-focus-300 mb-6" aria-hidden>
+                                <CheckOutlinedIcon className="w-20 h-20 sm:w-24 sm:h-24" />
                             </div>
-                            <div className="h-8 w-px bg-main/10" />
-                            <div className="flex flex-col">
-                                <span className="text-main/50 font-medium">Imágenes procesadas</span>
-                                <span className="text-base font-bold text-main mt-0.5">{createdResult?.totalImages ?? 0}</span>
-                            </div>
-                            <div className="h-8 w-px bg-main/10" />
-                            <div className="flex flex-col">
-                                <span className="text-main/50 font-medium">Estado</span>
-                                <span className="text-xs font-semibold text-success bg-success/15 px-2 py-0.5 rounded mt-0.5">Activo</span>
+
+                            <p className="text-base sm:text-lg text-main leading-snug max-w-xl mb-8">
+                                Producto{" "}
+                                <span className="font-semibold text-dx-primary">{name}</span>
+                                {" "}con{" "}
+                                <span className="font-semibold tabular-nums">{itemsCount}</span>
+                                {" "}{itemsLabel} y{" "}
+                                <span className="font-semibold tabular-nums">{presentationsCount}</span>
+                                {" "}{presentationsLabel} creados con éxito.
+                            </p>
+
+                            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-center gap-2 w-full max-w-md">
+                                <Button
+                                    text="Volver al listado"
+                                    stylingMode="text"
+                                    className="!rounded-dx !bg-main/10 w-full sm:w-auto"
+                                    onClick={onClose}
+                                />
+                                <Button
+                                    text="Ver producto"
+                                    type="default"
+                                    stylingMode="contained"
+                                    className="!bg-focus-300 shadow-lg shadow-black/20 !text-variant !rounded-dx w-full sm:w-auto"
+                                    onClick={() => {
+                                        if (createdResult?.id) {
+                                            window.open(`/products/productDetail?id=${createdResult.id}`, "_blank");
+                                        }
+                                    }}
+                                />
                             </div>
                         </div>
-
-                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
-                            <Button
-                                text="Ver producto"
-                                type="default"
-                                stylingMode="contained"
-                                className="!bg-focus-300 !text-variant hover:!bg-focus-400 font-semibold !rounded-dx w-full sm:w-auto px-6 py-2.5 shadow-md flex items-center justify-center gap-2"
-                                onClick={() => {
-                                    if (createdResult?.id) {
-                                        window.open(`/products/productDetail?id=${createdResult.id}`, '_blank');
-                                    }
-                                }}
-                            />
-
-                            <Button
-                                text="Volver al listado"
-                                type="normal"
-                                stylingMode="outlined"
-                                className="!border-main/20 text-main hover:!bg-main/5 font-medium !rounded-dx w-full sm:w-auto px-6 py-2.5"
-                                onClick={onClose}
-                            />
-                        </div>
-                    </div>
-                )}
+                    );
+                })()}
 
             </div>
 

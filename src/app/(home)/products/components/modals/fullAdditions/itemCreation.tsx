@@ -2,14 +2,16 @@
 
 import { IFUOM } from "@repo/api-contracts/erp";
 import { IFPackagingLevel } from "@repo/api-contracts/erp";
-import { CheckBox } from "devextreme-react";
-import { Button } from '@repo/devextreme';
+import { CheckBox, NumberBox, TextBox } from "devextreme-react";
+import { Button, SelectBox } from '@repo/devextreme';
 import { Tooltip } from "devextreme-react/tooltip";
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
-import { CustomRule, RequiredRule } from "devextreme-react/validator";
-import React, { useEffect, useState } from "react";
+import { AsyncRule, CustomRule, RequiredRule } from "devextreme-react/validator";
+import notify from "devextreme/ui/notify";
+import React, { useEffect, useRef, useState } from "react";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
 import { useAuth } from "@/contexts/AuthContext";
+import { itemsService } from "@/app/services/product_services/items.service";
 import { currenciesService } from "@/app/services/payments_services/currencies.service";
 import { providerService } from "@/app/services/location_services/provider.service";
 import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
@@ -19,6 +21,7 @@ import { generateUUID } from "@/lib/utils/id.helper";
 import { createEmptyItem } from "./creation";
 import ItemsCreatedList from "./itemsCreatedList";
 import PresentationsManagement from "./presentationsManagement";
+import ItemSuppliersManagement from "./itemSuppliersManagement";
 import ItemMediaUploadSection, { ICachedItemMedia } from "./itemMediaUploadSection";
 
 interface CheckboxContainerProps {
@@ -139,15 +142,42 @@ const ItemsSection = (props: IItemsSectionProps) => {
     const [currencies, setCurrencies] = useState<IFCurrency[]>([]);
     const [suppliers, setSuppliers] = useState<IFProvider[]>([]);
     const [platforms, setPlatforms] = useState<IFCommercialPlatform[]>([]);
+    /** Remount del Form al cargar un ítem para edición / limpiar borrador */
+    const [itemFormKey, setItemFormKey] = useState(0);
+    const [editingTempId, setEditingTempId] = useState<string | null>(null);
+    const editSnapshotRef = useRef<any>(null);
+    const editIndexRef = useRef<number>(-1);
 
     useEffect(() => {
         if (!token) return;
-        currenciesService.getAll(token).then(res => setCurrencies(res?.items || [])).catch(console.error);
-        providerService.getAll(token, currentCompany).then(res => setSuppliers(res?.items || [])).catch(console.error);
-        commercialPlatformsService.getAll({ companyId: currentCompany, limit: 500, offset: 0 }, token).then(res => setPlatforms(res?.items || [])).catch(console.error);
+        let cancelled = false;
+        Promise.all([
+            currenciesService.getAll(token),
+            providerService.getAll(token, currentCompany),
+            commercialPlatformsService.getAll({ companyId: currentCompany, limit: 500, offset: 0 }, token),
+        ])
+            .then(([currRes, provRes, platRes]) => {
+                if (cancelled) return;
+                setCurrencies(currRes?.items || []);
+                setSuppliers(provRes?.items || []);
+                setPlatforms(platRes?.items || []);
+            })
+            .catch(console.error);
+        return () => {
+            cancelled = true;
+        };
     }, [token, currentCompany]);
 
     const hasItems = itemsData.length > 0;
+    const isEditing = !!editingTempId;
+
+    const cloneItemForForm = (item: any) => ({
+        ...item,
+        suppliers: (item.suppliers || []).map((s: any) => ({ ...s })),
+        presentations: (item.presentations || []).map((p: any) => ({ ...p })),
+        platformIds: [...(item.platformIds || [])],
+        media: [...(item.media || [])],
+    });
 
     const selectedMode = saleBillingModes?.find((m: any) => m.code === productData.saleBillingModeCode);
     const requiresSecondaryUom = selectedMode ? (selectedMode.requiresSecondaryUom || selectedMode.isDualUom) : false;
@@ -156,33 +186,170 @@ const ItemsSection = (props: IItemsSectionProps) => {
     // If it's a service, force isInventoryItem to false in the current item
     useEffect(() => {
         if (isService && currentItem.isInventoryItem) {
-            setCurrentItem((prev: any) => ({ ...prev, isInventoryItem: false }));
+            currentItem.isInventoryItem = false;
         }
-    }, [isService, currentItem.isInventoryItem, setCurrentItem]);
+    }, [isService, currentItem.isInventoryItem]);
+
+    const notifyBrokenRules = (result: any, fallback: string) => {
+        const messages = [...new Set(
+            (result?.brokenRules || [])
+                .map((r: any) => r?.message)
+                .filter((m: unknown): m is string => typeof m === "string" && m.trim().length > 0)
+        )];
+        if (messages.length === 0) {
+            notify(fallback, "warning", 3500);
+            return;
+        }
+        if (messages.length === 1) {
+            notify(messages[0], "warning", 3500);
+            return;
+        }
+        notify(`Revise el ítem: ${messages.slice(0, 4).join(" · ")}${messages.length > 4 ? "…" : ""}`, "warning", 5000);
+    };
 
     const addItem = () => {
         const result = formRef.current?.instance().validate();
         if (!result?.isValid) {
+            notifyBrokenRules(
+                result,
+                "Complete los campos obligatorios del ítem (SKU, método de costo y UoM de pallet, entre otros)"
+            );
+            const firstBroken = result?.brokenRules?.[0];
+            firstBroken?.validator?.focus?.();
             return;
         }
 
-        setItemsData([...itemsData, {
+        // Validar que ningún proveedor tenga supplierSku vacío
+        if (Array.isArray(currentItem.suppliers) && currentItem.suppliers.length > 0) {
+            const invalidSupplier = currentItem.suppliers.find((s: any) => !(s.supplierSku || s.supplier_sku || "").trim());
+            if (invalidSupplier) {
+                notify("Todos los proveedores vinculados deben tener un Código de Proveedor (SKU)", "error", 3500);
+                return;
+            }
+        }
+
+        // Cada nivel de empaque con presentaciones debe tener exactamente una principal
+        const presentations = currentItem.presentations || [];
+        if (presentations.length > 0) {
+            const levelIds = [...new Set(presentations.map((p: any) => p.packagingLevelId).filter(Boolean))];
+            for (const levelId of levelIds) {
+                const levelPresentations = presentations.filter((p: any) => p.packagingLevelId === levelId);
+                const primaryCount = levelPresentations.filter((p: any) => p.isPrimary).length;
+                const levelName = packagingLevels.find((pl) => pl.id === levelId)?.name || "desconocido";
+                if (primaryCount === 0) {
+                    notify(
+                        `El nivel de empaque «${levelName}» necesita al menos una presentación marcada como principal`,
+                        "error",
+                        4500
+                    );
+                    return;
+                }
+                if (primaryCount > 1) {
+                    // Autocorregir: dejar solo la primera como principal
+                    let kept = false;
+                    levelPresentations.forEach((p: any) => {
+                        if (p.isPrimary && !kept) {
+                            kept = true;
+                        } else {
+                            p.isPrimary = false;
+                        }
+                    });
+                }
+            }
+        }
+
+        const saved = {
             ...currentItem,
             active: currentItem.active !== undefined ? currentItem.active : true,
             isDualUom: requiresSecondaryUom,
-            tempId: generateUUID(),
+            tempId: editingTempId || generateUUID(),
             presentations: [...(currentItem.presentations || [])],
-            media: [...(currentItem.media || [])]
-        }]);
-        clearAll();
+            media: [...(currentItem.media || [])],
+            suppliers: [...(currentItem.suppliers || [])],
+            platformIds: [...(currentItem.platformIds || [])],
+        };
+
+        if (editingTempId) {
+            const insertAt = editIndexRef.current;
+            setItemsData((prev) => {
+                const next = [...prev];
+                if (insertAt >= 0 && insertAt <= next.length) {
+                    next.splice(insertAt, 0, saved);
+                } else {
+                    next.push(saved);
+                }
+                return next;
+            });
+            editSnapshotRef.current = null;
+            editIndexRef.current = -1;
+            setEditingTempId(null);
+        } else {
+            setItemsData((prev) => [...prev, saved]);
+        }
+
+        setCurrentItem(createEmptyItem(currentCompany));
+        setItemFormKey((k) => k + 1);
+        setIsAddingItem(false);
     };
 
     const removeItem = (tempId: string) => {
-        setItemsData(itemsData.filter(i => i.tempId !== tempId));
+        setItemsData((prev) => prev.filter((i) => i.tempId !== tempId));
     };
 
+    const startEditItem = (tempId: string) => {
+        if (isAddingItem) {
+            const dirty =
+                !!(currentItem.sku || "").trim() ||
+                !!(currentItem.itemName || "").trim() ||
+                (currentItem.presentations || []).length > 0 ||
+                (currentItem.suppliers || []).length > 0 ||
+                (currentItem.media || []).length > 0 ||
+                isEditing;
+            if (dirty) {
+                notify(
+                    isEditing
+                        ? "Guarde o descarte el ítem en edición antes de editar otro"
+                        : "Confirme o descarte el ítem en borrador antes de editar uno confirmado",
+                    "warning",
+                    4500
+                );
+                return;
+            }
+        }
+
+        const index = itemsData.findIndex((i) => i.tempId === tempId);
+        const item = index >= 0 ? itemsData[index] : null;
+        if (!item) return;
+
+        editSnapshotRef.current = cloneItemForForm(item);
+        editIndexRef.current = index;
+        setItemsData((prev) => prev.filter((i) => i.tempId !== tempId));
+        setEditingTempId(tempId);
+        setCurrentItem(cloneItemForForm(item));
+        setItemFormKey((k) => k + 1);
+        setIsAddingItem(true);
+    };
+
+    /** Descarta el borrador; si era edición, restaura el ítem confirmado original */
     const clearAll = () => {
+        if (editingTempId && editSnapshotRef.current) {
+            const snapshot = editSnapshotRef.current;
+            const insertAt = editIndexRef.current;
+            setItemsData((prev) => {
+                const next = [...prev];
+                if (insertAt >= 0 && insertAt <= next.length) {
+                    next.splice(insertAt, 0, snapshot);
+                } else {
+                    next.push(snapshot);
+                }
+                return next;
+            });
+            editSnapshotRef.current = null;
+            editIndexRef.current = -1;
+            setEditingTempId(null);
+        }
         setCurrentItem(createEmptyItem(currentCompany));
+        setItemFormKey((k) => k + 1);
         setIsAddingItem(false);
     };
 
@@ -191,18 +358,20 @@ const ItemsSection = (props: IItemsSectionProps) => {
             {isAddingItem &&
                 <div className="p-4 bg-primary-0/40 rounded-dx border-1 border-focus-100/30 relative">
                     <div className="flex justify-between items-center mb-4 pr-8">
-                        <h3 className="text-lg">Añadir Items</h3>
-                        {hasItems &&
+                        <h3 className="text-lg">{isEditing ? "Editar ítem" : "Añadir Items"}</h3>
+                        {(hasItems || isEditing) &&
                             <Button
                                 icon="trash"
                                 type="danger"
                                 stylingMode="text"
+                                hint={isEditing ? "Descartar cambios" : "Descartar borrador"}
                                 className="!absolute top-4 right-4"
                                 onClick={clearAll}
                             />
                         }
                     </div>
                     <Form
+                        key={itemFormKey}
                         ref={formRef}
                         formData={currentItem}
                         labelLocation="top"
@@ -251,6 +420,22 @@ const ItemsSection = (props: IItemsSectionProps) => {
                                     validationCallback={(e) => {
                                         const val = typeof e.value === 'string' ? e.value.trim().toLowerCase() : '';
                                         return !itemsData.some(i => i.sku.trim().toLowerCase() === val);
+                                    }}
+                                />
+                                <AsyncRule
+                                    message="Este SKU ya está registrado en el catálogo"
+                                    validationCallback={async (e) => {
+                                        const val = typeof e.value === 'string' ? e.value.trim() : '';
+                                        if (!val || !token) return true;
+                                        try {
+                                            const res = await itemsService.checkSkuAvailability({
+                                                sku: val,
+                                                companyId: currentCompany
+                                            }, token);
+                                            return res.available;
+                                        } catch {
+                                            return true;
+                                        }
                                     }}
                                 />
                             </SimpleItem>
@@ -363,7 +548,8 @@ const ItemsSection = (props: IItemsSectionProps) => {
                                     searchEnabled: true,
                                     showClearButton: true,
                                     stylingMode: 'filled',
-                                    placeholder: "Seleccione moneda...",
+                                    placeholder: "Moneda de la compañía (si no elige)",
+                                    hint: "Sin selección, se usa la moneda base de la compañía",
                                     dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
                                 }}
                             />
@@ -371,22 +557,18 @@ const ItemsSection = (props: IItemsSectionProps) => {
                         </GroupItem>
 
                         <GroupItem colSpan={4} colCount={1} cssClass="!p-0 mt-3">
-                            <SimpleItem
-                                dataField="suppliers"
-                                label={{ text: "Proveedores" }}
-                                editorType="dxTagBox"
-                                editorOptions={{
-                                    dataSource: suppliers,
-                                    valueExpr: "id",
-                                    displayExpr: "name",
-                                    searchEnabled: true,
-                                    showClearButton: true,
-                                    stylingMode: 'filled',
-                                    placeholder: "Seleccione proveedores...",
-                                    width: "100%",
-                                    dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } }
-                                }}
-                            />
+                            <SimpleItem colSpan={4} label={{ visible: false }} cssClass="!p-0">
+                                {/* Contenedor aislado: evita que dxForm intercepte clics del bloque de proveedores */}
+                                <div className="relative z-10" onMouseDown={(e) => e.stopPropagation()}>
+                                    <ItemSuppliersManagement
+                                        currentItem={currentItem}
+                                        suppliers={suppliers}
+                                        itemsData={itemsData}
+                                        token={token}
+                                        currentCompany={currentCompany}
+                                    />
+                                </div>
+                            </SimpleItem>
 
                             <SimpleItem
                                 dataField="platformIds"
@@ -518,10 +700,8 @@ const ItemsSection = (props: IItemsSectionProps) => {
                                 <ItemMediaUploadSection
                                     media={currentItem.media || []}
                                     onChange={(newMedia) => {
-                                        setCurrentItem((prev: any) => ({
-                                            ...prev,
-                                            media: newMedia
-                                        }));
+                                        // Mutación in-place: no reemplazar currentItem (rompe Form / proveedores)
+                                        currentItem.media = newMedia;
                                     }}
                                 />
                             </SimpleItem>
@@ -531,7 +711,7 @@ const ItemsSection = (props: IItemsSectionProps) => {
                         <Button
                             type="default"
                             stylingMode="contained"
-                            text="Añadir Ítem con sus Presentaciones"
+                            text={isEditing ? "Guardar cambios del ítem" : "Confirmar item y sus presentaciones"}
                             onClick={addItem}
                             className="!bg-focus-300 shadow-lg shadow-black/20 !text-variant"
                         />
@@ -539,15 +719,14 @@ const ItemsSection = (props: IItemsSectionProps) => {
                 </div>
             }
 
-            <h2 className="text-lg my-4">Items a crear <span>({itemsData.length})</span></h2>
+            <h2 className="text-lg my-4">Items confirmados <span>({itemsData.length})</span></h2>
             {hasItems ?
                 <ItemsCreatedList
                     itemsData={itemsData}
-                    currentPresentationsMap={{}}
-                    setCurrentPresentationsMap={() => { }}
                     uoms={uoms}
                     costMethods={costMethods}
                     removeItem={removeItem}
+                    onEditItem={startEditItem}
                     canCreatePresentation={canCreatePresentation}
                     setItemsData={setItemsData}
                     setIsAddingItem={setIsAddingItem}

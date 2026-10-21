@@ -18,20 +18,46 @@ import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
 import CustomStore from "devextreme/data/custom_store";
 import { CheckBox } from 'devextreme-react/check-box';
 import notify from "devextreme/ui/notify";
-import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import ProductModal from "../modals/singleAdditions/productModal";
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
 import { IFPackagingLevel } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
-import Creation from "../modals/fullAdditions/creation";
 import { packagingLevelService } from "@/app/services/product_services/packagingLevel.service";
+
+/** Lazy: evita cargar el wizard completo (Forms DX + steps) con la página de productos */
+const Creation = dynamic(() => import("../modals/fullAdditions/creation"), {
+    ssr: false,
+    loading: () => null,
+});
+
+export const preloadCreationModal = () => {
+    if (typeof window !== "undefined") {
+        void import("../modals/fullAdditions/creation");
+    }
+};
 
 
 const { customLoad, customSave } = createGridStateStorage({ gridId: 'products-grid' });
 
-const ProductsClient = () => {
+export interface ProductsClientProps {
+    onSelectionChange?: (selectedProduct: any | null) => void;
+    selectionMode?: 'single' | 'multiple' | 'none';
+    clearSelectionTrigger?: number;
+    openCreationTrigger?: number;
+    onCreationSuccess?: () => void;
+}
+
+const ProductsClient: React.FC<ProductsClientProps> = ({
+    onSelectionChange,
+    selectionMode = 'none',
+    clearSelectionTrigger = 0,
+    openCreationTrigger = 0,
+    onCreationSuccess,
+}) => {
     const [packagingLevels, setPackagingLevels] = useState<IFPackagingLevel[]>([]);
     const gridRef = useRef<any>(null);
     const [uoms, setUoms] = useState<IFUOM[]>([]);
@@ -39,6 +65,8 @@ const ProductsClient = () => {
     const [brands, setBrands] = useState<IFBrand[]>([]);
     const [products, setProducts] = useState<any[]>([]);
     const [isCreationOpen, setIsCreationOpen] = useState(false);
+    /** Solo montar el wizard cuando el usuario lo abre (antes destruía el hilo al cargar la página) */
+    const [mountCreation, setMountCreation] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [taxes, setTaxes] = useState<IFTax[]>([]);
@@ -46,6 +74,9 @@ const ProductsClient = () => {
     const { token, permissions, currentCompany, includeInactive, isSuperAdmin } = useAuth();
     const { isRecoveryMode, recoveryVisibility } = useRecovery();
     const [refreshVersion, setRefreshVersion] = useState(0);
+    const selectedRowKeyRef = useRef<any>(null);
+    const justSelectedKeyRef = useRef<any>(null);
+    const isProgrammaticClearRef = useRef(false);
 
     // Refetch reactivo cuando cambia el switch de RecoveryMode o RecoveryVisibility
     useEffect(() => {
@@ -56,6 +87,37 @@ const ProductsClient = () => {
             gridRef.current.refresh();
         }
     }, [isRecoveryMode, recoveryVisibility]);
+
+    // Limpiar selección externa cuando se dispara el trigger (sin notificar al padre)
+    useEffect(() => {
+        if (clearSelectionTrigger > 0) {
+            const gridInstance = gridRef.current?.instance ? gridRef.current.instance() : gridRef.current;
+            isProgrammaticClearRef.current = true;
+            gridInstance?.clearSelection?.();
+            selectedRowKeyRef.current = null;
+            justSelectedKeyRef.current = null;
+            // Si no había selección, onSelectionChanged puede no dispararse
+            setTimeout(() => {
+                isProgrammaticClearRef.current = false;
+            }, 0);
+        }
+    }, [clearSelectionTrigger]);
+
+    const openCreationModal = () => {
+        preloadCreationModal();
+        setMountCreation(true);
+        startTransition(() => {
+            setIsCreationOpen(true);
+        });
+    };
+
+    // Abrir modal de creación completa externamente cuando se dispara el trigger
+    useEffect(() => {
+        if (openCreationTrigger > 0) {
+            openCreationModal();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- solo reaccionar al trigger externo
+    }, [openCreationTrigger]);
 
     const canModify = useMemo((): boolean => {
         return permissions ? canDo('modify', PERMISSIONS_CONSTANTS.modifyProducts, permissions) : false;
@@ -222,18 +284,24 @@ const ProductsClient = () => {
                 dataField: 'name',
                 caption: 'Nombre',
                 allowSorting: true,
+                width: 220,
+                minWidth: 160,
                 validationRules: [{ type: 'required', message: 'El nombre es obligatorio' }],
             },
             {
                 dataField: 'classificationName',
                 caption: 'Clasificación',
                 allowSorting: true,
+                width: 150,
+                minWidth: 120,
                 validationRules: [{ type: 'required', message: 'La clasificación es obligatoria' }],
             },
             {
                 dataField: 'prefix',
                 caption: 'Prefijo SKU',
                 allowSorting: true,
+                width: 130,
+                minWidth: 110,
                 validationRules: [{ type: 'required', message: 'El prefijo es obligatorio' }],
             },
             {
@@ -241,6 +309,8 @@ const ProductsClient = () => {
                 caption: 'Unidad de Medida',
                 allowSorting: true,
                 allowEditing: false,
+                width: 150,
+                minWidth: 120,
                 lookup: {
                     dataSource: uoms,
                     valueExpr: 'id',
@@ -252,6 +322,8 @@ const ProductsClient = () => {
                 caption: 'Categoría',
                 allowSorting: true,
                 allowEditing: false,
+                width: 160,
+                minWidth: 130,
                 lookup: {
                     dataSource: categories,
                     valueExpr: 'id',
@@ -262,6 +334,8 @@ const ProductsClient = () => {
                 dataField: 'brandId',
                 caption: 'Marca',
                 allowSorting: true,
+                width: 140,
+                minWidth: 120,
                 lookup: {
                     dataSource: brands,
                     valueExpr: 'id',
@@ -272,7 +346,8 @@ const ProductsClient = () => {
                 dataField: 'active',
                 caption: 'Activo',
                 allowSorting: true,
-                width: 80,
+                width: 90,
+                minWidth: 80,
                 alignment: 'center',
                 visible: includeInactive,
                 cellRender: (cellData: any) => (
@@ -286,12 +361,16 @@ const ProductsClient = () => {
                 caption: 'Categoría Padre',
                 allowSorting: true,
                 allowEditing: false,
+                width: 160,
+                minWidth: 130,
             },
             {
                 dataField: 'taxIds',
                 caption: 'Impuestos',
                 allowSorting: false,
                 allowEditing: false,
+                width: 180,
+                minWidth: 140,
                 cellTemplate: (container: HTMLElement, options: any) => {
                     const taxIds = options.value as string[] | null | undefined;
                     if (!taxIds || taxIds.length === 0) {
@@ -360,6 +439,50 @@ const ProductsClient = () => {
         }
     ], [canModify, isSuperAdmin, isRecoveryMode, token, currentCompany?.id]);
 
+    const handleRowClick = (e: any) => {
+        if (selectionMode !== 'single' || e.rowType !== 'data') return;
+        if (e.column?.type === 'buttons') return;
+
+        // Si la fila acaba de seleccionarse en esta misma acción de puntero, ignorar para no deseleccionarla
+        if (justSelectedKeyRef.current !== null && String(justSelectedKeyRef.current) === String(e.key)) {
+            justSelectedKeyRef.current = null;
+            return;
+        }
+
+        if (
+            selectedRowKeyRef.current !== null &&
+            String(selectedRowKeyRef.current) === String(e.key)
+        ) {
+            e.component.clearSelection();
+            selectedRowKeyRef.current = null;
+            justSelectedKeyRef.current = null;
+            if (onSelectionChange) {
+                onSelectionChange(null);
+            }
+        }
+    };
+
+    const handleSelectionChanged = (e: any) => {
+        const keys = e.selectedRowKeys || [];
+        const newKey = keys.length > 0 ? keys[0] : null;
+        if (newKey !== null && String(newKey) !== String(selectedRowKeyRef.current)) {
+            justSelectedKeyRef.current = newKey;
+            setTimeout(() => {
+                justSelectedKeyRef.current = null;
+            }, 250);
+        }
+        selectedRowKeyRef.current = newKey;
+        // El clear externo (clearSelectionTrigger) ya sincronizó el padre; no re-notificar
+        if (isProgrammaticClearRef.current) {
+            isProgrammaticClearRef.current = false;
+            return;
+        }
+        if (onSelectionChange) {
+            const product = e.selectedRowsData?.[0] || null;
+            onSelectionChange(product);
+        }
+    };
+
     return (
         <div className="flex flex-col w-full  min-w-full h-full rounded-dx font-sans overflow-hidden">
             <div className="w-full h-full flex flex-col">
@@ -372,7 +495,7 @@ const ProductsClient = () => {
                         dataSource={dataSource}
                         remoteOperations={false}
                         columns={columns}
-                        columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true }}
+                        columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true, minWidth: 110 }}
                         allowColumnReordering={true}
                         allowColumnResizing={true}
                         showBorders={true}
@@ -391,7 +514,9 @@ const ProductsClient = () => {
                             placeholder: 'Buscar productos...',
                             highlightSearchText: true
                         }}
-                        selection={{ mode: 'none' }}
+                        selection={selectionMode === 'none' ? { mode: 'none' } : { mode: selectionMode }}
+                        onRowClick={handleRowClick}
+                        onSelectionChanged={handleSelectionChanged}
                         editing={{
                             allowAdding: isRecoveryMode ? false : canModify,
                             allowUpdating: false,
@@ -399,7 +524,7 @@ const ProductsClient = () => {
                             allowDetail: false,
                             useIcons: true,
                             onAdd: () => {
-                                setIsCreationOpen(true);
+                                openCreationModal();
                             }
                         }}
                         actions={actions}
@@ -451,25 +576,34 @@ const ProductsClient = () => {
                 taxes={taxes}
                 initialData={selectedProduct}
             />
-            <Creation
-                isOpen={isCreationOpen}
-                onClose={() => setIsCreationOpen(false)}
-                onSuccess={() => {
-                    setRefreshVersion(prev => prev + 1);
-                    if (gridRef.current?.instance?.refresh) {
-                        gridRef.current.instance.refresh();
-                    } else if (gridRef.current?.refresh) {
-                        gridRef.current.refresh();
-                    }
-                }}
-                products={products}
-                uoms={uoms}
-                categories={categories}
-                brands={brands}
-                taxes={taxes}
-                packagingLevels={packagingLevels}
-                initialData={null}
-            />
+            {mountCreation ? (
+                <Creation
+                    isOpen={isCreationOpen}
+                    onClose={() => setIsCreationOpen(false)}
+                    onHidden={() => {
+                        setIsCreationOpen(false);
+                        setMountCreation(false);
+                    }}
+                    onSuccess={() => {
+                        setRefreshVersion(prev => prev + 1);
+                        if (gridRef.current?.instance?.refresh) {
+                            gridRef.current.instance.refresh();
+                        } else if (gridRef.current?.refresh) {
+                            gridRef.current.refresh();
+                        }
+                        if (onCreationSuccess) {
+                            onCreationSuccess();
+                        }
+                    }}
+                    products={products}
+                    uoms={uoms}
+                    categories={categories}
+                    brands={brands}
+                    taxes={taxes}
+                    packagingLevels={packagingLevels}
+                    initialData={null}
+                />
+            ) : null}
         </div>
     );
 };

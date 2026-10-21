@@ -3,7 +3,7 @@
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { CustomRule, RequiredRule } from "devextreme-react/validator";
 import TagBox from "devextreme-react/tag-box";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { PROCUREMENT_TYPES_OPTIONS } from "@/app/lib/constants/product.constants";
 import { currenciesService } from "@/app/services/payments_services/currencies.service";
 import { logisticProfileService } from "@/app/services/product_services/logisticProfile.service";
@@ -44,20 +44,131 @@ const ProductSection = (props: IProductSection) => {
     } = props;
 
     const { token } = useAuth();
-    const [currencies, setCurrencies] = useState<IFCurrency[]>([]);
-    const [logisticsProfiles, setLogisticsProfiles] = useState<IFLogisticProfile[]>([]);
-    const [temperatureClasses, setTemperatureClasses] = useState<IFTemperatureClass[]>([]);
-    const [hazardClasses, setHazardClasses] = useState<IFHazardClass[]>([]);
-    const [segregationGroups, setSegregationGroups] = useState<IFSegregationGroup[]>([]);
 
+    const HANDLING_FIELDS = [
+        "defaultLogisticsProfileId",
+        "defaultTemperatureClassId",
+        "defaultHazardClassId",
+        "defaultSegregationGroupId",
+        "handlingNotes",
+    ] as const;
+
+    const computeHasHandlingData = () => !!(
+        productData.defaultLogisticsProfileId ||
+        productData.defaultTemperatureClassId ||
+        productData.defaultHazardClassId ||
+        productData.defaultSegregationGroupId ||
+        (productData.handlingNotes && String(productData.handlingNotes).trim())
+    );
+
+    const initialHandlingVisible = computeHasHandlingData();
+    const handlingEnabledRef = useRef(initialHandlingVisible);
+    const handlingCatalogsLoadedRef = useRef(false);
+    const handlingHintRef = useRef<HTMLParagraphElement>(null);
+    const handlingHeaderRef = useRef<HTMLDivElement>(null);
+    /** itemOption remonta el GroupItem: hay que reaplicar value al CheckBox tras el refresh */
+    const handlingCheckBoxRef = useRef<any>(null);
+    const logisticsProfilesRef = useRef<IFLogisticProfile[]>([]);
+    const temperatureClassesRef = useRef<IFTemperatureClass[]>([]);
+    const hazardClassesRef = useRef<IFHazardClass[]>([]);
+    const segregationGroupsRef = useRef<IFSegregationGroup[]>([]);
+    /** Catálogo options fresco para CustomRule (evita closure stale del Form) */
+    const productsRef = useRef(products);
+    productsRef.current = products;
+
+    const clearHandlingFields = () => {
+        productData.defaultLogisticsProfileId = null;
+        productData.defaultTemperatureClassId = null;
+        productData.defaultHazardClassId = null;
+        productData.defaultSegregationGroupId = null;
+        productData.handlingNotes = "";
+        const form = formRef.current?.instance();
+        if (form) {
+            form.updateData("defaultLogisticsProfileId", null);
+            form.updateData("defaultTemperatureClassId", null);
+            form.updateData("defaultHazardClassId", null);
+            form.updateData("defaultSegregationGroupId", null);
+            form.updateData("handlingNotes", "");
+        }
+    };
+
+    const loadHandlingCatalogs = () => {
+        if (!token || !currentCompany || handlingCatalogsLoadedRef.current) return;
+        Promise.all([
+            logisticProfileService.getAll(currentCompany, token),
+            temperatureService.getAll(currentCompany, token),
+            hazardService.getAll(currentCompany, token),
+            segregationGroupsService.getAll(currentCompany, token),
+        ])
+            .then(([logistics, temps, hazards, segregations]) => {
+                handlingCatalogsLoadedRef.current = true;
+                logisticsProfilesRef.current = logistics;
+                temperatureClassesRef.current = temps;
+                hazardClassesRef.current = hazards;
+                segregationGroupsRef.current = segregations;
+                // Dxdocs: getEditor().option — sin setState (no remonta el Form)
+                const form = formRef.current?.instance();
+                form?.getEditor("defaultLogisticsProfileId")?.option("dataSource", logistics);
+                form?.getEditor("defaultTemperatureClassId")?.option("dataSource", temps);
+                form?.getEditor("defaultHazardClassId")?.option("dataSource", hazards);
+                form?.getEditor("defaultSegregationGroupId")?.option("dataSource", segregations);
+            })
+            .catch(console.error);
+    };
+
+    const syncHandlingCheckBox = (enabled: boolean) => {
+        const cb = handlingCheckBoxRef.current;
+        if (!cb || typeof cb.option !== "function") return;
+        if (cb.option("value") !== enabled) {
+            cb.option("value", enabled);
+        }
+    };
+
+    /**
+     * Toggle de sección opcional vía itemOption (puntual) + DOM nativo.
+     * Evita setState de React que re-crearía editorOptions y refrescaría todo el Form.
+     * Nota Dxdocs: itemOption refresca el grupo y re-inicializa editores/custom content
+     * → el CheckBox «Activar» vuelve a defaultValue; hay que re-sincronizar value.
+     */
+    const applyHandlingVisibility = (enabled: boolean, options?: { clear?: boolean }) => {
+        handlingEnabledRef.current = enabled;
+        const form = formRef.current?.instance();
+        if (form) {
+            HANDLING_FIELDS.forEach((field) => {
+                form.itemOption(field, "visible", enabled);
+            });
+            form.updateDimensions?.();
+        }
+        if (handlingHintRef.current) {
+            handlingHintRef.current.textContent = enabled
+                ? "Perfil logístico, temperatura, peligro y notas."
+                : "Opcional — actívelo si el producto requiere datos de manejo.";
+        }
+        if (handlingHeaderRef.current) {
+            handlingHeaderRef.current.classList.toggle("mb-3", enabled);
+            handlingHeaderRef.current.classList.toggle("mb-0", !enabled);
+        }
+        // Tras el refresh del GroupItem (síncrono o en el siguiente frame)
+        syncHandlingCheckBox(enabled);
+        requestAnimationFrame(() => syncHandlingCheckBox(enabled));
+        if (!enabled && options?.clear) {
+            clearHandlingFields();
+        }
+        if (enabled) {
+            loadHandlingCatalogs();
+        }
+    };
+
+    // Al resetear productData (apertura del modal), sincronizar visibilidad sin setState de UI
     useEffect(() => {
-        if (!token) return;
-        currenciesService.getAll(token).then(res => setCurrencies(res.items)).catch(console.error);
-        logisticProfileService.getAll(currentCompany, token).then(setLogisticsProfiles).catch(console.error);
-        temperatureService.getAll(currentCompany, token).then(setTemperatureClasses).catch(console.error);
-        hazardService.getAll(currentCompany, token).then(setHazardClasses).catch(console.error);
-        segregationGroupsService.getAll(currentCompany, token).then(setSegregationGroups).catch(console.error);
-    }, [token, currentCompany]);
+        const enabled = computeHasHandlingData();
+        handlingCatalogsLoadedRef.current = false;
+        requestAnimationFrame(() => {
+            applyHandlingVisibility(enabled, { clear: false });
+            if (enabled) loadHandlingCatalogs();
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al cambiar la ref de productData
+    }, [productData]);
 
     const descriptionRef = useRef<HTMLParagraphElement>(null);
 
@@ -112,47 +223,59 @@ const ProductSection = (props: IProductSection) => {
     }, [initialDescription]);
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <Form
                 ref={formRef}
                 formData={productData}
-                colCount={2}
+                colCount={1}
+                labelLocation="top"
                 scrollingEnabled={false}
             >
-                {/* Card 1: Información del Producto */}
+                {/* Card 1: Información del Producto — grid 3 cols, más compacto */}
                 <GroupItem
-                    colSpan={2}
-                    colCount={2}
-                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm !mb-6"
+                    colSpan={1}
+                    colCount={3}
+                    cssClass="!p-4 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm !mb-4 [&_.dx-field-item]:!pb-2 [&_.dx-field-item-label]:!pb-0.5"
                 >
                     <SimpleItem
-                        colSpan={2}
-                        cssClass="!p-0"
+                        colSpan={3}
+                        cssClass="!p-0 !pb-0"
                         label={{ visible: false }}
                     >
-                        <div className="mb-6 border-b border-main/10 pb-4">
-                            <h3 className="text-lg font-bold text-dx-primary mb-1">Información del Producto</h3>
-                            <p className="text-xs opacity-60">Datos generales del nuevo producto terminado.</p>
+                        <div className="mb-3 border-b border-main/10 pb-2.5 flex items-baseline justify-between gap-3">
+                            <h3 className="text-base font-bold text-dx-primary leading-tight">
+                                Información del Producto
+                            </h3>
+                            <p className="text-[11px] opacity-50 shrink-0 hidden sm:block">
+                                Datos generales del producto
+                            </p>
                         </div>
                     </SimpleItem>
 
                     <SimpleItem
                         dataField="name"
-                        colSpan={2}
-                        label={{ text: "Nombre del Producto" }}
+                        colSpan={3}
+                        label={{ text: "Nombre" }}
                         editorType="dxTextBox"
                         editorOptions={{
-                            placeholder: "Ingrese el nombre del producto",
-                            stylingMode: "filled"
+                            placeholder: "Nombre del producto",
+                            stylingMode: "filled",
+                            valueChangeEvent: "blur",
                         }}
                     >
                         <RequiredRule message="El nombre es obligatorio" />
+                        {/* Dxdocs: CustomRule + validationCallback en el Validator del Form */}
                         <CustomRule
                             message="Este producto ya existe"
                             reevaluate={true}
+                            ignoreEmptyValue={true}
                             validationCallback={(e: any) => {
-                                const val = e.value.trim().toLowerCase();
-                                return !products?.some(p => p.label.trim().toLowerCase() === val && p.id !== productData.id);
+                                const val = String(e.value ?? "").trim().toLowerCase();
+                                if (!val) return true;
+                                return !(productsRef.current || []).some((p) => {
+                                    const label = String(p?.label ?? p?.name ?? "").trim().toLowerCase();
+                                    return !!label && label === val && p?.id !== productData.id;
+                                });
                             }}
                         />
                     </SimpleItem>
@@ -165,7 +288,8 @@ const ProductSection = (props: IProductSection) => {
                             dataSource: classifications,
                             valueExpr: "code",
                             displayExpr: "name",
-                            stylingMode: "filled"
+                            stylingMode: "filled",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
                         }}
                     >
                         <RequiredRule message="La clasificación es obligatoria" />
@@ -177,14 +301,16 @@ const ProductSection = (props: IProductSection) => {
                         editorType="dxTextBox"
                         editorOptions={{
                             placeholder: "Ej: ABC",
-                            stylingMode: "filled"
+                            stylingMode: "filled",
+                            valueChangeEvent: "blur",
                         }}
                     >
                         <RequiredRule message="El prefijo es obligatorio" />
                         <CustomRule
-                            message="Este prefijo ya está en uso"
+                            message="Este prefijo ya está en uso (el servidor distingue mayúsculas/minúsculas)"
                             reevaluate={true}
                             validationCallback={(e: any) => {
+                                // UX local case-insensitive; BE UNIQUE (company_id, sku_prefix) es case-sensitive
                                 const val = typeof e.value === 'string' ? e.value.trim().toLowerCase() : '';
                                 if (!val) return true;
                                 return !products?.some(p => (p.code || "").trim().toLowerCase() === val && p.id !== productData.id);
@@ -201,7 +327,8 @@ const ProductSection = (props: IProductSection) => {
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
-                            stylingMode: "filled"
+                            stylingMode: "filled",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
                         }}
                     >
                         <RequiredRule message="La categoría es obligatoria" />
@@ -216,12 +343,12 @@ const ProductSection = (props: IProductSection) => {
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
-                            stylingMode: "filled"
+                            stylingMode: "filled",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
                         }}
                     >
                         <RequiredRule message="La marca es obligatoria" />
                     </SimpleItem>
-
 
                     <SimpleItem
                         dataField="procurementType"
@@ -232,17 +359,39 @@ const ProductSection = (props: IProductSection) => {
                             valueExpr: "id",
                             displayExpr: "name",
                             stylingMode: "filled",
-                            dropDownOptions: {
-                                wrapperAttr: {
-                                    class: "popup-menu-container"
-                                }
-                            }
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
+                        }}
+                    />
+
+                    <SimpleItem
+                        dataField="currencyId"
+                        label={{ text: "Moneda" }}
+                        editorType="dxSelectBox"
+                        editorOptions={{
+                            dataSource: [],
+                            valueExpr: "id",
+                            displayExpr: "name",
+                            searchEnabled: true,
+                            showClearButton: true,
+                            stylingMode: "filled",
+                            placeholder: "Moneda de la compañía (si no elige)",
+                            hint: "Sin selección, el servidor usa la moneda base de la compañía",
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
+                            onInitialized: (e: any) => {
+                                if (!token) return;
+                                currenciesService.getAll(token)
+                                    .then((res) => {
+                                        e.component?.option("dataSource", res.items as IFCurrency[]);
+                                    })
+                                    .catch(console.error);
+                            },
                         }}
                     />
 
                     <SimpleItem
                         dataField="taxIds"
-                        label={{ text: "Impuesto Asociado" }}
+                        colSpan={3}
+                        label={{ text: "Impuestos" }}
                         editorType="dxTagBox"
                         editorOptions={{
                             dataSource: taxes,
@@ -252,31 +401,7 @@ const ProductSection = (props: IProductSection) => {
                             showClearButton: true,
                             stylingMode: "filled",
                             placeholder: "Seleccione impuestos...",
-                            dropDownOptions: {
-                                wrapperAttr: {
-                                    class: "popup-menu-container"
-                                }
-                            }
-                        }}
-                    />
-
-                    <SimpleItem
-                        dataField="currencyId"
-                        label={{ text: "Moneda de Venta" }}
-                        editorType="dxSelectBox"
-                        editorOptions={{
-                            dataSource: currencies,
-                            valueExpr: "id",
-                            displayExpr: "name",
-                            searchEnabled: true,
-                            showClearButton: true,
-                            stylingMode: "filled",
-                            placeholder: "Seleccione moneda...",
-                            dropDownOptions: {
-                                wrapperAttr: {
-                                    class: "popup-menu-container"
-                                }
-                            }
+                            dropDownOptions: { wrapperAttr: { class: "popup-menu-container" } },
                         }}
                     />
 
@@ -302,18 +427,18 @@ const ProductSection = (props: IProductSection) => {
 
                 {/* Card 2: Modo de Operación */}
                 <GroupItem
-                    colSpan={2}
+                    colSpan={1}
                     colCount={2}
-                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm !mb-6"
+                    cssClass="!p-4 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm !mb-4 [&_.dx-field-item]:!pb-2 [&_.dx-field-item-label]:!pb-0.5"
                 >
                     <SimpleItem
                         colSpan={2}
-                        cssClass="!p-0"
+                        cssClass="!p-0 !pb-0"
                         label={{ visible: false }}
                     >
-                        <div className="mb-6 border-b border-main/10 pb-4">
-                            <h3 className="text-lg font-bold text-dx-primary mb-1">Modo de Operación</h3>
-                            <p className="text-xs opacity-60">Configuración de facturación y unidades duales.</p>
+                        <div className="mb-3 border-b border-main/10 pb-2.5 flex items-baseline justify-between gap-3">
+                            <h3 className="text-base font-bold text-dx-primary leading-tight">Modo de Operación</h3>
+                            <p className="text-[11px] opacity-50 shrink-0 hidden sm:block">Facturación y unidades</p>
                         </div>
                     </SimpleItem>
 
@@ -420,11 +545,11 @@ const ProductSection = (props: IProductSection) => {
                         colSpan={2}
                         label={{ visible: false }}
                     >
-                        <div className="mt-4 p-3 rounded-dx bg-main/5 border border-main/10">
-                            <p className="text-xs font-semibold text-dx-primary mb-1">Descripción del modo seleccionado:</p>
+                        <div className="mt-2 p-2.5 rounded-dx bg-main/5 border border-main/10">
+                            <p className="text-[11px] font-semibold text-dx-primary mb-0.5">Modo seleccionado</p>
                             <p
                                 ref={descriptionRef}
-                                className="text-xs text-main/70 leading-relaxed transition-all duration-300"
+                                className="text-[11px] text-main/70 leading-snug transition-all duration-300"
                             >
                                 {initialDescription}
                             </p>
@@ -432,20 +557,52 @@ const ProductSection = (props: IProductSection) => {
                     </SimpleItem>
                 </GroupItem>
 
-                {/* Card 3: Manejo de Artículos */}
+                {/* Card 3: Manejo de Artículos (opcional) */}
                 <GroupItem
-                    colSpan={2}
+                    colSpan={1}
                     colCount={2}
-                    cssClass="!p-5 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm"
+                    cssClass="!p-4 !rounded-dx !bg-primary-0/40 !border !border-focus-100/40 !shadow-sm [&_.dx-field-item]:!pb-2 [&_.dx-field-item-label]:!pb-0.5"
                 >
                     <SimpleItem
                         colSpan={2}
-                        cssClass="!p-0"
+                        cssClass="!p-0 !pb-0"
                         label={{ visible: false }}
                     >
-                        <div className="mb-6 border-b border-main/10 pb-4">
-                            <h3 className="text-lg font-bold text-dx-primary mb-1">Manejo de Artículos</h3>
-                            <p className="text-xs opacity-60">Configuración por defecto para el producto.</p>
+                        <div
+                            ref={handlingHeaderRef}
+                            className={`${initialHandlingVisible ? "mb-3" : "mb-0"} border-b border-main/10 pb-2.5 flex items-center justify-between gap-4`}
+                        >
+                            <div className="min-w-0">
+                                <h3 className="text-base font-bold text-dx-primary leading-tight">Manejo de Artículos</h3>
+                                <p ref={handlingHintRef} className="text-[11px] opacity-50 mt-0.5">
+                                    {initialHandlingVisible
+                                        ? "Perfil logístico, temperatura, peligro y notas."
+                                        : "Opcional — actívelo si el producto requiere datos de manejo."}
+                                </p>
+                            </div>
+                            <div
+                                className="shrink-0 pt-1"
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <CheckBox
+                                    text="Activar"
+                                    defaultValue={initialHandlingVisible}
+                                    onInitialized={(e) => {
+                                        handlingCheckBoxRef.current = e.component;
+                                        // Remount por itemOption: restaurar estado lógico
+                                        e.component?.option("value", handlingEnabledRef.current);
+                                    }}
+                                    onDisposing={() => {
+                                        handlingCheckBoxRef.current = null;
+                                    }}
+                                    onValueChanged={(e) => {
+                                        // Ignorar sync programático (option("value")) tras itemOption
+                                        if (!e.event) return;
+                                        applyHandlingVisibility(!!e.value, { clear: !e.value });
+                                    }}
+                                />
+                            </div>
                         </div>
                     </SimpleItem>
 
@@ -453,8 +610,9 @@ const ProductSection = (props: IProductSection) => {
                         dataField="defaultLogisticsProfileId"
                         label={{ text: "Perfil Logístico" }}
                         editorType="dxSelectBox"
+                        visible={initialHandlingVisible}
                         editorOptions={{
-                            dataSource: logisticsProfiles,
+                            dataSource: logisticsProfilesRef.current,
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
@@ -469,8 +627,9 @@ const ProductSection = (props: IProductSection) => {
                         dataField="defaultTemperatureClassId"
                         label={{ text: "Clase de Temperatura" }}
                         editorType="dxSelectBox"
+                        visible={initialHandlingVisible}
                         editorOptions={{
-                            dataSource: temperatureClasses,
+                            dataSource: temperatureClassesRef.current,
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
@@ -485,8 +644,9 @@ const ProductSection = (props: IProductSection) => {
                         dataField="defaultHazardClassId"
                         label={{ text: "Clase de Peligro" }}
                         editorType="dxSelectBox"
+                        visible={initialHandlingVisible}
                         editorOptions={{
-                            dataSource: hazardClasses,
+                            dataSource: hazardClassesRef.current,
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
@@ -501,8 +661,9 @@ const ProductSection = (props: IProductSection) => {
                         dataField="defaultSegregationGroupId"
                         label={{ text: "Grupo de Segregación" }}
                         editorType="dxSelectBox"
+                        visible={initialHandlingVisible}
                         editorOptions={{
-                            dataSource: segregationGroups,
+                            dataSource: segregationGroupsRef.current,
                             valueExpr: "id",
                             displayExpr: "name",
                             searchEnabled: true,
@@ -518,6 +679,7 @@ const ProductSection = (props: IProductSection) => {
                         dataField="handlingNotes"
                         label={{ text: "Notas de Manipulación" }}
                         editorType="dxTextArea"
+                        visible={initialHandlingVisible}
                         editorOptions={{
                             height: 90,
                             placeholder: "Instrucciones especiales de manejo...",

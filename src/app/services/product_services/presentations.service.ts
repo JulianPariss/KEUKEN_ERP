@@ -13,7 +13,12 @@ import {
     mapPresentationByItemParams,
     mapPresentationListV2,
     mapPresentationToCreate,
-    mapPresentationToUpdate
+    mapPresentationToUpdate,
+    IBAvailabilityResponse,
+    IFAvailabilityResponse,
+    IFBarcodeAvailabilityParams,
+    mapAvailabilityResponseToFrontend,
+    mapBarcodeAvailabilityParamsToBackend,
 } from "@repo/api-contracts/erp";
 import { formatQueryParams } from "@/lib/utils/formatter.helper";
 import { PRODUCTS_URL } from "../../lib/constants/api.constants";
@@ -180,6 +185,28 @@ export const presentationsService = {
             return message;
         } catch (error) {
             console.error("Error en deletePresentation:", error);
+            throw error;
+        }
+    },
+
+    async checkBarcodeAvailability(params: IFBarcodeAvailabilityParams, token: string, companyId?: string): Promise<IFAvailabilityResponse> {
+        try {
+            const backendParams = mapBarcodeAvailabilityParamsToBackend(params);
+            const queryParams = new URLSearchParams();
+            queryParams.set("barcode", backendParams.barcode);
+            if (backendParams.exclude_id) queryParams.set("exclude_id", backendParams.exclude_id);
+
+            const url = `${PRODUCTS_URL}/presentations/barcode-availability?${queryParams.toString()}`;
+            const data = await apiFetch<IBAvailabilityResponse>(
+                url,
+                { method: "GET" },
+                "No se pudo verificar la disponibilidad del código de barras",
+                { token, companyId }
+            );
+
+            return mapAvailabilityResponseToFrontend(data);
+        } catch (error) {
+            console.error("Error en checkBarcodeAvailability:", error);
             throw error;
         }
     },

@@ -18,14 +18,28 @@ import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
 import CustomStore from "devextreme/data/custom_store";
 import { CheckBox } from 'devextreme-react/check-box';
 import notify from "devextreme/ui/notify";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import PresentationsModal from "../modals/singleAdditions/presentationsModal";
 
 
 const { customLoad, customSave } = createGridStateStorage({ gridId: 'presentations-grid' });
 
-const PresentationsClient = () => {
+export interface PresentationsClientProps {
+    productFilter?: string | null;
+    itemSkuFilter?: string | null;
+    onProductFilterChange?: (filterValue: string | null) => void;
+    onItemSkuFilterChange?: (filterValue: string | null) => void;
+    refreshTrigger?: number;
+}
+
+const PresentationsClient: React.FC<PresentationsClientProps> = ({
+    productFilter = null,
+    itemSkuFilter = null,
+    onProductFilterChange,
+    onItemSkuFilterChange,
+    refreshTrigger = 0,
+}) => {
     const { isRecoveryMode, recoveryVisibility } = useRecovery();
     const [packagingLevels, setPackagingLevels] = useState<IFPackagingLevel[]>([]);
     const router = useRouter();
@@ -196,6 +210,8 @@ const PresentationsClient = () => {
                 caption: 'Producto',
                 allowSorting: true,
                 allowEditing: false,
+                width: 200,
+                minWidth: 150,
                 calculateDisplayValue: (rowData: any) => rowData.productName,
             },
             {
@@ -203,18 +219,24 @@ const PresentationsClient = () => {
                 caption: 'Item SKU',
                 allowSorting: true,
                 allowEditing: false,
+                width: 150,
+                minWidth: 120,
                 calculateDisplayValue: (rowData: any) => rowData.itemSku,
             },
             {
                 dataField: 'name',
                 caption: 'Nombre',
                 allowSorting: true,
+                width: 180,
+                minWidth: 140,
                 validationRules: [{ type: 'required', message: 'El nombre es obligatorio' }],
             },
             {
                 dataField: 'barcode',
                 caption: 'Código de Barras',
                 allowSorting: true,
+                width: 160,
+                minWidth: 130,
                 validationRules: [{ type: 'required', message: 'El código de barras es obligatorio' }],
             },
             {
@@ -222,6 +244,8 @@ const PresentationsClient = () => {
                 caption: 'Unidad de Medida',
                 allowSorting: true,
                 allowEditing: false,
+                width: 150,
+                minWidth: 120,
                 calculateDisplayValue: (rowData: any) => rowData.uomName,
             },
             {
@@ -248,6 +272,8 @@ const PresentationsClient = () => {
                 caption: 'Relación de Unidad de Medida',
                 allowSorting: true,
                 dataType: 'number',
+                width: 180,
+                minWidth: 140,
                 validationRules: [{ type: 'required', message: 'La relación de unidad de medida es obligatoria' }],
             },
             {
@@ -255,6 +281,8 @@ const PresentationsClient = () => {
                 caption: 'Nivel Empaque',
                 allowSorting: true,
                 visible: true,
+                width: 150,
+                minWidth: 120,
                 validationRules: [{ type: 'required', message: 'El nivel de empaque es obligatorio' }],
                 lookup: {
                     dataSource: packagingLevels,
@@ -274,7 +302,8 @@ const PresentationsClient = () => {
                 dataField: 'active',
                 caption: 'Activo',
                 allowSorting: true,
-                width: 80,
+                width: 90,
+                minWidth: 80,
                 alignment: 'center',
                 visible: includeInactive,
                 cellRender: (cellData: any) => (
@@ -344,18 +373,99 @@ const PresentationsClient = () => {
         }
     ], [canModify, items, isSuperAdmin, isRecoveryMode, token, currentCompany?.id]);
 
+    const isProgrammaticFilterRef = useRef(false);
+
+    // Refrescar externamente cuando se dispara refreshTrigger
+    useEffect(() => {
+        if (refreshTrigger > 0) {
+            setRefreshVersion(prev => prev + 1);
+            if (gridRef.current?.instance?.refresh) {
+                gridRef.current.instance.refresh();
+            } else if (gridRef.current?.refresh) {
+                gridRef.current.refresh();
+            }
+        }
+    }, [refreshTrigger]);
+
+    // Sincronizar el filtro de Producto programáticamente
+    useEffect(() => {
+        const gridInstance = gridRef.current?.instance ? gridRef.current.instance() : gridRef.current;
+        if (gridInstance?.columnOption) {
+            const currentVal = gridInstance.columnOption('productName', 'filterValue');
+            const targetVal = productFilter || null;
+            if (currentVal !== targetVal) {
+                isProgrammaticFilterRef.current = true;
+                gridInstance.columnOption('productName', {
+                    selectedFilterOperation: 'contains',
+                    filterValue: targetVal,
+                });
+                setTimeout(() => {
+                    isProgrammaticFilterRef.current = false;
+                }, 100);
+            }
+        }
+    }, [productFilter]);
+
+    // Sincronizar el filtro de Item SKU programáticamente
+    useEffect(() => {
+        const gridInstance = gridRef.current?.instance ? gridRef.current.instance() : gridRef.current;
+        if (gridInstance?.columnOption) {
+            const currentVal = gridInstance.columnOption('itemSku', 'filterValue');
+            const targetVal = itemSkuFilter || null;
+            if (currentVal !== targetVal) {
+                isProgrammaticFilterRef.current = true;
+                gridInstance.columnOption('itemSku', {
+                    selectedFilterOperation: 'contains',
+                    filterValue: targetVal,
+                });
+                setTimeout(() => {
+                    isProgrammaticFilterRef.current = false;
+                }, 100);
+            }
+        }
+    }, [itemSkuFilter]);
+
+    // Solo filterRow de Producto / Item SKU (no headerFilter / filterPanel)
+    const handleEditorPreparing = useCallback((e: any) => {
+        if (e.parentType !== 'filterRow') return;
+
+        if (e.dataField === 'productName') {
+            const standardHandler = e.editorOptions?.onValueChanged;
+            e.editorOptions = {
+                ...e.editorOptions,
+                onValueChanged: (args: any) => {
+                    standardHandler?.(args);
+                    if (!isProgrammaticFilterRef.current && args.event !== undefined) {
+                        onProductFilterChange?.(args.value ? String(args.value) : null);
+                    }
+                }
+            };
+        } else if (e.dataField === 'itemSku') {
+            const standardHandler = e.editorOptions?.onValueChanged;
+            e.editorOptions = {
+                ...e.editorOptions,
+                onValueChanged: (args: any) => {
+                    standardHandler?.(args);
+                    if (!isProgrammaticFilterRef.current && args.event !== undefined) {
+                        onItemSkuFilterChange?.(args.value ? String(args.value) : null);
+                    }
+                }
+            };
+        }
+    }, [onProductFilterChange, onItemSkuFilterChange]);
+
     return (
         <div className="flex flex-col w-full min-w-full h-full bg-dx-primary/10 rounded-dx font-sans overflow-hidden">
             <div className="w-full h-full flex flex-col gap-2">
                 <GenericDataGrid
-                            recoveryVisibility={recoveryVisibility}
+                    recoveryVisibility={recoveryVisibility}
                     ref={gridRef}
                     gridId="presentations-grid"
                     keyExpr="virtualId"
                     dataSource={dataSource}
                     remoteOperations={false}
                     columns={columns}
-                    columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true }}
+                    columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true, minWidth: 110 }}
                     allowColumnReordering={true}
                     allowColumnResizing={true}
                     showBorders={true}
@@ -369,6 +479,7 @@ const PresentationsClient = () => {
                     grouping={{ autoExpandAll: false, contextMenuEnabled: true }}
                     groupPanel={true}
                     selection={{ mode: 'none' }}
+                    onEditorPreparing={handleEditorPreparing}
                     searchPanel={{
                         visible: true,
                         width: 350,

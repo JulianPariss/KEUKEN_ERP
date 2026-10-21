@@ -119,6 +119,7 @@ const CustomerDetailModal = ({ isOpen, onClose, customerId }: CustomerDetailModa
                     <thead>
                         <tr className="bg-main/5 border-b border-main/10">
                             <th className="p-2 text-xs font-bold text-dx-primary uppercase tracking-wider">Nombre / Tipo</th>
+                            <th className="p-2 text-xs font-bold text-dx-primary uppercase tracking-wider">Cód. PDV</th>
                             <th className="p-2 text-xs font-bold text-dx-primary uppercase tracking-wider">Calle</th>
                             <th className="p-2 text-xs font-bold text-dx-primary uppercase tracking-wider">Ciudad</th>
                             <th className="p-2 text-xs font-bold text-dx-primary uppercase tracking-wider">Provincia</th>
@@ -134,6 +135,15 @@ const CustomerDetailModal = ({ isOpen, onClose, customerId }: CustomerDetailModa
                                 <td className="p-2 text-xs font-medium text-main">
                                     <div>{addr.name}</div>
                                     <div className="text-[10px] opacity-60 uppercase">{addr.type?.join(', ')}</div>
+                                </td>
+                                <td className="p-2 text-xs text-main">
+                                    {addr.code ? (
+                                        <span className="font-mono bg-focus-500/15 text-focus-300 px-1.5 py-0.5 rounded border border-focus-500/20 text-[11px]">
+                                            {addr.code}
+                                        </span>
+                                    ) : (
+                                        <span className="text-main/40 italic">—</span>
+                                    )}
                                 </td>
                                 <td className="p-2 text-xs text-main">{addr.street || "—"}</td>
                                 <td className="p-2 text-xs text-main">{addr.cityName || "—"}</td>

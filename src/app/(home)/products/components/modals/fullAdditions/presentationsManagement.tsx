@@ -6,9 +6,11 @@ import { generateUUID } from "@/lib/utils/id.helper";
 import { NumberBox, TextBox, CheckBox } from "devextreme-react";
 import { Button, SelectBox } from '@repo/devextreme';
 import { ValidationGroup } from "devextreme-react/validation-group";
-import Validator, { CustomRule, RequiredRule, PatternRule } from "devextreme-react/validator";
+import Validator, { CustomRule, RequiredRule, PatternRule, AsyncRule } from "devextreme-react/validator";
 import notify from "devextreme/ui/notify";
 import { useRef, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { presentationsService } from "@/app/services/product_services/presentations.service";
 
 interface IPresentationsManagementProps {
     currentItem: any;
@@ -25,10 +27,14 @@ const PresentationsManagement = ({
     itemsData,
     packagingLevels,
 }: IPresentationsManagementProps) => {
+    const { token } = useAuth();
     const validationGroupRef = useRef<any>(null);
+    /** Remount del borrador solo si ValidationGroup.reset no alcanza */
     const [groupKey, setGroupKey] = useState(0);
+    /** Refresco de la lista (mutación in-place) sin remount del borrador */
+    const [listTick, setListTick] = useState(0);
 
-    const tempPresentationRef = useRef({
+    const emptyPresentation = () => ({
         name: "",
         barcode: "",
         uomId: "",
@@ -38,47 +44,85 @@ const PresentationsManagement = ({
         isPrimary: false,
     });
 
+    const tempPresentationRef = useRef(emptyPresentation());
+
+    /**
+     * Tras un validate() OK, ValidationGroup.reset() vacía los editores y DX
+     * re-valida el cambio → Required/Pattern en vacío muestran error en rojo.
+     * Con defaultValue no controlado, el remount (groupKey) deja el borrador prístino.
+     */
+    const resetDraftEditors = () => {
+        tempPresentationRef.current = emptyPresentation();
+        setGroupKey((k) => k + 1);
+        setListTick((t) => t + 1);
+    };
+
     const addPresentationToCurrentItem = () => {
         const validationResult = validationGroupRef.current?.instance().validate();
 
         if (!validationResult?.isValid) {
-            notify("Por favor complete los campos de la presentación correctamente", "warning", 2000);
+            const messages = [...new Set(
+                (validationResult?.brokenRules || [])
+                    .map((r: any) => r?.message)
+                    .filter((m: unknown): m is string => typeof m === "string" && m.trim().length > 0)
+            )];
+            notify(
+                messages.length
+                    ? `Presentación incompleta: ${messages.slice(0, 3).join(" · ")}`
+                    : "Complete los campos obligatorios de la presentación (nombre, código de barras, UoM, nivel y ratio)",
+                "warning",
+                4000
+            );
             return;
         }
 
         const matchedLevel = packagingLevels.find(pl => pl.id === tempPresentationRef.current.packagingLevelId);
+        const packagingLevelId = tempPresentationRef.current.packagingLevelId;
+
+        if (!currentItem.presentations) {
+            currentItem.presentations = [];
+        }
+
+        const sameLevel = currentItem.presentations.filter(
+            (p: any) => p.packagingLevelId === packagingLevelId
+        );
+        // Primera del nivel → principal automática; si el usuario marca principal → desmarcar la anterior
+        const shouldBePrimary = !!tempPresentationRef.current.isPrimary || sameLevel.length === 0;
+
+        if (shouldBePrimary) {
+            sameLevel.forEach((p: any) => {
+                p.isPrimary = false;
+            });
+        }
+
         const newPresentation = {
             ...tempPresentationRef.current,
+            isPrimary: shouldBePrimary,
             packagingLevelCode: matchedLevel?.code,
             tempId: generateUUID()
         };
 
-        // Mutar el arreglo de presentaciones directamente en el objeto de datos en memoria para mantener fija la referencia de currentItem
-        if (!currentItem.presentations) {
-            currentItem.presentations = [];
-        }
         currentItem.presentations.push(newPresentation);
-
-        // Resetear la referencia de la presentación borrador
-        tempPresentationRef.current = {
-            name: "",
-            barcode: "",
-            uomId: "",
-            uomRatio: 1,
-            packagingLevelId: "",
-            active: true,
-            isPrimary: false,
-        };
-
-        // Cambiar la key del ValidationGroup remonta los inputs de forma 100% limpia y prístina sin alterar la referencia de currentItem ni resetear el scroll del <Form>
-        setGroupKey(k => k + 1);
+        resetDraftEditors();
     };
 
     const removePresentationFromCurrentItem = (tempId: string) => {
-        if (currentItem.presentations) {
-            currentItem.presentations = currentItem.presentations.filter((p: any) => p.tempId !== tempId);
-            setGroupKey(k => k + 1);
+        if (!currentItem.presentations) return;
+
+        const removed = currentItem.presentations.find((p: any) => p.tempId === tempId);
+        currentItem.presentations = currentItem.presentations.filter((p: any) => p.tempId !== tempId);
+
+        // Si se eliminó la principal, promover la primera restante del mismo nivel
+        if (removed?.isPrimary && removed.packagingLevelId) {
+            const remaining = currentItem.presentations.filter(
+                (p: any) => p.packagingLevelId === removed.packagingLevelId
+            );
+            if (remaining.length > 0 && !remaining.some((p: any) => p.isPrimary)) {
+                remaining[0].isPrimary = true;
+            }
         }
+
+        setListTick((t) => t + 1);
     };
 
     return (
@@ -101,6 +145,7 @@ const PresentationsManagement = ({
                                     message="Ya existe en este ítem"
                                     validationCallback={(e) => {
                                         const val = typeof e.value === 'string' ? e.value.trim().toLowerCase() : '';
+                                        if (!val) return true;
                                         return !(currentItem.presentations || []).some((p: any) =>
                                             (typeof p.name === 'string' ? p.name.trim().toLowerCase() : '') === val
                                         );
@@ -136,6 +181,21 @@ const PresentationsManagement = ({
                                             (typeof p.barcode === 'string' ? p.barcode.trim().toLowerCase() : '') === val
                                         );
                                         return !isDuplicateGlobal && !isDuplicateLocal;
+                                    }}
+                                />
+                                <AsyncRule
+                                    message="Código de barras ya registrado en el catálogo"
+                                    validationCallback={async (e) => {
+                                        const val = typeof e.value === 'string' ? e.value.trim() : '';
+                                        if (!val || !token) return true;
+                                        try {
+                                            const res = await presentationsService.checkBarcodeAvailability({
+                                                barcode: val
+                                            }, token);
+                                            return res.available;
+                                        } catch {
+                                            return true;
+                                        }
                                     }}
                                 />
                             </Validator>
@@ -227,8 +287,9 @@ const PresentationsManagement = ({
                 </div>
             </ValidationGroup>
 
+            {/* listTick fuerza re-pintado de la tabla tras mutación in-place */}
             {(currentItem.presentations || []).length > 0 ? (
-                <div className="mt-4 p-2 bg-main/5 rounded-dx">
+                <div key={`pres-list-${listTick}`} className="mt-4 p-2 bg-main/5 rounded-dx">
                     {Array.from(new Set(currentItem.presentations.map((p: any) => p.packagingLevelId))).map((levelId: any) => {
                         const levelName = packagingLevels.find((pl: any) => pl.id === levelId)?.name || "Desconocido";
                         const levelPresentations = currentItem.presentations.filter((p: any) => p.packagingLevelId === levelId);
@@ -261,20 +322,36 @@ const PresentationsManagement = ({
                                                         <CheckBox
                                                             value={p.isPrimary}
                                                             onValueChanged={(e) => {
-                                                                if (e.event) { // Only handle user clicks
-                                                                    const val = !!e.value;
-                                                                    // Update all presentations for this level
-                                                                    currentItem.presentations.forEach((pres: any) => {
-                                                                        if (pres.packagingLevelId === levelId) {
-                                                                            if (pres.tempId === p.tempId) {
-                                                                                pres.isPrimary = val;
-                                                                            } else if (val) { // If making this primary, others must be false
-                                                                                pres.isPrimary = false;
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                    setGroupKey(k => k + 1); // Trigger re-render to reflect changes
+                                                                if (!e.event) return;
+                                                                const val = !!e.value;
+
+                                                                if (!val) {
+                                                                    // No permitir dejar el nivel sin principal
+                                                                    const hasOtherPrimary = levelPresentations.some(
+                                                                        (pres: any) =>
+                                                                            pres.tempId !== p.tempId && pres.isPrimary
+                                                                    );
+                                                                    if (!hasOtherPrimary) {
+                                                                        notify(
+                                                                            "Cada nivel de empaque debe tener al menos una presentación principal",
+                                                                            "warning",
+                                                                            3000
+                                                                        );
+                                                                        e.component.option("value", true);
+                                                                        return;
+                                                                    }
+                                                                    p.isPrimary = false;
+                                                                    setListTick((t) => t + 1);
+                                                                    return;
                                                                 }
+
+                                                                // Marcar esta como principal y desmarcar las demás del nivel
+                                                                currentItem.presentations.forEach((pres: any) => {
+                                                                    if (pres.packagingLevelId === levelId) {
+                                                                        pres.isPrimary = pres.tempId === p.tempId;
+                                                                    }
+                                                                });
+                                                                setListTick((t) => t + 1);
                                                             }}
                                                         />
                                                     </div>

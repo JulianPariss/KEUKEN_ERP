@@ -24,5 +24,6 @@ export const ADMIN_URL = `${APIV1_URL}/admin`;
 export const BRANCHES_URL = `${COMMON_URL}/branches`;
 export const ESTABLISHMENTS_URL = `${COMMON_URL}/establishments`;
 export const LOGISTICS_CENTERS_URL = `${COMMON_URL}/logistics-centers`;
+export const PROCUREMENT_URL = `${APIV1_URL}/procurement`;
 
 export const API_KEY = "";

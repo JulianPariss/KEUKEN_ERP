@@ -55,11 +55,11 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
     const getSegregationName = (id: string) => segregationGroups.find(s => s.id === id)?.name || id;
     const getSupplierName = (idOrItem: any) => {
         if (!idOrItem) return "";
-        const id = typeof idOrItem === "object" ? idOrItem.id : idOrItem;
+        const id = typeof idOrItem === "object" ? (idOrItem.supplierId || idOrItem.supplier_id || idOrItem.id) : idOrItem;
         const found = suppliers.find(s => s.id === id);
-        if (found) return found.name;
-        if (typeof idOrItem === "object" && idOrItem.name) return idOrItem.name;
-        return id;
+        const name = found ? found.name : (typeof idOrItem === "object" && idOrItem.name ? idOrItem.name : id);
+        const sku = typeof idOrItem === "object" ? (idOrItem.supplierSku || idOrItem.supplier_sku) : null;
+        return sku ? `${name} (SKU: ${sku})` : name;
     };
     const getPlatformName = (idOrItem: any) => {
         if (!idOrItem) return "";
@@ -175,11 +175,11 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                         temperatureClassId: getDisplayTemperature(item.temperatureClassId),
                         hazardClassId: getDisplayHazard(item.hazardClassId),
                         segregationGroupId: getDisplaySegregation(item.segregationGroupId),
-                        suppliers: Array.isArray(itemSuppliers) && itemSuppliers.length > 0 
-                            ? itemSuppliers.map(getSupplierName).filter(Boolean).join(", ") 
+                        suppliers: Array.isArray(itemSuppliers) && itemSuppliers.length > 0
+                            ? itemSuppliers.map(getSupplierName).filter(Boolean).join(", ")
                             : "—",
-                        platforms: Array.isArray(itemPlatforms) && itemPlatforms.length > 0 
-                            ? itemPlatforms.map(getPlatformName).filter(Boolean).join(", ") 
+                        platforms: Array.isArray(itemPlatforms) && itemPlatforms.length > 0
+                            ? itemPlatforms.map(getPlatformName).filter(Boolean).join(", ")
                             : "—"
                     }}
                     readOnly={true}
@@ -364,7 +364,7 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                         </h4>
                         <ItemMediaUploadSection
                             media={item.media}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             readOnly={true}
                         />
                     </div>
@@ -550,7 +550,6 @@ const PreviewSection = ({ productData, itemsData, uoms, categories, brands, clas
                     >
                         <div className="mb-6 border-b border-main/10 pb-4">
                             <h3 className="text-lg font-bold text-dx-primary mb-1">Manejo de Artículos</h3>
-                            <p className="text-xs opacity-60">Configuración por defecto para el producto.</p>
                         </div>
                     </SimpleItem>
 

@@ -279,6 +279,24 @@ const ItemsModal = ({ isOpen, onClose, onSuccess, onHidden, uoms, products = [],
                         validationRules={[
                             { type: 'required', message: "El SKU es obligatorio" },
                             { type: 'stringLength', max: FIELD_LIMITS.stringShort, message: `El SKU no puede superar los ${FIELD_LIMITS.stringShort} caracteres` },
+                            {
+                                type: 'async',
+                                message: "Este SKU ya está registrado en el catálogo",
+                                validationCallback: async (e: any) => {
+                                    const val = typeof e.value === 'string' ? e.value.trim() : '';
+                                    if (!val || !token) return true;
+                                    try {
+                                        const res = await itemsService.checkSkuAvailability({
+                                            sku: val,
+                                            companyId: currentCompany?.id,
+                                            excludeId: isEditing ? initialData?.id : undefined
+                                        }, token);
+                                        return res.available;
+                                    } catch {
+                                        return true;
+                                    }
+                                }
+                            }
                         ]}
                     />
                     <SimpleItem

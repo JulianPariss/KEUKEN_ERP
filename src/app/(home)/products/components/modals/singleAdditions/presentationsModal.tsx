@@ -181,7 +181,24 @@ const PresentationsModal = ({ isOpen, onClose, onSuccess, onHidden, items = [], 
                     validationRules={[
                         { type: 'required', message: "El código de barras es obligatorio" },
                         { type: 'stringLength', max: FIELD_LIMITS.stringMiddle, message: `El código de barras no puede superar los ${FIELD_LIMITS.stringMiddle} caracteres` },
-                        { type: 'pattern', pattern: /^[a-zA-Z0-9\-_]+$/, message: "El código de barras solo puede contener caracteres alfanuméricos, guiones y guiones bajos" }
+                        { type: 'pattern', pattern: /^[a-zA-Z0-9\-_]+$/, message: "El código de barras solo puede contener caracteres alfanuméricos, guiones y guiones bajos" },
+                        {
+                            type: 'async',
+                            message: "Este código de barras ya está registrado en el catálogo",
+                            validationCallback: async (e: any) => {
+                                const val = typeof e.value === 'string' ? e.value.trim() : '';
+                                if (!val || !token) return true;
+                                try {
+                                    const res = await presentationsService.checkBarcodeAvailability({
+                                        barcode: val,
+                                        excludeId: isEditing ? initialData?.id : undefined
+                                    }, token);
+                                    return res.available;
+                                } catch {
+                                    return true;
+                                }
+                            }
+                        }
                     ]}
                 />
 

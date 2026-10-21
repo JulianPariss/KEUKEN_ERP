@@ -19,7 +19,14 @@ import {
     mapListParams,
     mapOptionsList,
     mapPresentation,
-    mapPresentationListV2
+    mapPresentationListV2,
+    IBAvailabilityResponse,
+    IFAvailabilityResponse,
+    IFSkuAvailabilityParams,
+    IFSupplierSkuAvailabilityParams,
+    mapAvailabilityResponseToFrontend,
+    mapSkuAvailabilityParamsToBackend,
+    mapSupplierSkuAvailabilityParamsToBackend,
 } from "@repo/api-contracts/erp";
 import { formatQueryParams } from "@/lib/utils/formatter.helper";
 import { PRODUCTS_URL } from "../../lib/constants/api.constants";
@@ -232,6 +239,52 @@ export const itemsService = {
             return message;
         } catch (error) {
             console.error("Error en deleteItem:", error);
+            throw error;
+        }
+    },
+
+    async checkSkuAvailability(params: IFSkuAvailabilityParams, token: string): Promise<IFAvailabilityResponse> {
+        try {
+            const backendParams = mapSkuAvailabilityParamsToBackend(params);
+            const queryParams = new URLSearchParams();
+            queryParams.set("sku", backendParams.sku);
+            if (backendParams.company_id) queryParams.set("company_id", backendParams.company_id);
+            if (backendParams.exclude_id) queryParams.set("exclude_id", backendParams.exclude_id);
+
+            const url = `${PRODUCTS_URL}/items/sku-availability?${queryParams.toString()}`;
+            const data = await apiFetch<IBAvailabilityResponse>(
+                url,
+                { method: "GET" },
+                "No se pudo verificar la disponibilidad del SKU",
+                { token, companyId: backendParams.company_id }
+            );
+
+            return mapAvailabilityResponseToFrontend(data);
+        } catch (error) {
+            console.error("Error en checkSkuAvailability:", error);
+            throw error;
+        }
+    },
+
+    async checkSupplierSkuAvailability(params: IFSupplierSkuAvailabilityParams, token: string, companyId?: string): Promise<IFAvailabilityResponse> {
+        try {
+            const backendParams = mapSupplierSkuAvailabilityParamsToBackend(params);
+            const queryParams = new URLSearchParams();
+            queryParams.set("supplier_id", backendParams.supplier_id);
+            queryParams.set("supplier_sku", backendParams.supplier_sku);
+            if (backendParams.exclude_id) queryParams.set("exclude_id", backendParams.exclude_id);
+
+            const url = `${PRODUCTS_URL}/item-suppliers/supplier-sku-availability?${queryParams.toString()}`;
+            const data = await apiFetch<IBAvailabilityResponse>(
+                url,
+                { method: "GET" },
+                "No se pudo verificar la disponibilidad del código de proveedor",
+                { token, companyId }
+            );
+
+            return mapAvailabilityResponseToFrontend(data);
+        } catch (error) {
+            console.error("Error en checkSupplierSkuAvailability:", error);
             throw error;
         }
     },

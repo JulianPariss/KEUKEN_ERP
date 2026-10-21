@@ -75,3 +75,88 @@ export function getDefaultErrorMessage(status: number, fallbackMessage?: string)
 
     return fallbackMessage || statusMessages[status] || `Error insospechado (${status}).`;
 }
+
+const SUPPLIER_SKU_DUP_MSG = "Ese código de proveedor ya está asignado a otro ítem";
+
+function getErrorCode(error: any): string {
+    return String(
+        error?.code ||
+        error?.rawDetails?.code ||
+        error?.rawDetails?.detail?.code ||
+        ""
+    );
+}
+
+function getErrorText(error: any): string {
+    return String(error?.message || error?.rawDetails?.message || error?.rawDetails?.detail || "");
+}
+
+/**
+ * Mapea errores específicos para vínculos y códigos de proveedor de ítem
+ * según ADR 0029/0030 y Handoff 2026-10 / fullAdditions sync.
+ * - POST/PATCH /products/full → 400 + supplier_sku_duplicate
+ * - POST/PUT /procurement/item-supplier → 409
+ * - supplier_sku vacío → 422
+ */
+export function mapItemSupplierError(error: any): string {
+    const status = error?.status;
+    const code = getErrorCode(error);
+    const text = getErrorText(error);
+
+    if (status === 400 && (code === "supplier_sku_duplicate" || text.includes("supplier_sku_duplicate"))) {
+        return SUPPLIER_SKU_DUP_MSG;
+    }
+    if (status === 409) {
+        return SUPPLIER_SKU_DUP_MSG;
+    }
+    if (status === 422) {
+        return "Código de proveedor obligatorio.";
+    }
+    if (status === 404) {
+        return "Vínculo o entidad no encontrada.";
+    }
+    return error?.message || "Error al procesar el proveedor del ítem.";
+}
+
+/**
+ * Errores de POST /products/full (create fullAdditions).
+ * Preferir el detalle del POST ante fallos de AsyncRule/availability.
+ */
+export function mapProductFullCreateError(error: any): string {
+    const status = error?.status;
+    const code = getErrorCode(error);
+    const text = getErrorText(error).toLowerCase();
+
+    if (status === 400 && (code === "supplier_sku_duplicate" || text.includes("supplier_sku_duplicate"))) {
+        return SUPPLIER_SKU_DUP_MSG;
+    }
+    if (status === 422 && (text.includes("supplier_sku") || code.includes("supplier_sku"))) {
+        return "Código de proveedor obligatorio.";
+    }
+    if (status === 409 || status === 400) {
+        if (text.includes("barcode") || code.includes("barcode")) {
+            return "Código de barras ya registrado en el catálogo.";
+        }
+        if (text.includes("sku_prefix") || text.includes("sku prefix") || code.includes("sku_prefix")) {
+            return "El prefijo SKU ya está en uso (el servidor distingue mayúsculas/minúsculas).";
+        }
+        if (
+            (text.includes("sku") && !text.includes("supplier")) ||
+            code.includes("sku_duplicate") ||
+            code === "sku_exists"
+        ) {
+            return "Este SKU ya está registrado en el catálogo.";
+        }
+    }
+    if (status === 422) {
+        return error?.message || "Error de validación en los datos del producto o ítems.";
+    }
+
+    // Proveedor u otros mensajes ya tipados
+    if (text.includes("supplier") || code.includes("supplier")) {
+        return mapItemSupplierError(error);
+    }
+
+    return error?.message || getDefaultErrorMessage(status || 500, "No se pudo crear el producto completo.");
+}
+

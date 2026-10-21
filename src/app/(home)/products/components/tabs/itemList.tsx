@@ -31,7 +31,23 @@ const costMethods = [
     { id: 'average', name: 'Promedio' }
 ];
 
-const ItemsClient = () => {
+export interface ItemsClientProps {
+    onSelectionChange?: (selectedItem: any | null) => void;
+    selectionMode?: 'single' | 'multiple';
+    clearSelectionTrigger?: number;
+    productFilter?: string | null;
+    onProductFilterChange?: (filterValue: string | null) => void;
+    refreshTrigger?: number;
+}
+
+const ItemsClient: React.FC<ItemsClientProps> = ({
+    onSelectionChange,
+    selectionMode = 'multiple',
+    clearSelectionTrigger = 0,
+    productFilter = null,
+    onProductFilterChange,
+    refreshTrigger = 0,
+}) => {
     const { isRecoveryMode, recoveryVisibility } = useRecovery();
     const router = useRouter();
     const { currentCompany } = useAuth();
@@ -229,16 +245,22 @@ const ItemsClient = () => {
                 caption: 'Producto',
                 allowSorting: true,
                 allowEditing: false,
+                width: 200,
+                minWidth: 150,
             },
             {
                 dataField: 'sku',
                 caption: 'SKU',
                 allowSorting: true,
+                width: 150,
+                minWidth: 120,
             },
             {
                 dataField: 'itemName',
                 caption: 'Nombre de item',
                 allowSorting: true,
+                width: 200,
+                minWidth: 150,
             },
             {
                 dataField: 'companyId',
@@ -250,6 +272,8 @@ const ItemsClient = () => {
                 dataField: 'costMethod',
                 caption: 'Método de Costo',
                 allowSorting: true,
+                width: 150,
+                minWidth: 120,
                 lookup: {
                     dataSource: costMethods,
                     valueExpr: 'id',
@@ -261,23 +285,31 @@ const ItemsClient = () => {
                 caption: 'Peso',
                 allowSorting: true,
                 dataType: 'number',
+                width: 110,
+                minWidth: 90,
             },
             {
                 dataField: 'volume',
                 caption: 'Volumen',
                 allowSorting: true,
                 dataType: 'number',
+                width: 110,
+                minWidth: 90,
             },
             {
                 dataField: 'palletUnits',
                 caption: 'Unidades por Pallet',
                 allowSorting: true,
                 dataType: 'number',
+                width: 160,
+                minWidth: 130,
             },
             {
                 dataField: 'palletUomId',
                 caption: 'Unidad de Medida de Pallet',
                 allowSorting: true,
+                width: 180,
+                minWidth: 140,
                 lookup: {
                     dataSource: uoms,
                     valueExpr: 'id',
@@ -289,18 +321,23 @@ const ItemsClient = () => {
                 caption: 'Días Mín. Vencimiento Recepción',
                 allowSorting: true,
                 dataType: 'number',
+                width: 200,
+                minWidth: 160,
             },
             {
                 dataField: 'minDaysToExpiryOrder',
                 caption: 'Días Mín. Vencimiento Orden',
                 allowSorting: true,
                 dataType: 'number',
+                width: 190,
+                minWidth: 150,
             },
             {
                 dataField: 'active',
                 caption: 'Activo',
                 allowSorting: true,
-                width: 80,
+                width: 90,
+                minWidth: 80,
                 alignment: 'center',
                 visible: includeInactive,
                 cellRender: (cellData: any) => (
@@ -313,7 +350,8 @@ const ItemsClient = () => {
                 dataField: 'isDualUom',
                 caption: 'U.Medida Dual',
                 allowSorting: true,
-                width: 100,
+                width: 120,
+                minWidth: 100,
                 alignment: 'center',
                 cellRender: (cellData: any) => (
                     <div className="flex justify-center items-center h-full">
@@ -380,6 +418,122 @@ const ItemsClient = () => {
         }
     ], [canModify, isSuperAdmin, isRecoveryMode, token, currentCompany?.id]);
 
+    const singleSelectedRowKeyRef = useRef<any>(null);
+    const justSelectedKeyRef = useRef<any>(null);
+    const isProgrammaticFilterRef = useRef(false);
+    const isProgrammaticClearRef = useRef(false);
+
+    const handleRowClick = (e: any) => {
+        if (selectionMode !== 'single' || e.rowType !== 'data') return;
+        if (e.column?.type === 'buttons') return;
+
+        // Si la fila acaba de seleccionarse en esta misma acción de puntero, ignorar para no deseleccionarla
+        if (justSelectedKeyRef.current !== null && String(justSelectedKeyRef.current) === String(e.key)) {
+            justSelectedKeyRef.current = null;
+            return;
+        }
+
+        if (
+            singleSelectedRowKeyRef.current !== null &&
+            String(singleSelectedRowKeyRef.current) === String(e.key)
+        ) {
+            e.component.clearSelection();
+            singleSelectedRowKeyRef.current = null;
+            justSelectedKeyRef.current = null;
+            setSelectedRowKeys([]);
+            if (onSelectionChange) {
+                onSelectionChange(null);
+            }
+        }
+    };
+
+    const handleSelectionChanged = (e: any) => {
+        const keys = e.selectedRowKeys || [];
+        setSelectedRowKeys(keys);
+        const newKey = keys.length > 0 ? keys[0] : null;
+        if (selectionMode === 'single') {
+            if (newKey !== null && String(newKey) !== String(singleSelectedRowKeyRef.current)) {
+                justSelectedKeyRef.current = newKey;
+                setTimeout(() => {
+                    justSelectedKeyRef.current = null;
+                }, 250);
+            }
+            singleSelectedRowKeyRef.current = newKey;
+        }
+        // El clear externo (clearSelectionTrigger) ya sincronizó el padre; no re-notificar
+        if (isProgrammaticClearRef.current) {
+            isProgrammaticClearRef.current = false;
+            return;
+        }
+        if (onSelectionChange) {
+            const item = e.selectedRowsData?.[0] || null;
+            onSelectionChange(item);
+        }
+    };
+
+    // Limpiar selección externa cuando se dispara el trigger (sin notificar al padre)
+    useEffect(() => {
+        if (clearSelectionTrigger > 0) {
+            const gridInstance = gridRef.current?.instance ? gridRef.current.instance() : gridRef.current;
+            isProgrammaticClearRef.current = true;
+            gridInstance?.clearSelection?.();
+            singleSelectedRowKeyRef.current = null;
+            justSelectedKeyRef.current = null;
+            setSelectedRowKeys([]);
+            // Si no había selección, onSelectionChanged puede no dispararse
+            setTimeout(() => {
+                isProgrammaticClearRef.current = false;
+            }, 0);
+        }
+    }, [clearSelectionTrigger]);
+
+    // Refrescar externamente cuando se dispara refreshTrigger
+    useEffect(() => {
+        if (refreshTrigger > 0) {
+            setRefreshVersion(prev => prev + 1);
+            if (gridRef.current?.instance?.refresh) {
+                gridRef.current.instance.refresh();
+            } else if (gridRef.current?.refresh) {
+                gridRef.current.refresh();
+            }
+        }
+    }, [refreshTrigger]);
+
+    // Sincronizar el filtro de Producto programáticamente
+    useEffect(() => {
+        const gridInstance = gridRef.current?.instance ? gridRef.current.instance() : gridRef.current;
+        if (gridInstance?.columnOption) {
+            const currentVal = gridInstance.columnOption('productName', 'filterValue');
+            const targetVal = productFilter || null;
+            if (currentVal !== targetVal) {
+                isProgrammaticFilterRef.current = true;
+                gridInstance.columnOption('productName', {
+                    selectedFilterOperation: 'contains',
+                    filterValue: targetVal,
+                });
+                setTimeout(() => {
+                    isProgrammaticFilterRef.current = false;
+                }, 100);
+            }
+        }
+    }, [productFilter]);
+
+    // Solo filterRow de Producto (no headerFilter / filterPanel): notifica edición manual al padre
+    const handleEditorPreparing = useCallback((e: any) => {
+        if (e.parentType !== 'filterRow' || e.dataField !== 'productName') return;
+        const standardHandler = e.editorOptions?.onValueChanged;
+        e.editorOptions = {
+            ...e.editorOptions,
+            onValueChanged: (args: any) => {
+                standardHandler?.(args);
+                // args.event definido = interacción de usuario; ausente en cambios programáticos
+                if (!isProgrammaticFilterRef.current && args.event !== undefined) {
+                    onProductFilterChange?.(args.value ? String(args.value) : null);
+                }
+            }
+        };
+    }, [onProductFilterChange]);
+
     return (
         <div className="flex flex-col w-full min-w-full h-full bg-dx-primary/10 rounded-dx font-sans overflow-hidden">
             <div className="w-full h-full flex flex-col gap-2">
@@ -391,7 +545,7 @@ const ItemsClient = () => {
                     dataSource={dataSource}
                     remoteOperations={false}
                     columns={columns}
-                    columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true }}
+                    columnDefaults={{ allowFiltering: true, allowHeaderFiltering: true, minWidth: 110 }}
                     allowColumnReordering={true}
                     allowColumnResizing={true}
                     showBorders={true}
@@ -410,12 +564,17 @@ const ItemsClient = () => {
                         placeholder: 'Buscar items...',
                         highlightSearchText: true
                     }}
-                    selection={{
-                        mode: 'multiple',
-                        selectAllMode: 'page',
-                        showCheckBoxesMode: 'always'
-                    }}
-                    onSelectionChanged={(e) => setSelectedRowKeys(e.selectedRowKeys || [])}
+                    selection={selectionMode === 'single'
+                        ? { mode: 'single' }
+                        : {
+                            mode: 'multiple',
+                            selectAllMode: 'page',
+                            showCheckBoxesMode: 'always'
+                        }
+                    }
+                    onRowClick={handleRowClick}
+                    onSelectionChanged={handleSelectionChanged}
+                    onEditorPreparing={handleEditorPreparing}
                     onToolbarPreparing={handleToolbarPreparing}
                     print={{
                         enabled: true,

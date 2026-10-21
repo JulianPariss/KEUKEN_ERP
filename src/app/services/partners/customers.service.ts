@@ -1,10 +1,10 @@
 import { apiFetch } from "@/app/lib/utils/apiClient.helper";
 import { PARTNERS_URL } from "@/app/lib/constants/api.constants";
-import { IBCustomer, IBCustomerCreate, IBCustomerFull, IBCustomerUpdate } from "@repo/api-contracts/erp";
+import { IBCustomer, IBCustomerAddress, IBCustomerCreate, IBCustomerFull, IBCustomerUpdate } from "@repo/api-contracts/erp";
 import { IBListV2 } from "@repo/api-contracts/erp";
-import { IFCustomer, IFCustomerCreate, IFCustomerFull, IFCustomerUpdate } from "@repo/api-contracts/erp";
+import { IFCustomer, IFCustomerAddress, IFCustomerCreate, IFCustomerFull, IFCustomerUpdate } from "@repo/api-contracts/erp";
 import { IFListV2 } from "@repo/api-contracts/erp";
-import { mapCustomer, mapCustomerFull, mapCustomerToCreate, mapCustomerToUpdate } from "@repo/api-contracts/erp";
+import { mapCustomer, mapCustomerAddress, mapCustomerFull, mapCustomerToCreate, mapCustomerToUpdate } from "@repo/api-contracts/erp";
 import { IFOptionItem, IFOptionsListParams } from "@repo/api-contracts/erp";
 import { mapOptionsList } from "@repo/api-contracts/erp";
 
@@ -169,6 +169,30 @@ export const customersService = {
             );
         } catch (error) {
             console.error("Error en delete customer:", error);
+            throw error;
+        }
+    },
+
+    async getAddresses(customerId: string, token: string, companyId?: string): Promise<IFCustomerAddress[]> {
+        try {
+            const url = companyId
+                ? `${PARTNERS_URL}/customers/${customerId}/addresses?company_id=${encodeURIComponent(companyId)}`
+                : `${PARTNERS_URL}/customers/${customerId}/addresses`;
+
+            const resData = await apiFetch<any>(
+                url,
+                { method: "GET" },
+                "No se pudieron obtener las direcciones del cliente",
+                { token, companyId }
+            );
+
+            const items: IBCustomerAddress[] = Array.isArray(resData)
+                ? resData
+                : (resData?.items || []);
+
+            return items.map(mapCustomerAddress);
+        } catch (error) {
+            console.error("Error en getAddresses customer:", error);
             throw error;
         }
     }

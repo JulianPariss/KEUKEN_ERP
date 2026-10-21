@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { generateUUID } from '@/lib/utils/id.helper';
 
 export interface ICachedItemMedia {
@@ -23,6 +23,20 @@ export default function ItemMediaUploadSection({
     readOnly = false,
 }: ItemMediaUploadSectionProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    // Estado local: refresca la grilla sin forzar setState del ítem padre (Form estable)
+    const [localMedia, setLocalMedia] = useState<ICachedItemMedia[]>(media);
+    const mediaPropRef = useRef(media);
+
+    useEffect(() => {
+        if (mediaPropRef.current === media) return;
+        mediaPropRef.current = media;
+        setLocalMedia(media);
+    }, [media]);
+
+    const commit = useCallback((next: ICachedItemMedia[]) => {
+        setLocalMedia(next);
+        onChange(next);
+    }, [onChange]);
 
     const handleFilesSelected = useCallback((files: FileList | File[]) => {
         const validFiles = Array.from(files).filter(file =>
@@ -36,12 +50,12 @@ export default function ItemMediaUploadSection({
             id: generateUUID(),
             file,
             previewUrl: URL.createObjectURL(file),
-            kindCode: media.length === 0 && idx === 0 ? 'main' : '',
+            kindCode: localMedia.length === 0 && idx === 0 ? 'main' : '',
             altText: '',
         }));
 
-        onChange([...media, ...newItems]);
-    }, [media, onChange]);
+        commit([...localMedia, ...newItems]);
+    }, [localMedia, commit]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -65,19 +79,19 @@ export default function ItemMediaUploadSection({
     };
 
     const handleRemoveImage = (idToRemove: string) => {
-        const itemToRemove = media.find(m => m.id === idToRemove);
+        const itemToRemove = localMedia.find(m => m.id === idToRemove);
         if (itemToRemove?.previewUrl) {
             URL.revokeObjectURL(itemToRemove.previewUrl);
         }
-        onChange(media.filter(m => m.id !== idToRemove));
+        commit(localMedia.filter(m => m.id !== idToRemove));
     };
 
     const handleUpdateKind = (id: string, kindCode: string) => {
-        onChange(media.map(m => m.id === id ? { ...m, kindCode } : m));
+        commit(localMedia.map(m => m.id === id ? { ...m, kindCode } : m));
     };
 
     const handleUpdateAlt = (id: string, altText: string) => {
-        onChange(media.map(m => m.id === id ? { ...m, altText } : m));
+        commit(localMedia.map(m => m.id === id ? { ...m, altText } : m));
     };
 
     return (
@@ -124,9 +138,9 @@ export default function ItemMediaUploadSection({
             )}
 
             {/* Lista / Grilla de imágenes cacheadas */}
-            {media.length > 0 ? (
+            {localMedia.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                    {media.map((item, idx) => (
+                    {localMedia.map((item) => (
                         <div
                             key={item.id}
                             className="flex items-center gap-2.5 p-2 rounded-dx bg-primary-950/40 border border-main/10 relative group"

@@ -14,6 +14,7 @@ interface NormalizedSupplier {
     id: string;
     name: string;
     code?: string;
+    supplierSku?: string;
     priority?: number;
     isPrimary: boolean;
 }
@@ -38,6 +39,7 @@ export default function ItemSuppliersSection({ suppliers }: ItemSuppliersSection
             const id = typeof s === 'string' ? s : (s.id || s.supplier_id || s.supplierId || s.provider_id || '');
             const rawName = typeof s === 'string' ? '' : (s.name || s.supplier_name || s.supplierName || s.provider_name);
             const code = typeof s === 'string' ? undefined : (s.code || s.supplier_code);
+            const supplierSku = typeof s === 'string' ? undefined : (s.supplierSku || s.supplier_sku);
 
             // Búsqueda en el directorio cargado si no venía el nombre completo
             const directoryMatch = providersDirectory?.find(p => p.id === id);
@@ -57,6 +59,7 @@ export default function ItemSuppliersSection({ suppliers }: ItemSuppliersSection
                 id,
                 name: finalName,
                 code: finalCode,
+                supplierSku,
                 priority: priorityNum,
                 isPrimary: isExplicitPrimary
             };
@@ -159,6 +162,11 @@ export default function ItemSuppliersSection({ suppliers }: ItemSuppliersSection
                                 </span>
                             </div>
                             <div className="flex items-center gap-2 text-[11px] text-main/50 shrink-0">
+                                {primarySupplier.supplierSku && (
+                                    <span className="font-mono bg-focus-500/20 text-focus-300 px-1.5 py-0.5 rounded border border-focus-500/30">
+                                        SKU: {primarySupplier.supplierSku}
+                                    </span>
+                                )}
                                 {primarySupplier.code && (
                                     <span className="font-mono bg-primary-950/40 px-1.5 py-0.5 rounded border border-main/10">
                                         {primarySupplier.code}
@@ -191,11 +199,18 @@ export default function ItemSuppliersSection({ suppliers }: ItemSuppliersSection
                                                 {supp.name}
                                             </span>
                                         </div>
-                                        {supp.code && (
-                                            <span className="font-mono text-[10px] text-main/40 shrink-0">
-                                                {supp.code}
-                                            </span>
-                                        )}
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            {supp.supplierSku && (
+                                                <span className="font-mono text-[10px] bg-focus-500/15 text-focus-300 px-1 py-0.5 rounded border border-focus-500/20">
+                                                    SKU: {supp.supplierSku}
+                                                </span>
+                                            )}
+                                            {supp.code && (
+                                                <span className="font-mono text-[10px] text-main/40">
+                                                    {supp.code}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
