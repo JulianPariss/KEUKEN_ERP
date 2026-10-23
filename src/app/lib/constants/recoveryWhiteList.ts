@@ -4,6 +4,7 @@
  */
 export const RECOVERY_WHITE_LIST: string[] = [
     '/products',
+    '/productsv2',
     '/products/categories',
     '/products/brands',
     '/products/uom-categories',
@@ -13,6 +14,7 @@ export const RECOVERY_WHITE_LIST: string[] = [
     '/stock/serial-numbers',
     '/structure/establishments',
     '/structure/logisticCenters',
+    '/priceLists',
     '/priceLists/pricePolicies',
     '/providers/articleHandling',
     '/providers/suppliers',
@@ -21,6 +23,7 @@ export const RECOVERY_WHITE_LIST: string[] = [
     '/logistics/vehicles',
     '/priceLists/listTypes',
     '/delivery',
+    '/delivery/routes',
     '/delivery/zones',
     '/delivery/vehicles',
     '/providers',
@@ -81,6 +84,6 @@ export function isPathInRecoveryWhiteList(pathname: string): boolean {
 
     return RECOVERY_WHITE_LIST.some(route => {
         const normalizedRoute = route.length > 1 && route.endsWith('/') ? route.slice(0, -1) : route;
-        return normalizedPath === normalizedRoute;
+        return normalizedPath.toLowerCase() === normalizedRoute.toLowerCase();
     });
 }

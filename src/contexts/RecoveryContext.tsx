@@ -1,5 +1,6 @@
 'use client';
 
+import '@/lib/erp-api-client.setup';
 import { createContext, ReactNode, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
