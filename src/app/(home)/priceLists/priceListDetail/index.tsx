@@ -6,7 +6,7 @@ import GenericEmpty from "@/components/GenericEmpty";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IFPriceListCatalogItem } from "@repo/api-contracts/erp";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import CustomStore from "devextreme/data/custom_store";
 import notify from "devextreme/ui/notify";
 import { formatPercent, formatPrice } from "@/app/lib/utils/prittier";

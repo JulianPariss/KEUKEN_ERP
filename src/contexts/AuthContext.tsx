@@ -3,11 +3,11 @@
 import { loginAction, logoutAction, updatePermissionsCookieAction } from '@/app/actions/auth.actions';
 import { TFPermissionsConfig } from '@/app/lib/permissions/getPermissions';
 import { mapPermissionsToFrontend } from '@/app/lib/utils/permission.helper';
-import { authService } from '@/app/services/userContext/auth.service';
+import { authService } from '@repo/erp-services/userContext/auth.service';
 import { ICompany } from "@repo/api-contracts/erp";
 import { IFProfileContext } from "@repo/api-contracts/erp";
 import { IFUser } from "@repo/api-contracts/erp";
-import { companiesService } from '@/app/services/userContext/companies.service';
+import { companiesService } from '@repo/erp-services/userContext/companies.service';
 import { getToken } from '@/lib/utils/token.helper';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';

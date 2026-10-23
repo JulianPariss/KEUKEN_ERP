@@ -1,5 +1,5 @@
 import { translateMapStructures } from '@/app/lib/utils/gridMap.helper';
-import { locationService } from '@/app/services/warehouse/locations.service';
+import { locationService } from '@repo/erp-services/warehouse/locations.service';
 import { IMapStructureTranslation } from "@/types/gridMap.types";
 import { IFLocation } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';

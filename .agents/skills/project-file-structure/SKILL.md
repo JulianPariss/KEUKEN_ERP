@@ -15,11 +15,10 @@ Esta carpeta contiene el enrutador de Next.js (App Router) y la lógica de negoc
     *   **Componentes de Dominio:** Cada página/módulo tiene su propia carpeta de `components/`.
     *   **Modales y Acciones UI:** Dentro de esa carpeta de componentes, debe existir una carpeta `actions/` (`src/app/(home)/[modulo]/components/actions/`). Aquí es donde se definen generalmente los componentes de modales de creación, edición, eliminación o cualquier otra acción interactiva de esa vista.
 *   `src/app/actions/`: Acciones de servidor (Server Actions) de Next.js (`*.actions.ts`). Actúan como intermediarios entre los componentes del cliente y los servicios.
-*   `src/app/services/`: Clases o funciones de servicio (`*.service.ts`) que realizan peticiones HTTP al backend (APIs). También puede incluir carpetas específicas para agrupar servicios complejos (ej. `location_services`).
-*   `src/app/types/`: Tipos de TypeScript e interfaces. Maneja las entidades espejadas entre backend y frontend:
-    *   `backendTypes/`: Tipos que reflejan exactamente la estructura de los datos tal cual vienen o van hacia el backend (ej. snake_case).
-    *   `frontendTypes/`: Entidades espejadas de los `backendTypes`, pero adaptadas para el uso amigable dentro de React (ej. camelCase, tipos extendidos para la UI).
-    *   `mappers/`: Funciones traductoras (mappers) que convierten un `backendType` a un `frontendType` (ej. `mapAccount`) y viceversa (ej. `mapAccountToCreate`). Siempre que la API devuelva o reciba un dato, **DEBE** pasar por su respectivo mapper.
+*   **Servicios HTTP:** viven en el monorepo package `@repo/erp-services` (no en `src/app/services/`). Importar p. ej. `@repo/erp-services/product_services/products.service`.
+*   **Cliente HTTP / URLs / errores:** `@repo/erp-api-client` (bootstrap en `src/lib/erp-api-client.setup.ts`).
+*   **UI de products:** `@repo/product-ui` (las `page.tsx` de products quedan en el app + `ProductUiBridge`).
+*   **Tipos / mappers de API:** `@repo/api-contracts/erp` (no crear `src/app/types` nuevos para contratos de backend).
 
 ## 📂 `src/` (Raíz de código fuente)
 Contiene elementos globales y reutilizables que no están atados a una ruta específica.
@@ -35,9 +34,9 @@ Cuando agregues una nueva página o módulo dentro de `src/app/(home)/`:
 3. **Archivo Auto-generado:** **NUNCA** debes modificar manualmente el archivo `src/app/lib/routes/generated-routes.ts`, ya que su contenido se sobreescribe completamente al ejecutar el generador.
 
 ## 📜 Convenciones de Nomenclatura
-*   **Servicios:** `[entidad].service.ts` (ej. `accounts.service.ts`).
+*   **Servicios:** `[entidad].service.ts` dentro de `@repo/erp-services` (ej. `accountant/accounts.service.ts`).
 *   **Acciones de Servidor:** `[entidad].actions.ts` (ej. `auth.actions.ts`).
-*   **Mappers:** `[entidad].mapper.ts` (ej. `accounts.mapper.ts`).
+*   **Mappers / tipos:** en `@repo/api-contracts/erp` (ej. `mapAccount`).
 *   **Componentes Generales:** PascalCase (ej. `GenericDataGrid.tsx`).
 *   **Carpetas de módulos:** camelCase o lowercase (ej. `keysManager`, `products`).
 

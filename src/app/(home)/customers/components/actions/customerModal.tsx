@@ -1,4 +1,4 @@
-import { customersService } from "@/app/services/partners/customers.service";
+import { customersService } from "@repo/erp-services/partners/customers.service";
 import { IFCustomerCreate, IFCustomerUpdate } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';
@@ -7,11 +7,11 @@ import Form, { Item } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
 import { useEffect, useRef, useState, useCallback } from "react";
 import MetadataFieldsClient from "@/components/metadata/MetadataFieldsClient";
-import { metadataService } from "@/app/services/metadata.service";
-import { countriesService } from "@/app/services/location_services/countries.service";
-import { statesService } from "@/app/services/location_services/states.service";
-import { citiesService } from "@/app/services/location_services/cities.service";
-import { localizationService } from "@/app/services/localization.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
+import { countriesService } from "@repo/erp-services/location_services/countries.service";
+import { statesService } from "@repo/erp-services/location_services/states.service";
+import { citiesService } from "@repo/erp-services/location_services/cities.service";
+import { localizationService } from "@repo/erp-services/localization.service";
 
 interface CustomerModalProps {
     isOpen: boolean;

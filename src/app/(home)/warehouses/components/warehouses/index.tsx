@@ -1,6 +1,6 @@
 'use client'
 
-import { warehouseService } from "@/app/services/warehouse/warehouse.service";
+import { warehouseService } from "@repo/erp-services/warehouse/warehouse.service";
 import { IWarehouse } from "@repo/api-contracts/erp";
 import { mapWarehouseList } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

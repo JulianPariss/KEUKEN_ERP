@@ -5,7 +5,7 @@ import GenericEmpty from "@/components/GenericEmpty";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IFSaleOrder, IFSaleOrderDetail } from "@repo/api-contracts/erp";
-import { saleOrdersService } from "@/app/services/priceLists/saleOrders.service";
+import { saleOrdersService } from "@repo/erp-services/priceLists/saleOrders.service";
 import notify from "devextreme/ui/notify";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SaleOrderDetailHeader } from "./components/SaleOrderDetailHeader";

@@ -5,7 +5,7 @@ import { canDo } from '@/app/lib/utils/permission.helper';
 import { IFLocation, TFLocationState } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocations } from '@/contexts/LocationsContext';
-import { locationService } from '@/app/services/warehouse/locations.service';
+import { locationService } from '@repo/erp-services/warehouse/locations.service';
 import { Button } from '@repo/devextreme';
 import { useMemo, useState } from 'react';
 import LocationChangeState from '../actions/changeState';

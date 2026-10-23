@@ -1,8 +1,8 @@
 'use client';
 
-import { priceListsService } from '@/app/services/priceLists/priceLists.service';
-import { productsService } from '@/app/services/product_services/products.service';
-import { itemsService } from '@/app/services/product_services/items.service';
+import { priceListsService } from '@repo/erp-services/priceLists/priceLists.service';
+import { productsService } from '@repo/erp-services/product_services/products.service';
+import { itemsService } from '@repo/erp-services/product_services/items.service';
 import { IFPriceListItemCreate } from "@repo/api-contracts/erp";
 import { IFOptionItem } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';

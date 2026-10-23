@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { SelectBox } from "@repo/devextreme";
 import notify from "devextreme/ui/notify";
 import { LIST_TYPE_OPERATION_OPTIONS } from "@/app/lib/constants/priceList.constants";
-import { listTypesService } from "@/app/services/priceLists/listTypes.service";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { listTypesService } from "@repo/erp-services/priceLists/listTypes.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import { IFListType } from "@repo/api-contracts/erp";
 import { IFPriceList } from "@repo/api-contracts/erp";
 

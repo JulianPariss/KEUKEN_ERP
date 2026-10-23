@@ -1,24 +1,15 @@
-export const formatQueryParams = (params: any): Record<string, string> => {
-    return Object.fromEntries(
-        Object.entries(params || {})
-            .filter(([_, v]) => v !== null && v !== undefined)
-            .map(([k, v]) => [k, String(v)])
-    );
-};
-
 export const formatQualityState = (qualityState: string): string => {
     switch (qualityState) {
-        case 'good':
-            return 'Bueno';
-        case 'quarantine':
-            return 'Cuarentena';
-        case 'scrap':
-            return 'Scrap';
+        case "good":
+            return "Bueno";
+        case "quarantine":
+            return "Cuarentena";
+        case "scrap":
+            return "Scrap";
         default:
-            return 'Desconocido';
+            return "Desconocido";
     }
 };
-
 
 export const formatCssColor = (color: string) => {
     if (typeof window === "undefined") return "white";
@@ -32,15 +23,15 @@ export const formatCssColor = (color: string) => {
 export const formatDate = (dateStr?: string | Date | null): string => {
     if (!dateStr) return "-";
     try {
-        const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+        const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
         return date.toLocaleDateString("es-AR", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
             hour: "2-digit",
-            minute: "2-digit"
+            minute: "2-digit",
         });
     } catch {
-        return typeof dateStr === 'string' ? dateStr : "-";
+        return typeof dateStr === "string" ? dateStr : "-";
     }
-};
+};

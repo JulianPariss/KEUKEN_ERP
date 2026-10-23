@@ -1,12 +1,12 @@
 'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { pricePoliciesService } from "@/app/services/priceLists/pricePolicies.service";
-import { salesChannelsService } from "@/app/services/salesChannels.service";
+import { pricePoliciesService } from "@repo/erp-services/priceLists/pricePolicies.service";
+import { salesChannelsService } from "@repo/erp-services/salesChannels.service";
 import { IFSalesChannel } from "@repo/api-contracts/erp";
-import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
+import { commercialPlatformsService } from "@repo/erp-services/partners/commercialPlatforms.service";
 import { IFCommercialPlatform } from "@repo/api-contracts/erp";
 import { PRICELIST_OPERATION_LABELS, PRICELIST_OPERATION_OPTIONS } from "@/app/lib/constants/priceList.constants";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';

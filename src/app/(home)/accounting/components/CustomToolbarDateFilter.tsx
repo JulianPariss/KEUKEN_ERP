@@ -3,7 +3,7 @@
 import { SelectBox } from '@repo/devextreme';
 import { useEffect, useRef, useState, createContext, useContext } from 'react';
 import dayjs from 'dayjs';
-import { periodsService } from '@/app/services/accountant/periods.service';
+import { periodsService } from '@repo/erp-services/accountant/periods.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { IFPeriod } from "@repo/api-contracts/erp";
 

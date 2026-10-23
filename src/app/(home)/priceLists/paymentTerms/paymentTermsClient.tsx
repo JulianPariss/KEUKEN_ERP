@@ -1,11 +1,11 @@
 'use client';
 
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { paymentTermsService } from "@/app/services/payments_services/paymentTerms.service";
+import { paymentTermsService } from "@repo/erp-services/payments_services/paymentTerms.service";
 import { IFPaymentTerm } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

@@ -1,6 +1,6 @@
 "use client";
 
-import { inventoryService } from "@/app/services/warehouse/inventory.service";
+import { inventoryService } from "@repo/erp-services/warehouse/inventory.service";
 import { IFStockByLocationItem } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { NumberBox } from "devextreme-react";

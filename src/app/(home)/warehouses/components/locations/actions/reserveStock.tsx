@@ -1,6 +1,6 @@
 "use client";
 
-import { stockService } from "@/app/services/stock.service";
+import { stockService } from "@repo/erp-services/stock.service";
 import { IFStockByLocationItem } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { NumberBox } from "devextreme-react";

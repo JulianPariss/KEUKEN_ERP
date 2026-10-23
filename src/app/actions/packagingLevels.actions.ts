@@ -1,6 +1,6 @@
 "use server";
 
-import { packagingLevelService } from "../services/product_services/packagingLevel.service";
+import { packagingLevelService } from "@repo/erp-services/product_services/packagingLevel.service";
 
 export async function getCachedPackagingLevels(token: string) {
     "use cache";

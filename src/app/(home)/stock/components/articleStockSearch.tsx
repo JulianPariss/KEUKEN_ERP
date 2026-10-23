@@ -5,7 +5,7 @@ import { LoadPanel } from "devextreme-react/load-panel";
 import { TextBox } from "devextreme-react/text-box";
 import notify from "devextreme/ui/notify";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
-import { stockService } from "@/app/services/stock.service";
+import { stockService } from "@repo/erp-services/stock.service";
 import { IFArticleStock } from "@repo/api-contracts/erp";
 import { Button } from '@repo/devextreme';
 import GenericEmpty from "@/components/GenericEmpty";

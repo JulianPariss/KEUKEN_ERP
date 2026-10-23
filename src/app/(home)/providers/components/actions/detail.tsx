@@ -4,7 +4,7 @@ import { IFProvider, IFProviderFull } from "@repo/api-contracts/erp";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
-import { providerService } from "@/app/services/location_services/provider.service";
+import { providerService } from "@repo/erp-services/location_services/provider.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import notify from "devextreme/ui/notify";

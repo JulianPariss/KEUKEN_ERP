@@ -1,7 +1,7 @@
 "use client";
 
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
-import { establishmentsService } from "@/app/services/userContext/establishments.service";
+import { establishmentsService } from "@repo/erp-services/userContext/establishments.service";
 import { IFEstablishment, IFEstablishmentCreate } from "@repo/api-contracts/erp";
 import { GenericButton } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

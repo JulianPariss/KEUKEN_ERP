@@ -1,6 +1,6 @@
 'use client';
 
-import { listTypesService } from '@/app/services/priceLists/listTypes.service';
+import { listTypesService } from '@repo/erp-services/priceLists/listTypes.service';
 import { IFListTypeCreate } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@repo/devextreme';

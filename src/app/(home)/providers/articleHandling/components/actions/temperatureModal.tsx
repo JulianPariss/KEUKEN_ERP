@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { temperatureService } from "@/app/services/product_services/temperature.service";
+import { temperatureService } from "@repo/erp-services/product_services/temperature.service";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";

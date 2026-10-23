@@ -6,7 +6,7 @@ import { Button } from '@repo/devextreme';
 import Form, { SimpleItem } from "devextreme-react/form";
 import "devextreme-react/select-box";
 import notify from "devextreme/ui/notify";
-import { serialNumbersService } from "@/app/services/serialNumbers.service";
+import { serialNumbersService } from "@repo/erp-services/serialNumbers.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
 

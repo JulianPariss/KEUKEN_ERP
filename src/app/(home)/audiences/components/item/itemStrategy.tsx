@@ -1,8 +1,8 @@
 import React from "react";
 import { IClusterStrategy } from "../strategy/types";
-import { itemClustersService } from "@/app/services/audiences/itemClusters.service";
-import { itemsService } from "@/app/services/product_services/items.service";
-import { clusterRulesService } from "@/app/services/audiences/clusterRules.service";
+import { itemClustersService } from "@repo/erp-services/audiences/itemClusters.service";
+import { itemsService } from "@repo/erp-services/product_services/items.service";
+import { clusterRulesService } from "@repo/erp-services/audiences/clusterRules.service";
 import { ItemRuleEditor } from "./itemRuleEditor";
 import { IFItemCluster } from "@repo/api-contracts/erp";
 import { IFItemRuleSet } from "@repo/api-contracts/erp";

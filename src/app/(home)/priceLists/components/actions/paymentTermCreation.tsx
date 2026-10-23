@@ -1,7 +1,7 @@
 "use client";
 
-import { paymentMethodsService } from "@/app/services/payments_services/paymentMethods.service";
-import { paymentTermsService } from "@/app/services/payments_services/paymentTerms.service";
+import { paymentMethodsService } from "@repo/erp-services/payments_services/paymentMethods.service";
+import { paymentTermsService } from "@repo/erp-services/payments_services/paymentTerms.service";
 import { IFPaymentMethod } from "@repo/api-contracts/erp";
 import { IFPaymentTerm, IFPaymentTermCreation, IFPaymentTermUpdate } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

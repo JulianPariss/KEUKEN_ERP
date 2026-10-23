@@ -1,16 +1,16 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { logisticProfileService } from "@/app/services/product_services/logisticProfile.service";
+import { logisticProfileService } from "@repo/erp-services/product_services/logisticProfile.service";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
 import { useCallback, useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { IFLogisticProfile } from "@repo/api-contracts/erp";
-import { operativeProfileService } from "@/app/services/product_services/operativeProfile.service";
-import { segregationGroupsService } from "@/app/services/product_services/segregationGroups.service";
-import { temperatureService } from "@/app/services/product_services/temperature.service";
+import { operativeProfileService } from "@repo/erp-services/product_services/operativeProfile.service";
+import { segregationGroupsService } from "@repo/erp-services/product_services/segregationGroups.service";
+import { temperatureService } from "@repo/erp-services/product_services/temperature.service";
 import { IFOperativeProfile } from "@repo/api-contracts/erp";
 import { IFSegregationGroup } from "@repo/api-contracts/erp";
 import { IFTemperatureClass } from "@repo/api-contracts/erp";

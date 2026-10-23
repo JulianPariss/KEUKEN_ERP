@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { segregationGroupsService } from "@/app/services/product_services/segregationGroups.service";
+import { segregationGroupsService } from "@repo/erp-services/product_services/segregationGroups.service";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";

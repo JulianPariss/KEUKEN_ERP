@@ -1,6 +1,6 @@
 'use client';
 
-import { journalsService } from '@/app/services/accountant/journals.service';
+import { journalsService } from '@repo/erp-services/accountant/journals.service';
 import { IFJournalEntry } from "@repo/api-contracts/erp";
 import { useAccounting } from '@/contexts/AccountingContext';
 import { useAuth } from '@/contexts/AuthContext';

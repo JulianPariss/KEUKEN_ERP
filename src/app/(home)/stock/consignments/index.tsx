@@ -6,7 +6,7 @@ import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import CustomStore from "devextreme/data/custom_store";
 import notify from "devextreme/ui/notify";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
-import { consignmentsService } from "@/app/services/consignments.service";
+import { consignmentsService } from "@repo/erp-services/consignments.service";
 import { CONSIGNMENT_STATES } from "@/app/lib/constants/common.constants";
 import ConsignmentModal from "./components/actions/consignmentModal";
 import ConsignmentReturnModal from "./components/actions/consignmentReturnModal";

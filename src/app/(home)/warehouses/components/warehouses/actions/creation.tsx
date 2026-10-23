@@ -6,7 +6,7 @@ import Form, { SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { warehouseService } from "@/app/services/warehouse/warehouse.service";
+import { warehouseService } from "@repo/erp-services/warehouse/warehouse.service";
 import { IWarehouseCreate } from "@repo/api-contracts/erp";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";

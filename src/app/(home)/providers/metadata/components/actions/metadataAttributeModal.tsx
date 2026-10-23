@@ -1,6 +1,6 @@
 "use client";
 
-import { metadataService } from "@/app/services/metadata.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
 import { IFMetadataAttribute, IFMetadataGroup } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

@@ -1,4 +1,4 @@
-import { periodsService } from '@/app/services/accountant/periods.service';
+import { periodsService } from '@repo/erp-services/accountant/periods.service';
 import { IFPeriod } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';
 import Form, { ButtonItem, GroupItem, Item } from 'devextreme-react/form';

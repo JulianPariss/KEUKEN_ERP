@@ -5,7 +5,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { Button } from '@repo/devextreme';
 import Form, { SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
-import { consignmentsService } from "@/app/services/consignments.service";
+import { consignmentsService } from "@repo/erp-services/consignments.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { getZeroTimeDate } from "@/app/lib/utils/prittier";
 

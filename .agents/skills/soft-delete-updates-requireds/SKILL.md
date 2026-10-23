@@ -125,63 +125,44 @@ La funcionalidad de **Recovery Mode** permite a usuarios administradores (`super
 
 ### Endpoint y Servicio de Restauración Genérico
 
-El servicio genérico se encuentra centralizado en `src/app/services/common.service.ts`:
+El servicio genérico está en `@repo/erp-services/common.service`:
 
 * **Método**: `POST`
 * **URL**: `/api/v1/admin/recovery/{schema}/{table}/{id}/restore`
-* **Definición de Tipos**:
-  - `IBRestoreResponse` en `src/app/types/backendTypes/general.types.ts`:
-    ```typescript
-    export interface IBRestoreResponse {
-        restored: boolean;
-        schema_name: string;
-        table_name: string;
-        id: string;
-        message: string;
-    }
-    ```
-  - `IFRestoreResponse` en `src/app/types/frontendTypes/general.types.ts`:
-    ```typescript
-    export interface IFRestoreResponse {
-        restored: boolean;
-        schemaName: string;
-        tableName: string;
-        id: string;
-        message: string;
-    }
-    ```
-  - `mapRestoreResponse` en `src/app/types/mappers/general.mapper.ts`.
+* **Tipos / mapper**: `@repo/api-contracts/erp` (`IBRestoreResponse`, `IFRestoreResponse`, `mapRestoreResponse`).
 
-### Consumo en Servicios (`common.service.ts`)
+### Consumo
 
 ```typescript
-import { ADMIN_URL } from "../lib/constants/api.constants";
-import { IBRestoreResponse } from "../types/backendTypes/general.types";
-import { IFRestoreResponse } from "../types/frontendTypes/general.types";
-import { mapRestoreResponse } from "../types/mappers/general.mapper";
+import { commonService } from "@repo/erp-services/common.service";
+
+await commonService.restore(schema, table, id, token);
+```
+
+### Implementación de referencia (package)
+
+```typescript
+import { ADMIN_URL, apiFetch } from "@repo/erp-api-client";
+import {
+    IBRestoreResponse,
+    IFRestoreResponse,
+    mapRestoreResponse,
+} from "@repo/api-contracts/erp";
 
 export const commonService = {
-    async restore(schema: string, table: string, id: string, token: string): Promise<IFRestoreResponse> {
-        try {
-            const response = await fetch(`${ADMIN_URL}/recovery/${schema}/${table}/${id}/restore`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || `Error ${response.status}: No se pudo restaurar el registro`);
-            }
-
-            const data: IBRestoreResponse = await response.json();
-            return mapRestoreResponse(data);
-        } catch (error) {
-            console.error("Error en restore:", error);
-            throw error;
-        }
+    async restore(
+        schema: string,
+        table: string,
+        id: string,
+        token: string
+    ): Promise<IFRestoreResponse> {
+        const data: IBRestoreResponse = await apiFetch(
+            `${ADMIN_URL}/recovery/${schema}/${table}/${id}/restore`,
+            { method: "POST" },
+            "No se pudo restaurar el registro",
+            { token }
+        );
+        return mapRestoreResponse(data);
     },
 };
 ```

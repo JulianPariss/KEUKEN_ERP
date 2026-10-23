@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { localizationService } from '@/app/services/localization.service';
+import { localizationService } from '@repo/erp-services/localization.service';
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomStore from 'devextreme/data/custom_store';

@@ -6,7 +6,7 @@ import { canDo } from "@/app/lib/utils/permission.helper";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import CustomStore from "devextreme/data/custom_store";
 import notify from "devextreme/ui/notify";
 import AddNewPriceList from "./components/actions/addNewPriceList";

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import { usersService } from "@/app/services/users.service";
+import { usersService } from "@repo/erp-services/users.service";
 import { IFUser } from "@repo/api-contracts/erp";
 import { IFRole } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

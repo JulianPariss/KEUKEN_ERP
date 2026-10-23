@@ -7,7 +7,7 @@ import CustomStore from "devextreme/data/custom_store";
 import { CheckBox } from 'devextreme-react/check-box';
 import notify from "devextreme/ui/notify";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
-import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
+import { commercialPlatformsService } from "@repo/erp-services/partners/commercialPlatforms.service";
 import CommercialPlatformModal from "./components/actions/commercialPlatformModal";
 import { canDo } from "@/app/lib/utils/permission.helper";
 

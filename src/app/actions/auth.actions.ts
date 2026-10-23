@@ -1,6 +1,6 @@
 'use server';
 
-import { authService } from '@/app/services/userContext/auth.service';
+import { authService } from '@repo/erp-services/userContext/auth.service';
 import { cookies, headers } from 'next/headers';
 
 async function getIsSecure(): Promise<boolean> {

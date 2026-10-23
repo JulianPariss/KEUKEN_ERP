@@ -1,6 +1,6 @@
 'use client';
 
-import { accountsService } from '@/app/services/accountant/accounts.service';
+import { accountsService } from '@repo/erp-services/accountant/accounts.service';
 import { IFAccount } from "@repo/api-contracts/erp";
 import { IFTax } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';

@@ -1,6 +1,6 @@
 import React from "react";
 import { cookies } from "next/headers";
-import { metadataService } from "@/app/services/metadata.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
 import MetadataFieldsClient from "./MetadataFieldsClient";
 import { IFMetadataFieldsProps } from "@repo/api-contracts/erp";
 

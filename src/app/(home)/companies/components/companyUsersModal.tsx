@@ -7,7 +7,7 @@ import SelectBox from 'devextreme-react/select-box';
 import TagBox from 'devextreme-react/tag-box';
 import notify from 'devextreme/ui/notify';
 import { IFCompany, IFUser, IFRoleAssignment, IFOptionItem } from '@repo/api-contracts/erp';
-import { usersService } from '@/app/services/users.service';
+import { usersService } from '@repo/erp-services/users.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { OPERATIONAL_ROLES } from '@/app/lib/constants/users.constants';
 

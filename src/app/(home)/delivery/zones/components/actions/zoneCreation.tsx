@@ -1,6 +1,6 @@
 "use client";
 
-import { zonesService } from "@/app/services/zones.service";
+import { zonesService } from "@repo/erp-services/zones.service";
 import { IFZoneCreate, IFZoneUpdate, TFZoneType } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

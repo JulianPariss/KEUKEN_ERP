@@ -1,6 +1,6 @@
 "use client";
 
-import { statesService } from "@/app/services/location_services/states.service";
+import { statesService } from "@repo/erp-services/location_services/states.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";

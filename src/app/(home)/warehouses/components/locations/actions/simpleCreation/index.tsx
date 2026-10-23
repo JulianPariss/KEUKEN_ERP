@@ -6,7 +6,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { locationService } from "@/app/services/warehouse/locations.service";
+import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFLocationSimpleCreation } from "@repo/api-contracts/erp";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

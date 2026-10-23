@@ -5,7 +5,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { TextBox } from "devextreme-react/text-box";
 import notify from "devextreme/ui/notify";
 import { useRouter, useSearchParams } from "next/navigation";
-import { warehouseService } from "@/app/services/warehouse/warehouse.service";
+import { warehouseService } from "@repo/erp-services/warehouse/warehouse.service";
 import { IWarehouse } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

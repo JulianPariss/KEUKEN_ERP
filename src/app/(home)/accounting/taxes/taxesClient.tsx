@@ -1,6 +1,6 @@
 'use client';
 
-import { taxesService } from "@/app/services/accountant/taxes.service";
+import { taxesService } from "@repo/erp-services/accountant/taxes.service";
 import { IFTax } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

@@ -3,7 +3,7 @@
 import { useRecovery } from "@/contexts/RecoveryContext";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,7 +13,7 @@ import { CheckBox } from 'devextreme-react/check-box';
 import notify from "devextreme/ui/notify";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BranchCreationModal from "./components/actions/branchCreation";
-import { branchesService } from "@/app/services/userContext/branches.service";
+import { branchesService } from "@repo/erp-services/userContext/branches.service";
 
 const { customLoad, customSave } = createGridStateStorage({ gridId: 'branches-grid' });
 

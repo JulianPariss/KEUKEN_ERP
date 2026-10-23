@@ -2,8 +2,8 @@
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { countriesService } from "@/app/services/location_services/countries.service";
-import { taxCategoriesService } from "@/app/services/payments_services/taxCategories.service";
+import { countriesService } from "@repo/erp-services/location_services/countries.service";
+import { taxCategoriesService } from "@repo/erp-services/payments_services/taxCategories.service";
 import { IFCountry } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn, SelectBox } from '@repo/devextreme';
 import GenericEmpty from "@/components/GenericEmpty";

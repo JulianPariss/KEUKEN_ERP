@@ -2,9 +2,9 @@
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { logisticsCentersService } from "@/app/services/userContext/logisticsCenters.service";
+import { logisticsCentersService } from "@repo/erp-services/userContext/logisticsCenters.service";
 import { IFLogisticsCenter } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

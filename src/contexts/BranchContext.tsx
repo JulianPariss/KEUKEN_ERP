@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { IFBranch } from "@repo/api-contracts/erp";
-import { branchesService } from '@/app/services/userContext/branches.service';
+import { branchesService } from '@repo/erp-services/userContext/branches.service';
 import { useAuth } from './AuthContext';
 
 interface BranchContextType {

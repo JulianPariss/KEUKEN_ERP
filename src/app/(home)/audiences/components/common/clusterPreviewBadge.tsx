@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@repo/devextreme';
 import notify from "devextreme/ui/notify";
 import { IFCustomerRuleSet, IFClusterPreviewResult } from "@repo/api-contracts/erp";
-import { clusterRulesService } from "@/app/services/audiences/clusterRules.service";
+import { clusterRulesService } from "@repo/erp-services/audiences/clusterRules.service";
 import { customerStrategy } from "../customer/customerStrategy";
 
 export interface ClusterPreviewBadgeProps {

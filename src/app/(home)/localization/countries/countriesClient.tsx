@@ -2,10 +2,10 @@
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { countriesService } from "@/app/services/location_services/countries.service";
-import { currenciesService } from "@/app/services/payments_services/currencies.service";
+import { countriesService } from "@repo/erp-services/location_services/countries.service";
+import { currenciesService } from "@repo/erp-services/payments_services/currencies.service";
 import { IFCurrency } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

@@ -1,6 +1,6 @@
 'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import notify from "devextreme/ui/notify";
 import CustomStore from "devextreme/data/custom_store";
 import { CheckBox } from 'devextreme-react/check-box';
-import { temperatureService } from "@/app/services/product_services/temperature.service";
+import { temperatureService } from "@repo/erp-services/product_services/temperature.service";
 import TemperatureModal from "./actions/temperatureModal";
 
 const TemperatureLevelsList = () => {

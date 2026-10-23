@@ -4,9 +4,22 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@repo/product-ui/*": [
+        "../../packages/product-ui/src/*"
+      ],
+      "@repo/erp-services/*": [
+        "../../packages/erp-services/src/*"
+      ],
+      "@repo/erp-api-client": [
+        "../../packages/erp-api-client/src/index.ts"
+      ],
+      "@repo/erp-api-client/*": [
+        "../../packages/erp-api-client/src/*"
       ]
     }
   },
+
   "include": [
     "next-env.d.ts",
     "**/*.ts",

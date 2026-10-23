@@ -1,11 +1,11 @@
 'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
 
-import { zonesService } from "@/app/services/zones.service";
+import { zonesService } from "@repo/erp-services/zones.service";
 import { deliveryZones } from "@/app/lib/utils/prittier";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

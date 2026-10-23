@@ -1,5 +1,5 @@
 import SectionHeader from "../components/section/sectionHeader";
-import ProductTabs from "./components/tabs/tabs";
+import ProductTabs from "@repo/product-ui/components/tabs/tabs";
 
 const ProductsPage = () => {
     return (

@@ -2,9 +2,9 @@
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { salesRoutesService } from "@/app/services/priceLists/salesRoutes.service";
-import { usersService } from "@/app/services/users.service";
-import zonesService from "@/app/services/zones.service";
+import { salesRoutesService } from "@repo/erp-services/priceLists/salesRoutes.service";
+import { usersService } from "@repo/erp-services/users.service";
+import zonesService from "@repo/erp-services/zones.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";

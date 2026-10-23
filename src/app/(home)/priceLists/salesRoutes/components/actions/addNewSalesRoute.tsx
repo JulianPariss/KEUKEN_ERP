@@ -1,6 +1,6 @@
 'use client';
 
-import { salesRoutesService } from '@/app/services/priceLists/salesRoutes.service';
+import { salesRoutesService } from '@repo/erp-services/priceLists/salesRoutes.service';
 import { IFSalesRoute, IFSalesRouteCreate } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@repo/devextreme';

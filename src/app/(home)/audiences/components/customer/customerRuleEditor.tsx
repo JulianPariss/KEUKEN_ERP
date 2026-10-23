@@ -10,9 +10,9 @@ import {
     IFCustomerRuleSet,
     IFPredicate
 } from "@repo/api-contracts/erp";
-import { customerClustersService } from "@/app/services/audiences/customerClusters.service";
-import { itemClustersService } from "@/app/services/audiences/itemClusters.service";
-import { categoriesService } from "@/app/services/product_services/categories.service";
+import { customerClustersService } from "@repo/erp-services/audiences/customerClusters.service";
+import { itemClustersService } from "@repo/erp-services/audiences/itemClusters.service";
+import { categoriesService } from "@repo/erp-services/product_services/categories.service";
 import { IFCategory } from "@repo/api-contracts/erp";
 
 import {

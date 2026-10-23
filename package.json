@@ -11,7 +11,13 @@
   },
   "dependencies": {
     "@repo/api-contracts": "workspace:*",
+    "@repo/erp-api-client": "workspace:*",
+    "@repo/erp-services": "workspace:*",
+    "@repo/product-ui": "workspace:*",
     "@repo/custom-components": "workspace:*",
+
+
+
     "@repo/devextreme": "workspace:*",
     "@repo/icons": "workspace:*",
     "@repo/map-core": "workspace:*",

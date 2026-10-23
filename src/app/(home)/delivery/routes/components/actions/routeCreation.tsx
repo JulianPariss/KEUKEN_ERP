@@ -1,7 +1,7 @@
 "use client";
 
-import { routesService } from "@/app/services/routes.service";
-import { vehiclesService } from "@/app/services/vehicles.service";
+import { routesService } from "@repo/erp-services/routes.service";
+import { vehiclesService } from "@repo/erp-services/vehicles.service";
 import { IFRouteCreate } from "@repo/api-contracts/erp";
 import { IFVehicle } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,7 +12,7 @@ import notify from "devextreme/ui/notify";
 import "devextreme-react/select-box";
 import "devextreme-react/text-box";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usersService } from "@/app/services/users.service";
+import { usersService } from "@repo/erp-services/users.service";
 import { IFUser } from "@repo/api-contracts/erp";
 
 interface RouteCreationModalProps {

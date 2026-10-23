@@ -1,9 +1,9 @@
 "use client";
 
-import { providerService } from "@/app/services/location_services/provider.service";
-import { countriesService } from "@/app/services/location_services/countries.service";
-import { statesService } from "@/app/services/location_services/states.service";
-import { citiesService } from "@/app/services/location_services/cities.service";
+import { providerService } from "@repo/erp-services/location_services/provider.service";
+import { countriesService } from "@repo/erp-services/location_services/countries.service";
+import { statesService } from "@repo/erp-services/location_services/states.service";
+import { citiesService } from "@repo/erp-services/location_services/cities.service";
 import { IFProvider, IFProviderCreation, IFProviderUpdate } from "@repo/api-contracts/erp";
 import { IFCountry } from "@repo/api-contracts/erp";
 import { IFState } from "@repo/api-contracts/erp";

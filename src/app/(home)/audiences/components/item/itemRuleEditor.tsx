@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { SelectBox } from "@repo/devextreme";
 import { useAuth } from "@/contexts/AuthContext";
 import { IFItemRuleSet, ScopeType } from "@repo/api-contracts/erp";
-import { categoriesService } from "@/app/services/product_services/categories.service";
-import { itemClustersService } from "@/app/services/audiences/itemClusters.service";
+import { categoriesService } from "@repo/erp-services/product_services/categories.service";
+import { itemClustersService } from "@repo/erp-services/audiences/itemClusters.service";
 import { IFCategory } from "@repo/api-contracts/erp";
 
 export interface ItemRuleEditorProps {

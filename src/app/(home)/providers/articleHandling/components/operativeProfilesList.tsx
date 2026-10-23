@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import notify from "devextreme/ui/notify";
-import { operativeProfileService } from "@/app/services/product_services/operativeProfile.service";
+import { operativeProfileService } from "@repo/erp-services/product_services/operativeProfile.service";
 import { IFOperativeProfile } from "@repo/api-contracts/erp";
 const OperativeProfilesList = () => {
     const { currentCompany, token } = useAuth();

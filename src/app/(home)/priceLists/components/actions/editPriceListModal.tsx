@@ -6,7 +6,7 @@ import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import { PRICE_LIST_STATES, FIELD_LIMITS } from "@/app/lib/constants/common.constants";
 import { IFPriceList, IFPriceListUpdate } from "@repo/api-contracts/erp";
 

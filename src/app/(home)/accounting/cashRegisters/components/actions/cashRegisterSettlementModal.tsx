@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
-import { cashRegistersService } from "@/app/services/accountant/cashRegisters.service";
+import { cashRegistersService } from "@repo/erp-services/accountant/cashRegisters.service";
 import { IFCashRegister, IFCashRegisterSettlementCreation, IFCashRegisterSettlementResponse } from "@repo/api-contracts/erp";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

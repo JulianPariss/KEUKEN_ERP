@@ -14,74 +14,65 @@ Este error ocurre cuando un token de autenticación contiene permisos o acceso a
 
 ## 1. Patrón en los Servicios (Service Layer)
 
-En cada método de los archivos de servicio (`src/app/services/**/*.service.ts`):
+En cada método de `@repo/erp-services/**/*.service.ts`:
 
 1. **Aceptar `companyId?: string`** como parámetro adicional (o requerido) en los métodos de la API (`getAll`, `getById`, `create`, `update`, `delete`).
 2. **Incluir `company_id` como Query Parameter (`?company_id=${encodeURIComponent(companyId)}`)** en la URL de las peticiones HTTP (`GET`, `POST`, `PATCH`, `PUT`, `DELETE`).
-3. **Para peticiones `POST` / `PATCH` / `PUT` / `DELETE`**, adjuntar también `company_id` en el body JSON enviado si el endpoint lo requiere.
+3. **Pasar `companyId` en el contexto de `apiFetch`** (`{ token, companyId }`) para inyectar `X-Company-Id`.
+4. **Para peticiones `POST` / `PATCH` / `PUT` / `DELETE`**, adjuntar también `company_id` en el body JSON si el endpoint lo requiere.
 
 ### Ejemplo de Implementación en Servicio:
 
 ```typescript
+import { apiFetch, EXAMPLE_URL } from "@repo/erp-api-client";
+
 export const exampleEntityService = {
     async getAll(token: string, companyId?: string): Promise<IFListV2<IFEntity>> {
-        try {
-            const url = companyId
-                ? `${BASE_URL}/entities?company_id=${encodeURIComponent(companyId)}`
-                : `${BASE_URL}/entities`;
+        const url = companyId
+            ? `${EXAMPLE_URL}?company_id=${encodeURIComponent(companyId)}`
+            : EXAMPLE_URL;
 
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-            ...
-        } catch (error) {
-            console.error("Error en getAllEntities:", error);
-            throw error;
-        }
+        return apiFetch(
+            url,
+            { method: "GET" },
+            "No se pudieron obtener los registros",
+            { token, companyId }
+        );
     },
 
     async create(data: IFEntityCreate, token: string, companyId?: string): Promise<any> {
-        try {
-            const mappedData = mapEntityToCreate(data);
-            const targetCompanyId = companyId || data.companyId;
-            const payload = targetCompanyId ? { ...mappedData, company_id: targetCompanyId } : mappedData;
-            const url = targetCompanyId
-                ? `${BASE_URL}/entities?company_id=${encodeURIComponent(targetCompanyId)}`
-                : `${BASE_URL}/entities`;
+        const mappedData = mapEntityToCreate(data);
+        const targetCompanyId = companyId || data.companyId;
+        const payload = targetCompanyId
+            ? { ...mappedData, company_id: targetCompanyId }
+            : mappedData;
+        const url = targetCompanyId
+            ? `${EXAMPLE_URL}?company_id=${encodeURIComponent(targetCompanyId)}`
+            : EXAMPLE_URL;
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: JSON.stringify(payload),
-            });
-            ...
-        } catch (error) { ... }
+        return apiFetch(
+            url,
+            { method: "POST", body: JSON.stringify(payload) },
+            "No se pudo crear el registro",
+            { token, companyId: targetCompanyId }
+        );
     },
 
     async delete(id: string, token: string, companyId?: string): Promise<any> {
-        try {
-            const url = companyId
-                ? `${BASE_URL}/entities/${id}?company_id=${encodeURIComponent(companyId)}`
-                : `${BASE_URL}/entities/${id}`;
+        const url = companyId
+            ? `${EXAMPLE_URL}/${id}?company_id=${encodeURIComponent(companyId)}`
+            : `${EXAMPLE_URL}/${id}`;
 
-            const response = await fetch(url, {
+        return apiFetch(
+            url,
+            {
                 method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
                 ...(companyId ? { body: JSON.stringify({ company_id: companyId }) } : {}),
-            });
-            ...
-        } catch (error) { ... }
-    }
+            },
+            "No se pudo eliminar el registro",
+            { token, companyId }
+        );
+    },
 };
 ```
 
@@ -125,6 +116,7 @@ En todos los componentes React (`*Client.tsx`, modales, formularios, hooks):
 Cuando ocurra un error de `company_id`:
 - [ ] ¿El método del servicio acepta el parámetro `companyId`?
 - [ ] ¿La URL de la petición incluye `?company_id=${companyId}`?
+- [ ] ¿Se pasa `{ token, companyId }` al contexto de `apiFetch`?
 - [ ] ¿El componente consumidor extrae `currentCompany` de `useAuth()`?
 - [ ] ¿El componente pasa `currentCompany?.id` a la llamada del servicio?
 - [ ] ¿El arreglo de dependencias (`useMemo` / `useEffect`) incluye `currentCompany?.id`?

@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { inventoryService } from "@/app/services/warehouse/inventory.service";
+import { inventoryService } from "@repo/erp-services/warehouse/inventory.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "@/contexts/LocationsContext";
 import { Button } from '@repo/devextreme';

@@ -1,6 +1,6 @@
 'use client';
 
-import { accountsService } from '@/app/services/accountant/accounts.service';
+import { accountsService } from '@repo/erp-services/accountant/accounts.service';
 import { useAccounting } from '@/contexts/AccountingContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@repo/devextreme';

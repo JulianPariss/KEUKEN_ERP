@@ -1,6 +1,6 @@
 "use server";
 
-import { productsService } from "../services/product_services/products.service";
+import { productsService } from "@repo/erp-services/product_services/products.service";
 import { updateTag } from "next/cache";
 
 export async function revalidateProducts() {

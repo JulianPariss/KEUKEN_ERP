@@ -1,6 +1,6 @@
 "use client";
 
-import { locationService } from "@/app/services/warehouse/locations.service";
+import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoadPanel, TextBox } from "devextreme-react";
 import { Button } from '@repo/devextreme';

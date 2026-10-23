@@ -6,19 +6,19 @@ import SectionHeader from '../components/section/sectionHeader';
 import ColumnToggleTabs, {
     type IProductColumnState,
     type TProductColumnId,
-} from '../products/components/columnToggleTabs';
+} from '@repo/product-ui/components/columnToggleTabs';
 
 // Clientes dinámicos cargados una sola vez a nivel de módulo
 const ProductsClient = dynamic(
-    () => import('../products/components/tabs/productsList'),
+    () => import('@repo/product-ui/components/tabs/productsList'),
     { ssr: false }
 );
 const ItemsClient = dynamic(
-    () => import('../products/components/tabs/itemList'),
+    () => import('@repo/product-ui/components/tabs/itemList'),
     { ssr: false }
 );
 const PresentationsClient = dynamic(
-    () => import('../products/components/tabs/presentationsList'),
+    () => import('@repo/product-ui/components/tabs/presentationsList'),
     { ssr: false }
 );
 
@@ -166,7 +166,7 @@ const ProductsPageV2 = () => {
 
     const handlePreloadCreation = useCallback(() => {
         if (typeof window !== "undefined") {
-            void import("../products/components/modals/fullAdditions/creation");
+            void import("@repo/product-ui/components/modals/fullAdditions/creation");
         }
     }, []);
 

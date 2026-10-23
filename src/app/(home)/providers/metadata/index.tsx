@@ -11,7 +11,7 @@ import CustomStore from "devextreme/data/custom_store";
 import { CheckBox } from 'devextreme-react/check-box';
 import notify from "devextreme/ui/notify";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { metadataService } from "@/app/services/metadata.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
 import { IFMetadataAttribute, IFMetadataGroup } from "@repo/api-contracts/erp";
 import MetadataAttributeModal from "./components/actions/metadataAttributeModal";
 

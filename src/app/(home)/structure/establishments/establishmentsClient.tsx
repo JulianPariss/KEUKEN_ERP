@@ -3,9 +3,9 @@ import { useRecovery } from "@/contexts/RecoveryContext";
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { establishmentsService } from "@/app/services/userContext/establishments.service";
+import { establishmentsService } from "@repo/erp-services/userContext/establishments.service";
 import { IFEstablishment } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

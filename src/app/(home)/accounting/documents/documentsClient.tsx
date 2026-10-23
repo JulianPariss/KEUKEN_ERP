@@ -1,6 +1,6 @@
 'use client';
 
-import { documentsService } from "@/app/services/documents.service";
+import { documentsService } from "@repo/erp-services/documents.service";
 import { parseDevExtremeFilterToBackend } from "@repo/api-contracts/erp";
 import { IBDocumentsListParams } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';

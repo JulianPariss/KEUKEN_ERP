@@ -1,6 +1,6 @@
 "use client";
 
-import { cashRegistersService } from "@/app/services/accountant/cashRegisters.service";
+import { cashRegistersService } from "@repo/erp-services/accountant/cashRegisters.service";
 import { IFCashRegister, IFCashRegisterCreation, IFCashRegisterType } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

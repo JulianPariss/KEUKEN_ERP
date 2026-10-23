@@ -6,7 +6,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { inventoryService } from "@/app/services/warehouse/inventory.service";
+import { inventoryService } from "@repo/erp-services/warehouse/inventory.service";
 
 interface ReserveModalProps {
     onHiding: () => void;

@@ -52,11 +52,11 @@ Asegurar que las interfaces frontend y backend incluyan los campos opcionales de
   deletedByName: entidad.deleted_by_name,
   ```
 
-### Paso 2: Servicio API (`*.service.ts`)
-Toda función de lectura (`getAll`) y mutación (`create`, `update`, `delete`) **DEBE OBLIGATORIAMENTE** utilizar `getOperationalHeaders(token, companyId)` para enviar automáticamente las cabeceras de `RecoveryMode`, `RecoveryVisibility` y `CompanyId`:
+### Paso 2: Servicio API (`@repo/erp-services/**/*.service.ts`)
+Toda función de lectura (`getAll`) y mutación (`create`, `update`, `delete`) **DEBE OBLIGATORIAMENTE** usar `apiFetch` de `@repo/erp-api-client`, que inyecta cabeceras de `RecoveryMode`, `RecoveryVisibility` y `CompanyId`:
 
 ```typescript
-import { getOperationalHeaders } from "@/app/lib/utils/api.helper";
+import { apiFetch, API_URL } from "@repo/erp-api-client";
 
 export const miEntidadService = {
     async getAll(token: string, companyId?: string): Promise<IFListV2<IFEntidad>> {
@@ -64,11 +64,12 @@ export const miEntidadService = {
             ? `${API_URL}?company_id=${encodeURIComponent(companyId)}`
             : API_URL;
 
-        const response = await fetch(url, {
-            method: "GET",
-            headers: getOperationalHeaders(token, companyId),
-        });
-        // ...
+        return apiFetch(
+            url,
+            { method: "GET" },
+            "No se pudieron obtener los registros",
+            { token, companyId }
+        );
     }
 };
 ```
@@ -77,9 +78,13 @@ export const miEntidadService = {
 **REGLA DE ORO PARA SELECTORES Y DROPDOWNS (`SelectBox`, `Lookup`, Filtros de Entidad Padre, Modales)**:
 - Toda llamada a servicio o fetch destinado a poblar un selector desplegable (ej. `fetchCountries`, `fetchStates`, `fetchCurrencies`, etc.) **DEBE OBLIGATORIAMENTE** ejecutarse con `recoveryMode` deshabilitado (`{ recoveryMode: false }`).
 - Los selectores permiten elegir únicamente elementos vigentes y no eliminados. Sus consultas fetch no deben reaccionar al estado de `isRecoveryMode`.
-- **Implementación**: Pasar `{ recoveryMode: false }` al invocar `getOperationalHeaders`:
+- **Implementación**: pasar `recoveryOptions` en el contexto de `apiFetch`:
   ```typescript
-  getOperationalHeaders(token, companyId, undefined, { recoveryMode: false })
+  await apiFetch(url, { method: "GET" }, "…", {
+      token,
+      companyId,
+      recoveryOptions: { recoveryMode: false },
+  });
   ```
   O pasar un parámetro explícito al servicio (ej. `ignoreRecovery: true` / `disableRecovery: true`).
 

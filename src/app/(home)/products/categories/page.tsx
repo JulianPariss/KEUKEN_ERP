@@ -1,5 +1,5 @@
 import SectionHeader from "../../components/section/sectionHeader";
-import CategoriesClient from "./categoriesClient";
+import CategoriesClient from "@repo/product-ui/categories/categoriesClient";
 
 const CategoriesPage = () => {
     return (

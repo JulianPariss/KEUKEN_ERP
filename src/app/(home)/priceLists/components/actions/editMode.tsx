@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { IFPriceListCatalogItem, IFPriceListBulkUpdateItem } from "@repo/api-contracts/erp";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import notify from "devextreme/ui/notify";
 
 interface UseEditModeProps {

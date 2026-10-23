@@ -2,7 +2,7 @@
 
 import PERMISSIONS_CONSTANTS from '@/app/lib/constants/permissions.constants';
 import { canDo } from '@/app/lib/utils/permission.helper';
-import { roleService } from '@/app/services/userContext/roles.service';
+import { roleService } from '@repo/erp-services/userContext/roles.service';
 import { TFRoles } from "@repo/api-contracts/erp";
 import { useAuth } from '@/contexts/AuthContext';
 import Box, { Item } from 'devextreme-react/box';

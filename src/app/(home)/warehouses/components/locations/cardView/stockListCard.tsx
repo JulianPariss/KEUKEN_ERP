@@ -2,7 +2,7 @@
 
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { stockService } from "@/app/services/stock.service";
+import { stockService } from "@repo/erp-services/stock.service";
 import { IFStockByLocation, IFStockByLocationItem } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoadIndicator } from "devextreme-react";

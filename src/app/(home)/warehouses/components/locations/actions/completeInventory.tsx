@@ -7,7 +7,7 @@ import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "@/contexts/LocationsContext";
-import { inventoryService } from "@/app/services/warehouse/inventory.service";
+import { inventoryService } from "@repo/erp-services/warehouse/inventory.service";
 
 interface CompleteInventoryProps {
     onHiding: () => void;

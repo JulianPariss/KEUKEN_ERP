@@ -1,6 +1,6 @@
 "use client";
 
-import { paymentMethodsService } from "@/app/services/payments_services/paymentMethods.service";
+import { paymentMethodsService } from "@repo/erp-services/payments_services/paymentMethods.service";
 import { IFPaymentMethod, IFPaymentMethodCreation, IFPaymentMethodsUpdate } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

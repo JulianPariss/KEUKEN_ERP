@@ -1,7 +1,7 @@
 "use client";
 
-import { codelistsService } from "@/app/services/codelists.service";
-import { taxCategoriesService } from "@/app/services/payments_services/taxCategories.service";
+import { codelistsService } from "@repo/erp-services/codelists.service";
+import { taxCategoriesService } from "@repo/erp-services/payments_services/taxCategories.service";
 import { IFCodelistTaxCategory } from "@repo/api-contracts/erp";
 import { IFTaxCategoryCreation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

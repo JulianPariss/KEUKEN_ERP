@@ -1,7 +1,7 @@
 "use client";
 
-import { countriesService } from "@/app/services/location_services/countries.service";
-import { currenciesService } from "@/app/services/payments_services/currencies.service";
+import { countriesService } from "@repo/erp-services/location_services/countries.service";
+import { currenciesService } from "@repo/erp-services/payments_services/currencies.service";
 import { IFCountryCreation } from "@repo/api-contracts/erp";
 import { IFCurrency } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

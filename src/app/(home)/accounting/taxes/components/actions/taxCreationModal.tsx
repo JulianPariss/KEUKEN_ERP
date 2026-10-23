@@ -1,8 +1,8 @@
 'use client';
 
-import { accountsService } from '@/app/services/accountant/accounts.service';
-import { taxesService } from '@/app/services/accountant/taxes.service';
-import { localizationService } from '@/app/services/localization.service';
+import { accountsService } from '@repo/erp-services/accountant/accounts.service';
+import { taxesService } from '@repo/erp-services/accountant/taxes.service';
+import { localizationService } from '@repo/erp-services/localization.service';
 import { IFAccount } from "@repo/api-contracts/erp";
 import { IFTax } from "@repo/api-contracts/erp";
 import { IFTaxAuthorityScheme } from "@repo/api-contracts/erp";

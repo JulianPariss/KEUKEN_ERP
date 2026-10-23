@@ -8,7 +8,7 @@ import notify from "devextreme/ui/notify";
 import CustomStore from "devextreme/data/custom_store";
 import { useEffect, useMemo } from "react";
 import LocationsAdjustInventory from "../actions/inventory";
-import { inventoryService } from "@/app/services/warehouse/inventory.service";
+import { inventoryService } from "@repo/erp-services/warehouse/inventory.service";
 
 const StockList = () => {
     const { fetchStock, stock, loadingStock, selectedLocation, activeInventory, setActiveInventory } = useLocations();

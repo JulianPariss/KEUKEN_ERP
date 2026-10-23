@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Form, { SimpleItem, GroupItem, TabbedItem, Tab } from "devextreme-react/form";
 import { GenericButton as Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { metadataService } from "@/app/services/metadata.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
 import { IFMetadataAttribute, IFMetadataGroup, IFMetadataFieldsProps } from "@repo/api-contracts/erp";
 import MetadataEmptyState from "./MetadataEmptyState";
 import notify from "devextreme/ui/notify";

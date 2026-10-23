@@ -1,7 +1,7 @@
 "use client";
 
-import { citiesService } from "@/app/services/location_services/cities.service";
-import { statesService } from "@/app/services/location_services/states.service";
+import { citiesService } from "@repo/erp-services/location_services/cities.service";
+import { statesService } from "@repo/erp-services/location_services/states.service";
 import { IFCitieCreation } from "@repo/api-contracts/erp";
 import { IFState } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

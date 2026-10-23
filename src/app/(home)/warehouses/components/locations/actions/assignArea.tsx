@@ -6,7 +6,7 @@ import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { areaService } from "@/app/services/warehouse/areas.service";
+import { areaService } from "@repo/erp-services/warehouse/areas.service";
 import { IFArea } from "@repo/api-contracts/erp";
 import { IFLocation } from "@repo/api-contracts/erp";
 

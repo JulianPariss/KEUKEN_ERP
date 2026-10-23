@@ -1,7 +1,7 @@
 'use client';
 
-import { locationService } from "@/app/services/warehouse/locations.service";
-import { warehouseService } from "@/app/services/warehouse/warehouse.service";
+import { locationService } from "@repo/erp-services/warehouse/locations.service";
+import { warehouseService } from "@repo/erp-services/warehouse/warehouse.service";
 import { IFLocation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "@/contexts/LocationsContext";

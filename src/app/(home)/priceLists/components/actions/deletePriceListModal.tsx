@@ -5,7 +5,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { priceListsService } from "@/app/services/priceLists/priceLists.service";
+import { priceListsService } from "@repo/erp-services/priceLists/priceLists.service";
 import { IFPriceList } from "@repo/api-contracts/erp";
 
 interface DeletePriceListModalProps {

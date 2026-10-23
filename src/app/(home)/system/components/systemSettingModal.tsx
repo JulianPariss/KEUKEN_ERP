@@ -1,6 +1,6 @@
 "use client";
 
-import { systemService } from "@/app/services/system.service";
+import { systemService } from "@repo/erp-services/system.service";
 import { IFSystemSetting, IFSystemSettingUpdate } from "@repo/api-contracts/erp";
 import { SYSTEM_KEY_TEMPLATES } from "@/app/lib/constants/systemKeys.constants";
 import { useAuth } from "@/contexts/AuthContext";

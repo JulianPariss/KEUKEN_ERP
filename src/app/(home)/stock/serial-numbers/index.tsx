@@ -1,7 +1,7 @@
 "use client";
 
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { canDo } from "@/app/lib/utils/permission.helper";
@@ -14,8 +14,8 @@ import CustomStore from "devextreme/data/custom_store";
 import CheckBox from "devextreme-react/check-box";
 import notify from "devextreme/ui/notify";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
-import { serialNumbersService } from "@/app/services/serialNumbers.service";
-import { itemsService } from "@/app/services/product_services/items.service";
+import { serialNumbersService } from "@repo/erp-services/serialNumbers.service";
+import { itemsService } from "@repo/erp-services/product_services/items.service";
 import { IFOptionItem } from "@repo/api-contracts/erp";
 import { SERIAL_NUMBER_STATES } from "@/app/lib/constants/common.constants";
 import SerialNumberModal from "./components/actions/serialNumberModal";

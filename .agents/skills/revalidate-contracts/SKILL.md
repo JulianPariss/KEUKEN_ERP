@@ -14,7 +14,7 @@ Skill operativa para auditar y sincronizar los tipos TypeScript del backend (`ba
 - **`contracts.json`**: Especificación OpenAPI 3.1.0 canónica del backend.
 - **`audit-pairs.json`**: Registro central de pares a auditar (`ts_interface` en `backendTypes` vs `backend_schema` de OpenAPI).
 - **`scripts/verify_contracts.py`**: Motor de auditoría. Compara tipos, imprime el estado en consola y regenera los reportes en `results/`.
-- **`scripts/scan_services.py`**: Utilidad para inspeccionar llamadas y mapeo de endpoints desde `api.constants.ts`.
+- **`scripts/scan_services.py`**: Utilidad para inspeccionar llamadas y mapeo de endpoints desde `@repo/erp-api-client` + `@repo/erp-services`.
 - **`results/services-gaps.md`**: Reporte global persistente con el desglose de discrepancias de todos los modelos.
 - **`results/services-unuseds.md`**: Reporte de endpoints de la API backend no consumidos por el frontend.
 

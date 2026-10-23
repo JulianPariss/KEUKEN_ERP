@@ -14,26 +14,27 @@ Para comenzar la creación de la nueva página, se debe contar con la siguiente 
 - **Parámetros:** Cualquier otro requerimiento o parámetro relevante para el ABM.
 
 ## 2. Tipos de Datos (Types)
-A partir de la estructura proporcionada para el backend, debes crear las interfaces y tipos necesarios en la carpeta `src/app/types/`:
+A partir de la estructura proporcionada para el backend, crea interfaces en `@repo/api-contracts/erp` (backendTypes / frontendTypes).
 
 > [!IMPORTANT]
-> **Antes de crear los tipos e interfaces:** existen tipos comunes entre diferentes endpoints/servicios ya definidos. Siempre verifica si la estructura solicitada coincide o puede extender de las ya definidas en `src/app/types/backendTypes/general.types.ts` y `src/app/types/frontendTypes/general.types.ts` para evitar duplicar código.
+> Reutilizá tipos generales ya definidos en el package de contratos antes de crear nuevos.
 
-- **Backend:** Crea los tipos del backend en `src/app/types/backendTypes/` (ej. `IB[Entidad]`, `IB[Entidad]Create`, respetando snake_case si así viene).
-- **Frontend:** Crea los tipos del frontend en `src/app/types/frontendTypes/` (ej. `IF[Entidad]`, respetando camelCase).
+- **Backend:** `IB[Entidad]`, `IB[Entidad]Create` (snake_case).
+- **Frontend:** `IF[Entidad]` (camelCase).
 
 ## 3. Mappers
 
-> [!IMPORTANT]
-> **Antes de definir el mapper:** así como con los tipos, verifica si los mapeos necesarios ya se encuentran cubiertos en `src/app/types/mappers/general.mapper.ts`.
-
-Crea los mappers básicos en `src/app/types/mappers/` para transformar la información entre los tipos de Backend y Frontend:
-- Una función para mapear de Backend a Frontend (ej. `map[Entidad]`).
-- Una función para mapear de Frontend a Backend en creación/edición (ej. `map[Entidad]ToCreate`).
+Crea mappers en `@repo/api-contracts/erp` (`map[Entidad]`, `map[Entidad]ToCreate`, etc.).
 
 ## 4. Servicios
-Crea el archivo de servicio en `src/app/services/` (o una subcarpeta correspondiente a su dominio) llamado `[entidad].service.ts`.
-Este archivo debe contener los métodos básicos de CRUD (getAll, create, update, delete) llamando a la API y utilizando los mappers creados en el paso anterior.
+Crea el servicio en `@repo/erp-services/[dominio]/[entidad].service.ts` usando `apiFetch` y URLs de `@repo/erp-api-client`.
+Consumilo desde el app con:
+
+```ts
+import { exampleService } from "@repo/erp-services/[dominio]/[entidad].service";
+```
+
+Seguí la skill del package `@repo/erp-services` para el patrón de implementación.
 
 ## 5. Estructura de la Vista (Componentes y Páginas)
 Debes crear un nuevo folder con el nombre de la entidad dentro de la estructura indicada. Si no hubo una estructura indicada en el prompt, por defecto se creará dentro de `src/app/(home)/`.

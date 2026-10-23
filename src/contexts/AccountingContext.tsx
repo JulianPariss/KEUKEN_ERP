@@ -1,5 +1,5 @@
-import { accountsService } from '@/app/services/accountant/accounts.service';
-import { journalsService } from '@/app/services/accountant/journals.service';
+import { accountsService } from '@repo/erp-services/accountant/accounts.service';
+import { journalsService } from '@repo/erp-services/accountant/journals.service';
 import { IFAccountLinesList, IFAccountNode, IFAccountsTree } from "@repo/api-contracts/erp";
 import { IFJournal } from "@repo/api-contracts/erp";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';

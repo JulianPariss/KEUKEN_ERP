@@ -1,9 +1,9 @@
 'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { customersService } from "@/app/services/partners/customers.service";
+import { customersService } from "@repo/erp-services/partners/customers.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";

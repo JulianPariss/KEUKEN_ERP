@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Script utilitario para revalidar y auditar discrepancias entre:
-1. Constantes y servicios del frontend (`api.constants.ts`, `src/app/services/`)
+1. Constantes y servicios del frontend (`@repo/erp-api-client`, `@repo/erp-services`)
 2. Tipos de Backend definidos en el frontend (`packages/api-contracts/src/erp/backendTypes/`)
 3. Especificación OpenAPI del backend (`contracts.json`)
 4. Archivo de mapeos de pares dinámico (`audit-pairs.json`)
@@ -29,15 +29,14 @@ DEFAULT_OUTPUT_PATH = DEFAULT_RESULTS_DIR / "services-gaps.md"
 DEFAULT_UNUSED_OUTPUT_PATH = DEFAULT_RESULTS_DIR / "services-unuseds.md"
 
 # Ruta raíz del monorepo
-WORKSPACE_ROOT = SKILL_DIR.parents[4]  # c:\Users\julia\Desktop\Proyectos\KEUKEN_UWS
-ERP_SRC = WORKSPACE_ROOT / "apps" / "erp-next" / "src" / "app"
-API_CONSTANTS_FILE = ERP_SRC / "lib" / "constants" / "api.constants.ts"
-SERVICES_DIR = ERP_SRC / "services"
+WORKSPACE_ROOT = SKILL_DIR.parents[4]
+API_CONSTANTS_FILE = WORKSPACE_ROOT / "packages" / "erp-api-client" / "src" / "constants.ts"
+SERVICES_DIR = WORKSPACE_ROOT / "packages" / "erp-services" / "src"
 BACKEND_TYPES_DIR = WORKSPACE_ROOT / "packages" / "api-contracts" / "src" / "erp" / "backendTypes"
 
 
 def parse_api_constants():
-    """Lee api.constants.ts y resuelve el mapa de constantes a URLs relativas."""
+    """Lee erp-api-client/constants.ts y resuelve el mapa de constantes a URLs relativas."""
     constants = {}
     if not API_CONSTANTS_FILE.exists():
         return constants

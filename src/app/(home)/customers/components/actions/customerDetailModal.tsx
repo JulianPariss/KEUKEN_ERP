@@ -1,4 +1,4 @@
-import { customersService } from "@/app/services/partners/customers.service";
+import { customersService } from "@repo/erp-services/partners/customers.service";
 import { IFCustomerFull } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Popup } from "devextreme-react/popup";
@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 import React from "react";
 import notify from "devextreme/ui/notify";
 import MetadataFieldsClient from "@/components/metadata/MetadataFieldsClient";
-import { metadataService } from "@/app/services/metadata.service";
+import { metadataService } from "@repo/erp-services/metadata.service";
 
 interface CustomerDetailModalProps {
     isOpen: boolean;

@@ -1,11 +1,11 @@
 "use client";
 
-import { vehiclesService } from "@/app/services/vehicles.service";
+import { vehiclesService } from "@repo/erp-services/vehicles.service";
 import { IFVehicleCreate } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usersService } from "@/app/services/users.service";
+import { usersService } from "@repo/erp-services/users.service";
 import { IFUser } from "@repo/api-contracts/erp";
 import notify from "devextreme/ui/notify";
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";

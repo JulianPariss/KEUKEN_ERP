@@ -8,9 +8,9 @@ import CustomStore from "devextreme/data/custom_store";
 import notify from "devextreme/ui/notify";
 import { useMemo, useRef, useState, useEffect } from "react";
 
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { providerService } from "@/app/services/location_services/provider.service";
+import { providerService } from "@repo/erp-services/location_services/provider.service";
 import { IFListBasicParams } from "@repo/api-contracts/erp";
 import { IFProvider } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

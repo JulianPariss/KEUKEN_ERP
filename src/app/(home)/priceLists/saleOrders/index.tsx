@@ -1,6 +1,6 @@
 'use client';
 
-import { saleOrdersService } from "@/app/services/priceLists/saleOrders.service";
+import { saleOrdersService } from "@repo/erp-services/priceLists/saleOrders.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";

@@ -1,7 +1,7 @@
 'use client';
 
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { salesChannelsService } from "@/app/services/salesChannels.service";
+import { salesChannelsService } from "@repo/erp-services/salesChannels.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";

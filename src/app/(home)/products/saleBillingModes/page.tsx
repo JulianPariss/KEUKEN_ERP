@@ -1,10 +1,10 @@
 import SectionHeader from "../../components/section/sectionHeader";
-import SaleBillingModesClient from "./saleBillingModesClient";
+import SaleBillingModesClient from "@repo/product-ui/saleBillingModes/saleBillingModesClient";
 
 const SaleBillingModesPage = () => {
     return (
         <div className="flex flex-col w-full h-full gap-y-2 overflow-hidden">
-            <SectionHeader title="Modos de Venta" />
+            <SectionHeader title="Modos de facturación" />
             <SaleBillingModesClient />
         </div>
     );

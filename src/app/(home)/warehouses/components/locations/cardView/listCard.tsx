@@ -4,7 +4,7 @@ import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
 import { useDelayedLoading } from "@/app/lib/hooks/useDelayedLoading";
 import { useInfiniteScroll } from "@/app/lib/hooks/useInfiniteScroll";
 import { canDo } from "@/app/lib/utils/permission.helper";
-import { locationService } from "@/app/services/warehouse/locations.service";
+import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFLocation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "@/contexts/LocationsContext";

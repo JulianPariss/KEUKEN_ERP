@@ -1,8 +1,8 @@
 'use client';
 
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { fragilityService } from "@/app/services/product_services/fragility.service";
+import { fragilityService } from "@repo/erp-services/product_services/fragility.service";
 import { IFFragilityClass } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

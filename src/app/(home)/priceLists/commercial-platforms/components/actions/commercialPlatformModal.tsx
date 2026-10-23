@@ -5,7 +5,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import { Button } from '@repo/devextreme';
 import Form, { SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
-import { commercialPlatformsService } from "@/app/services/partners/commercialPlatforms.service";
+import { commercialPlatformsService } from "@repo/erp-services/partners/commercialPlatforms.service";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface CommercialPlatformModalProps {

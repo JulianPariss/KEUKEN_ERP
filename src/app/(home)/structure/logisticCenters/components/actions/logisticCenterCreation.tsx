@@ -1,7 +1,7 @@
 "use client";
 
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
-import { logisticsCentersService } from "@/app/services/userContext/logisticsCenters.service";
+import { logisticsCentersService } from "@repo/erp-services/userContext/logisticsCenters.service";
 import { IFLogisticsCenter, IFLogisticsCenterCreate } from "@repo/api-contracts/erp";
 import { GenericButton } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

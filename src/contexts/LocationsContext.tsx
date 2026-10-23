@@ -2,8 +2,8 @@
 
 import PERMISSIONS_CONSTANTS from '@/app/lib/constants/permissions.constants';
 import { canDo } from '@/app/lib/utils/permission.helper';
-import { inventoryService } from '@/app/services/warehouse/inventory.service';
-import { stockService } from '@/app/services/stock.service';
+import { inventoryService } from '@repo/erp-services/warehouse/inventory.service';
+import { stockService } from '@repo/erp-services/stock.service';
 import { IFInventory } from "@repo/api-contracts/erp";
 import { IFStockByLocation } from "@repo/api-contracts/erp";
 import notify from 'devextreme/ui/notify';

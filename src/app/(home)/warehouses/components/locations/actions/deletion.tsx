@@ -7,7 +7,7 @@ import { CheckBox } from "devextreme-react/check-box";
 import notify from "devextreme/ui/notify";
 import { Button } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
-import { locationService } from "@/app/services/warehouse/locations.service";
+import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFLocation } from "@repo/api-contracts/erp";
 
 interface LocationDeletionProps {

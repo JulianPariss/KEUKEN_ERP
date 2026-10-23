@@ -1,8 +1,8 @@
 'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { commonService } from "@/app/services/common.service";
+import { commonService } from "@repo/erp-services/common.service";
 
-import { usersService } from '@/app/services/users.service';
+import { usersService } from '@repo/erp-services/users.service';
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from '@/contexts/AuthContext';
 import { createGridPrinter } from '@/lib/printer/gridPrinter';

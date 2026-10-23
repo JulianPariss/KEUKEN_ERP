@@ -5,7 +5,7 @@ description: Guía y pasos obligatorios para migrar servicios existentes al clie
 
 # Instructivo de Migración de Servicios a `apiFetch`
 
-Este documento sirve como guía paso a paso para migrar cualquier servicio existente en `src/app/services` al nuevo estándar de cliente HTTP centralizado (`apiFetch`).
+Este documento sirve como guía paso a paso para migrar cualquier servicio en `@repo/erp-services` al cliente HTTP centralizado `apiFetch` de `@repo/erp-api-client`.
 
 ## Objetivo de la Migración
 Eliminar el uso directo de `fetch` y la evaluación manual de `!response.ok` en favor de `apiFetch`, el cual:
@@ -22,12 +22,12 @@ Reemplaza la importación de `getOperationalHeaders` por `apiFetch`. Si el servi
 
 **Antes:**
 ```typescript
-import { getOperationalHeaders } from "@/app/lib/utils/api.helper";
+import { getOperationalHeaders } from "@repo/erp-api-client"; // legacy
 ```
 
 **Después:**
 ```typescript
-import { apiFetch } from "@/app/lib/utils/apiClient.helper";
+import { apiFetch } from "@repo/erp-api-client";
 ```
 
 ### 2. Modificar la Llamada HTTP
@@ -168,7 +168,7 @@ En su lugar, consume dinámicamente `error.message`, el cual contiene el mensaje
 Si el componente necesita reaccionar a códigos HTTP específicos (ej. 422 de validación o 403 sin permisos):
 
 ```typescript
-import { ApiError } from "@/app/lib/utils/apiError.helper";
+import { ApiError } from "@repo/erp-api-client";
 
 } catch (error: any) {
     console.error("Error en la operación:", error);

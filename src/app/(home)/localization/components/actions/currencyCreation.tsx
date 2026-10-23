@@ -1,6 +1,6 @@
 "use client";
 
-import { currenciesService } from "@/app/services/payments_services/currencies.service";
+import { currenciesService } from "@repo/erp-services/payments_services/currencies.service";
 import { IFCurrencyCreation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@repo/devextreme';

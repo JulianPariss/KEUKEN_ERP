@@ -1,6 +1,6 @@
 'use client';
 
-import { stockService } from "@/app/services/stock.service";
+import { stockService } from "@repo/erp-services/stock.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";

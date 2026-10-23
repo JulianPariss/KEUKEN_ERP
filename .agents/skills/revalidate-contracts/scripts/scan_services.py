@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script utilitario para escanear y extraer las rutas de la API invocadas en src/app/services.
-Cruza las constantes de api.constants.ts con los métodos de servicio, contracts.json (OpenAPI)
-y audit-pairs.json para identificar endpoints encolados vs pendientes de auditar.
+Script utilitario para escanear y extraer las rutas de la API invocadas en @repo/erp-services.
+Cruza las constantes de @repo/erp-api-client (constants.ts) con los métodos de servicio,
+contracts.json (OpenAPI) y audit-pairs.json para identificar endpoints encolados vs pendientes.
 """
 
 import sys
@@ -18,15 +18,15 @@ if hasattr(sys.stdout, "reconfigure"):
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 WORKSPACE_ROOT = SKILL_DIR.parents[4]
-SERVICES_DIR = WORKSPACE_ROOT / "apps" / "erp-next" / "src" / "app" / "services"
-API_CONSTANTS_FILE = WORKSPACE_ROOT / "apps" / "erp-next" / "src" / "app" / "lib" / "constants" / "api.constants.ts"
+SERVICES_DIR = WORKSPACE_ROOT / "packages" / "erp-services" / "src"
+API_CONSTANTS_FILE = WORKSPACE_ROOT / "packages" / "erp-api-client" / "src" / "constants.ts"
 CONTRACTS_FILE = SKILL_DIR / "contracts.json"
 AUDIT_PAIRS_FILE = SKILL_DIR / "audit-pairs.json"
 BACKEND_TYPES_DIR = WORKSPACE_ROOT / "packages" / "api-contracts" / "src" / "erp" / "backendTypes"
 
 
 def resolve_api_constants():
-    """Lee y resuelve recursivamente las constantes definidas en api.constants.ts."""
+    """Lee y resuelve recursivamente las constantes definidas en erp-api-client/constants.ts."""
     constants = {}
     if not API_CONSTANTS_FILE.exists():
         return constants

@@ -1,9 +1,11 @@
+import "@/lib/erp-api-client.setup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DxConfigProvider } from "@/contexts/DxConfigProvider";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { BrandProvider, getBrandConfig } from "@repo/ui/brand";
 import type { Metadata } from "next";
 import './globals.css';
+
 
 export function generateMetadata(): Metadata {
   const brand = getBrandConfig();

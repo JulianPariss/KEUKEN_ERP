@@ -1,8 +1,8 @@
 import React from "react";
 import { IClusterStrategy } from "../strategy/types";
-import { customerClustersService } from "@/app/services/audiences/customerClusters.service";
-import { customersService } from "@/app/services/partners/customers.service";
-import { clusterRulesService } from "@/app/services/audiences/clusterRules.service";
+import { customerClustersService } from "@repo/erp-services/audiences/customerClusters.service";
+import { customersService } from "@repo/erp-services/partners/customers.service";
+import { clusterRulesService } from "@repo/erp-services/audiences/clusterRules.service";
 import { CustomerRuleEditor } from "./customerRuleEditor";
 import { IFCustomerCluster } from "@repo/api-contracts/erp";
 import { IFCustomerRuleSet } from "@repo/api-contracts/erp";

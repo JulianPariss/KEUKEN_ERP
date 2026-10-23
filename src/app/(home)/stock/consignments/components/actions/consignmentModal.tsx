@@ -6,9 +6,9 @@ import { Button } from '@repo/devextreme';
 import Form, { SimpleItem } from "devextreme-react/form";
 import notify from "devextreme/ui/notify";
 import CustomStore from "devextreme/data/custom_store";
-import { consignmentsService } from "@/app/services/consignments.service";
-import { itemsService } from "@/app/services/product_services/items.service";
-import { customersService } from "@/app/services/partners/customers.service";
+import { consignmentsService } from "@repo/erp-services/consignments.service";
+import { itemsService } from "@repo/erp-services/product_services/items.service";
+import { customersService } from "@repo/erp-services/partners/customers.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { getZeroTimeDate } from "@/app/lib/utils/prittier";
 

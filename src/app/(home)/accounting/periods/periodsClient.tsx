@@ -1,6 +1,6 @@
 'use client';
 
-import { periodsService } from "@/app/services/accountant/periods.service";
+import { periodsService } from "@repo/erp-services/accountant/periods.service";
 import { IFPeriod } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
