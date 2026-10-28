@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useRef, useState } from 'react';
 import { localizationService } from '@repo/erp-services/localization.service';
@@ -7,8 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { CheckBox } from 'devextreme-react/check-box';
 import CustomStore from 'devextreme/data/custom_store';
 import notify from 'devextreme/ui/notify';
-import PERMISSIONS_CONSTANTS from '@/app/lib/constants/permissions.constants';
-import { canDo } from '@/app/lib/utils/permission.helper';
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 
 export default function TaxAuthoritySchemesList() {
     const { token, permissions, isSuperAdmin, includeInactive } = useAuth();

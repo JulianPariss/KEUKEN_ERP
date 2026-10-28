@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
+import PERMISSIONS_CONSTANTS from "@repo/access";
 import { useDelayedLoading } from "@/app/lib/hooks/useDelayedLoading";
 import { useInfiniteScroll } from "@/app/lib/hooks/useInfiniteScroll";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFLocation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";

@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import GenericEmpty from "@/components/GenericEmpty";
 import { useAuth } from "@/contexts/AuthContext";

@@ -86,7 +86,7 @@ export default function UsersClient() {
         <div className="flex flex-col w-full min-w-full h-full bg-dx-primary/10 rounded-dx font-sans overflow-hidden">
             <div className="w-full h-full flex flex-col gap-2">
                 <GenericDataGrid
-                            recoveryVisibility={recoveryVisibility}
+                    recoveryVisibility={recoveryVisibility}
                     ref={gridRef}
                     gridId="users-grid"
                     keyExpr="id"
@@ -163,6 +163,8 @@ export default function UsersClient() {
                 visible={isModalOpen}
                 onHiding={() => {
                     setIsModalOpen(false);
+                }}
+                onHidden={() => {
                     setSelectedUser(null);
                 }}
                 onShown={(e) => {
@@ -184,11 +186,19 @@ export default function UsersClient() {
                         onSave={async (values) => {
                             if (modalMode === 'create') {
                                 try {
+                                    const selectedRole = values.role || (values.roles && values.roles[0]) || "user";
                                     const payload = {
                                         name: values.name,
                                         login: values.login,
                                         password: values.password,
-                                        roles: values.roles || ["user"],
+                                        roles: [selectedRole],
+                                        roleAssignments: [
+                                            {
+                                                companyId: companyId,
+                                                level: 'company',
+                                                roles: [selectedRole],
+                                            }
+                                        ],
                                         companyIds: [companyId],
                                         active: values.active !== undefined ? values.active : true
                                     };
@@ -217,6 +227,8 @@ export default function UsersClient() {
                 isOpen={isPermissionsModalOpen}
                 onClose={() => {
                     setIsPermissionsModalOpen(false);
+                }}
+                onHidden={() => {
                     setSelectedUserForPermissions(null);
                 }}
                 user={selectedUserForPermissions}

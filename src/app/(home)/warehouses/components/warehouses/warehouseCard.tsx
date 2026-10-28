@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { useAuth } from "@/contexts/AuthContext";
 import { DropDownButton } from "devextreme-react/drop-down-button";
 import Link from "next/link";

@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { systemService } from "@repo/erp-services/system.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
 import { commonService } from "@repo/erp-services/common.service";
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFLocation, IFLocationSeachParams } from "@repo/api-contracts/erp";
 import { GenericDataGrid, IGenericDataGridColumn, Button } from '@repo/devextreme';

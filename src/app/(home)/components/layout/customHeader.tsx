@@ -106,8 +106,9 @@ export default function CustomHeader({ routes }: HeaderProps) {
           itemRender={renderItemWithHint}
           dropDownOptions={{
             width: 240,
+            maxHeight: 180,
             wrapperAttr: {
-              class: "popup-menu-container"
+              class: "popup-menu-container company-dropdown-popup"
             }
           }}
         />
@@ -125,8 +126,9 @@ export default function CustomHeader({ routes }: HeaderProps) {
           itemRender={renderItemWithHint}
           dropDownOptions={{
             width: 240,
+            maxHeight: 180,
             wrapperAttr: {
-              class: "popup-menu-container"
+              class: "popup-menu-container company-dropdown-popup"
             }
           }}
         />

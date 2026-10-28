@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { LoadPanel, ScrollView } from "devextreme-react";
 import { Popup, Position } from "devextreme-react/popup";
 import ValidationGroup from "devextreme-react/validation-group";
 import notify from "devextreme/ui/notify";
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { locationService } from "@repo/erp-services/warehouse/locations.service";
 import { IFItemCreation, IFItemsCreation } from "@repo/api-contracts/erp";
 import { IFLocationCreation } from "@repo/api-contracts/erp";

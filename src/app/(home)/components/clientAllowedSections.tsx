@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirstLevelRoutes, IAppRoute } from "@/app/lib/routes/getRoutes";
-import { canRenderRoute } from "@/app/lib/utils/permission.helper";
+import { canRenderRoute } from "@repo/access";
 import SectionContainer from "./section/sectionContainer";
 import { useEffect, useState } from "react";
 import { getCustomData } from "@/app/lib/routes/customData";
@@ -25,18 +25,18 @@ export function SectionsFallback() {
 }
 
 export default function ClientAllowedSections() {
-    const { user, loading } = useAuth();
+    const { effectiveScopes, loading, companyLicense } = useAuth();
     const [allowedRoutes, setAllowedRoutes] = useState<IAppRoute[] | null>(null);
 
     useEffect(() => {
         if (!loading) {
-            const userPermissions = user?.roles || [];
+            const userPermissions = effectiveScopes;
             const routes = getFirstLevelRoutes().filter(route => {
-                return canRenderRoute(route.path, userPermissions);
+                return canRenderRoute(route.path, userPermissions, companyLicense);
             });
             setAllowedRoutes(routes);
         }
-    }, [user, loading]);
+    }, [effectiveScopes, loading, companyLicense]);
 
     if (loading || allowedRoutes === null) {
         return <SectionsFallback />;

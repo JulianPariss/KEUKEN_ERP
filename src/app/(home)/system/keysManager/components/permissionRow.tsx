@@ -1,7 +1,7 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import { Button } from '@repo/devextreme';
 import { CheckBox } from "devextreme-react/check-box";
-import { TPermissionAction } from "@/app/lib/permissions/getPermissions";
+import { TPermissionAction } from "@repo/access";
 import { actionHeaders } from "./permissionsSelector";
 
 export interface PermissionRowProps {

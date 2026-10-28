@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemo, useRef, useState } from "react";
@@ -9,7 +9,7 @@ import notify from "devextreme/ui/notify";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
 import { commercialPlatformsService } from "@repo/erp-services/partners/commercialPlatforms.service";
 import CommercialPlatformModal from "./components/actions/commercialPlatformModal";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 
 const { customLoad, customSave } = createGridStateStorage({
   gridId: "commercial-platforms-grid",

@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { areaService } from "@repo/erp-services/warehouse/areas.service";
 import { IFAreaCreate, IFAreaType } from "@repo/api-contracts/erp";
 import { Button } from '@repo/devextreme';

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
@@ -9,8 +9,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { warehouseService } from "@repo/erp-services/warehouse/warehouse.service";
 import { IWarehouseCreate } from "@repo/api-contracts/erp";
 import { FIELD_LIMITS } from "@/app/lib/constants/common.constants";
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 
 interface WarehouseCreationProps {
     onSuccess: () => Promise<void>;

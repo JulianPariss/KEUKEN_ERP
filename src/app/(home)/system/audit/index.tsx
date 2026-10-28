@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 import { systemService } from "@repo/erp-services/system.service";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";

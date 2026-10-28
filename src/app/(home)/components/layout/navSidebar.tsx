@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { getCustomData, getParentChain, IGNORED_ROUTE_KEYS } from '@/app/lib/routes/customData';
 import { IAppRoute } from '@/app/lib/routes/getRoutes';
-import { canRenderRoute } from '@/app/lib/utils/permission.helper';
+import { canRenderRoute } from "@repo/access";
 import { useAuth } from '@/contexts/AuthContext';
 import TextBox from 'devextreme-react/text-box';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,9 +17,9 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
   const [searchValue, setSearchValue] = useState<string>('')
   const searchRef = useRef(null)
 
-  const { user } = useAuth();
+  const { effectiveScopes, companyLicense } = useAuth();
   const { brand } = useBrand();
-  const userPermissions: string[] = user?.roles || [];
+  const userPermissions: string[] = effectiveScopes;
 
   const pathname = usePathname();
   const router = useRouter();
@@ -28,7 +28,7 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
     const filtered = initialRoutes
       .filter(route => {
         if (IGNORED_ROUTE_KEYS.includes(route.routeKey)) return false;
-        if (!canRenderRoute(route.path, userPermissions)) return false;
+        if (!canRenderRoute(route.path, userPermissions, companyLicense)) return false;
         return true;
       })
       .map(route => {
@@ -61,7 +61,7 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
     });
 
     return result;
-  }, [initialRoutes, userPermissions]);
+  }, [initialRoutes, userPermissions, companyLicense]);
 
   const routeTree = useMemo(() => {
     const items = JSON.parse(JSON.stringify(routes));

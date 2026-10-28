@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import {
     permissionsConfig,
     TFPermissionsConfig,
     TPermissionAction
-} from "@/app/lib/permissions/getPermissions";
-import { mapPermissionsToFrontend } from "@/app/lib/utils/permission.helper";
+} from "@repo/access";
+import { mapPermissionsToFrontend } from "@repo/access";
 import { useAuth } from "@/contexts/AuthContext";
 import { CheckBox } from "devextreme-react/check-box";
 import { ScrollView } from "devextreme-react/scroll-view";

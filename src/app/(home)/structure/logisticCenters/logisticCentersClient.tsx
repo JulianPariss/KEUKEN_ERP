@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import { logisticsCentersService } from "@repo/erp-services/userContext/logisticsCenters.service";
@@ -19,16 +19,16 @@ import LogisticCenterCreationModal from "./components/actions/logisticCenterCrea
 const { customLoad, customSave } = createGridStateStorage({ gridId: 'logistics-centers-grid' });
 
 const LogisticCentersClient = () => {
-    const { token, user, permissions, loading, includeInactive, currentCompany } = useAuth();
+    const { token, user, permissions, loading, includeInactive, currentCompany, isSuperAdmin } = useAuth();
     const { isRecoveryMode, recoveryVisibility } = useRecovery();
     const gridRef = useRef<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCenter, setSelectedCenter] = useState<IFLogisticsCenter | null>(null);
     const [refreshVersion, setRefreshVersion] = useState(0);
 
-    const isSuperAdmin = useMemo(() => {
-        return user?.roles?.includes('superadmin') ?? false;
-    }, [user]);
+
+
+
 
     const canView = useMemo(() => {
         if (isSuperAdmin) return true;

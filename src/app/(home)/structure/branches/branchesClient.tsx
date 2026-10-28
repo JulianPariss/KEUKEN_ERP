@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useRecovery } from "@/contexts/RecoveryContext";
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
@@ -26,8 +26,8 @@ const BranchesClient = () => {
     const [refreshVersion, setRefreshVersion] = useState(0);
 
     const isSuperAdmin = useMemo(() => {
-        return authIsSuperAdmin || canUseRecovery || (user?.roles?.includes('superadmin') ?? false);
-    }, [authIsSuperAdmin, canUseRecovery, user]);
+        return authIsSuperAdmin || canUseRecovery;
+    }, [authIsSuperAdmin, canUseRecovery]);
 
     const canView = useMemo(() => {
         if (isSuperAdmin) return true;

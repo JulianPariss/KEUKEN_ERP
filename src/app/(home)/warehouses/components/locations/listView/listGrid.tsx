@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { IFLocation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "@/contexts/LocationsContext";

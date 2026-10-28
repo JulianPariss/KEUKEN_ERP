@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import {
     permissionsConfig,
     TFPermissionsConfig,
     TPermissionAction
-} from "@/app/lib/permissions/getPermissions";
-import { mapPermissionsToBackend, mapPermissionsToFrontend } from "@/app/lib/utils/permission.helper";
+} from "@repo/access";
+import { mapPermissionsToBackend, mapPermissionsToFrontend } from "@repo/access";
 import { IFRole } from "@repo/api-contracts/erp";
 import { Button } from '@repo/devextreme';
 import { Popover } from "devextreme-react/popover";

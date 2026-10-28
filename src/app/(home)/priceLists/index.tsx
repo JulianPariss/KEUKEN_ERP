@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRecovery } from "@/contexts/RecoveryContext";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";

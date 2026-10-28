@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 import { useRecovery } from "@/contexts/RecoveryContext";
 import { commonService } from "@repo/erp-services/common.service";
 
-import { canDo } from "@/app/lib/utils/permission.helper";
+import { canDo } from "@repo/access";
 import { pricePoliciesService } from "@repo/erp-services/priceLists/pricePolicies.service";
 import { salesChannelsService } from "@repo/erp-services/salesChannels.service";
 import { IFSalesChannel } from "@repo/api-contracts/erp";

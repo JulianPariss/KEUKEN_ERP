@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
-import PERMISSIONS_CONSTANTS from "@/app/lib/constants/permissions.constants";
-import { canDo } from "@/app/lib/utils/permission.helper";
+import PERMISSIONS_CONSTANTS from "@repo/access";
+import { canDo } from "@repo/access";
 import { salesRoutesService } from "@repo/erp-services/priceLists/salesRoutes.service";
 import { usersService } from "@repo/erp-services/users.service";
 import zonesService from "@repo/erp-services/zones.service";

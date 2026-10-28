@@ -84,7 +84,7 @@ export function BranchProvider({ children }: { children: ReactNode }) {
         fetchBranches();
 
         return () => { isMounted = false; };
-    }, [isAuthenticated, token, currentCompany?.id, profileContext?.branchAccessMode]);
+    }, [isAuthenticated, token, currentCompany?.id, profileContext?.branchAccessMode, profileContext?.allowedBranchIds]);
 
     const changeBranch = async (branch: IFBranch | null) => {
         setCurrentBranch(branch);

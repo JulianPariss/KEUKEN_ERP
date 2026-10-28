@@ -1,6 +1,7 @@
 'use server';
 
 import { authService } from '@repo/erp-services/userContext/auth.service';
+import { TFMeLicenseField } from '@repo/api-contracts/erp';
 import { cookies, headers } from 'next/headers';
 
 async function getIsSecure(): Promise<boolean> {
@@ -28,13 +29,13 @@ async function getIsSecure(): Promise<boolean> {
 export async function loginAction(email: string, password: string) {
     try {
         const authData = await authService.login(email, password);
-        
+
         // Obtener la primera compañía por defecto si existe
         const defaultCompanyId = authData.user?.companyIds?.[0];
-        
+
         // Obtener el contexto de perfil del usuario utilizando el token devuelto y la compañía por defecto
         const profileData = await authService.getProfileContext(authData.accessToken, defaultCompanyId);
-        
+
         const cookieStore = await cookies();
         const isSecure = await getIsSecure();
 
@@ -46,10 +47,9 @@ export async function loginAction(email: string, password: string) {
             maxAge: 60 * 60 * 24 * 7,
         });
 
-        // Combinar roles y scopes para soportar tanto chequeo de autoridad (superadmin, admin) como scopes puntuales
+        // Combinar roles y scopes de la empresa operativa (roles_effective + scopes_effective)
         const permissionsArray = Array.from(new Set([
             ...(profileData.rolesEffective || []),
-            ...(authData.user?.roles || []),
             ...(profileData.scopesEffective || []),
         ]));
 
@@ -60,6 +60,17 @@ export async function loginAction(email: string, password: string) {
             path: '/',
             maxAge: 60 * 60 * 24 * 7,
         });
+
+        // Guardar licencia de la compañía operativa en cookie para SSR y middleware
+        if (profileData.license) {
+            cookieStore.set('companyLicense', encodeURIComponent(JSON.stringify(profileData.license)), {
+                httpOnly: false,
+                secure: isSecure,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 60 * 60 * 24 * 7,
+            });
+        }
 
         const userWithRoles = {
             ...authData.user,
@@ -92,8 +103,31 @@ export async function updatePermissionsCookieAction(permissions: string[]) {
     }
 }
 
+export async function updateCompanyLicenseCookieAction(license: TFMeLicenseField | undefined) {
+    try {
+        const cookieStore = await cookies();
+        const isSecure = await getIsSecure();
+        if (license) {
+            cookieStore.set('companyLicense', encodeURIComponent(JSON.stringify(license)), {
+                httpOnly: false,
+                secure: isSecure,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 60 * 60 * 24 * 7,
+            });
+        } else {
+            cookieStore.delete('companyLicense');
+        }
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error updating companyLicense cookie:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function logoutAction() {
     const cookieStore = await cookies();
     cookieStore.delete('authToken');
     cookieStore.delete('permissions');
+    cookieStore.delete('companyLicense');
 }

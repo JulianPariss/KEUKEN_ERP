@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import CustomStore from 'devextreme/data/custom_store';
@@ -9,7 +9,7 @@ import { IFCompany, IFCurrency, IFCompanyCreate, IFCompanyUpdate } from '@repo/a
 import { companiesService } from '@repo/erp-services/companies.service';
 import { currenciesService } from '@repo/erp-services/payments_services/currencies.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { canDo } from '@/app/lib/utils/permission.helper';
+import { canDo } from "@repo/access";
 import { createGridStateStorage } from '@/lib/storage/gridStateStorage';
 import { createGridPrinter } from '@/lib/printer/gridPrinter';
 import CompanyCreationModal from './components/companyCreationModal';
