@@ -143,6 +143,7 @@ export default function CustomHeader({ routes }: HeaderProps) {
           stylingMode="text"
           className="text-dx-text hover:text-dx-link transition-colors"
           dropDownOptions={{
+            minWidth: 180,
             wrapperAttr: {
               class: "popup-menu-container"
             }

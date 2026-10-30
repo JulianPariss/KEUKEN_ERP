@@ -9,7 +9,15 @@ import { useEffect } from 'react';
 export default function DevExtremeIntlBridge() {
     const { locale } = useLocale();
     useEffect(() => {
-        loadMessages({ ...esMessages, ...enMessage, ...ptMessages });
+        // es.json de DX aún trae "Tabla de datos" sin placeholders; EN ya tiene rows/cols.
+        const esPatched = {
+            ...esMessages,
+            es: {
+                ...(esMessages as { es?: Record<string, string> }).es,
+                'dxDataGrid-ariaDataGrid': 'Tabla de datos con {0} filas y {1} columnas',
+            },
+        };
+        loadMessages({ ...esPatched, ...enMessage, ...ptMessages });
         dxLocale(locale);
     }, [locale]);
 

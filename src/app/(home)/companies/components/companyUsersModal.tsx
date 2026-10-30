@@ -4,12 +4,13 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Popup, Position, ToolbarItem } from 'devextreme-react/popup';
 import { Button } from '@repo/devextreme';
 import SelectBox from 'devextreme-react/select-box';
-import TagBox from 'devextreme-react/tag-box';
 import notify from 'devextreme/ui/notify';
 import { IFCompany, IFUser, IFRoleAssignment, IFOptionItem } from '@repo/api-contracts/erp';
 import { usersService } from '@repo/erp-services/users.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { OPERATIONAL_ROLES } from '@/app/lib/constants/users.constants';
+
+const DEFAULT_ROLE = 'user';
 
 interface CompanyUsersModalProps {
     isOpen: boolean;
@@ -23,7 +24,7 @@ interface UserRowItemProps {
     user: IFUser;
     companyId: string;
     actionLoading: boolean;
-    onUpdateRoles: (user: IFUser, newRoles: string[]) => void;
+    onUpdateRole: (user: IFUser, newRole: string) => void;
     onRemoveUser: (user: IFUser) => void;
 }
 
@@ -31,24 +32,21 @@ const UserRowItem = React.memo(function UserRowItem({
     user,
     companyId,
     actionLoading,
-    onUpdateRoles,
+    onUpdateRole,
     onRemoveUser,
 }: UserRowItemProps) {
     const userAssignment = user.roleAssignments?.find(
         (ra) => ra.companyId === companyId
     );
-    const currentRoles = useMemo(
-        () => userAssignment?.roles || ['user'],
-        [userAssignment?.roles]
-    );
+    const currentRole = userAssignment?.roles?.[0] || DEFAULT_ROLE;
 
     const handleRoleChanged = useCallback(
         (e: any) => {
-            if (e.event) {
-                onUpdateRoles(user, e.value || []);
+            if (e.event && e.value) {
+                onUpdateRole(user, e.value);
             }
         },
-        [user, onUpdateRoles]
+        [user, onUpdateRole]
     );
 
     const handleRemove = useCallback(() => {
@@ -73,15 +71,13 @@ const UserRowItem = React.memo(function UserRowItem({
 
             {/* Role selector for this company */}
             <div className="flex-1 max-w-[340px]">
-                <TagBox
+                <SelectBox
                     dataSource={OPERATIONAL_ROLES}
                     valueExpr="id"
                     displayExpr="name"
-                    value={currentRoles}
+                    value={currentRole}
                     onValueChanged={handleRoleChanged}
                     searchEnabled={true}
-                    showSelectionControls={true}
-                    applyValueMode="useButtons"
                     stylingMode="filled"
                     disabled={actionLoading}
                 />
@@ -106,8 +102,8 @@ interface AddUserSectionProps {
     availableUsers: IFOptionItem[];
     selectedUserId: string;
     onUserIdChange: (id: string) => void;
-    selectedRoles: string[];
-    onRolesChange: (roles: string[]) => void;
+    selectedRole: string;
+    onRoleChange: (role: string) => void;
     onAssign: () => void;
     disabled: boolean;
     loading: boolean;
@@ -117,8 +113,8 @@ const AddUserSection = React.memo(function AddUserSection({
     availableUsers,
     selectedUserId,
     onUserIdChange,
-    selectedRoles,
-    onRolesChange,
+    selectedRole,
+    onRoleChange,
     onAssign,
     disabled,
     loading,
@@ -156,17 +152,17 @@ const AddUserSection = React.memo(function AddUserSection({
                 </div>
 
                 <div className="col-span-12 md:col-span-5 flex flex-col gap-1">
-                    <label className="text-xs text-main/70">Roles Operativos</label>
-                    <TagBox
+                    <label className="text-xs text-main/70">Rol Operativo</label>
+                    <SelectBox
                         dataSource={OPERATIONAL_ROLES}
                         valueExpr="id"
                         displayExpr="name"
-                        value={selectedRoles}
-                        onValueChanged={(e) => onRolesChange(e.value || [])}
-                        placeholder="Roles..."
+                        value={selectedRole}
+                        onValueChanged={(e) => {
+                            if (e.value) onRoleChange(e.value);
+                        }}
+                        placeholder="Seleccionar rol..."
                         searchEnabled={true}
-                        showSelectionControls={true}
-                        applyValueMode="useButtons"
                         stylingMode="filled"
                         disabled={disabled || loading}
                     />
@@ -203,7 +199,7 @@ function CompanyUsersModal({
 
     // New assignment form state
     const [selectedUserIdToAdd, setSelectedUserIdToAdd] = useState<string>('');
-    const [selectedRolesToAdd, setSelectedRolesToAdd] = useState<string[]>(['user']);
+    const [selectedRoleToAdd, setSelectedRoleToAdd] = useState<string>(DEFAULT_ROLE);
 
     const fetchUsers = useCallback(async () => {
         if (!token || !company?.id) return;
@@ -227,7 +223,7 @@ function CompanyUsersModal({
         if (isOpen && company?.id) {
             fetchUsers();
             setSelectedUserIdToAdd('');
-            setSelectedRolesToAdd(['user']);
+            setSelectedRoleToAdd(DEFAULT_ROLE);
         }
     }, [isOpen, company?.id, fetchUsers]);
 
@@ -235,7 +231,7 @@ function CompanyUsersModal({
         setAssignedUsers([]);
         setUserOptions([]);
         setSelectedUserIdToAdd('');
-        setSelectedRolesToAdd(['user']);
+        setSelectedRoleToAdd(DEFAULT_ROLE);
         setLoading(false);
         setActionLoading(false);
         onHidden?.();
@@ -253,8 +249,8 @@ function CompanyUsersModal({
             return;
         }
 
-        if (selectedRolesToAdd.length === 0) {
-            notify('Seleccione al menos un rol para el usuario', 'warning', 2500);
+        if (!selectedRoleToAdd) {
+            notify('Seleccione un rol para el usuario', 'warning', 2500);
             return;
         }
 
@@ -275,7 +271,7 @@ function CompanyUsersModal({
             const newAssignment: IFRoleAssignment = {
                 companyId: company.id,
                 level: 'company',
-                roles: selectedRolesToAdd,
+                roles: [selectedRoleToAdd],
             };
 
             await usersService.update(
@@ -289,7 +285,7 @@ function CompanyUsersModal({
 
             notify(`Usuario ${targetUser.name} asignado correctamente`, 'success', 3000);
             setSelectedUserIdToAdd('');
-            setSelectedRolesToAdd(['user']);
+            setSelectedRoleToAdd(DEFAULT_ROLE);
             await fetchUsers();
             onSuccess?.();
         } catch (error: any) {
@@ -301,11 +297,11 @@ function CompanyUsersModal({
         }
     };
 
-    const handleUpdateUserRoles = useCallback(async (user: IFUser, newRoles: string[]) => {
+    const handleUpdateUserRole = useCallback(async (user: IFUser, newRole: string) => {
         if (!company?.id || !token) return;
 
-        if (newRoles.length === 0) {
-            notify('Debe mantener al menos un rol asignado', 'warning', 2500);
+        if (!newRole) {
+            notify('Debe seleccionar un rol', 'warning', 2500);
             return;
         }
 
@@ -317,7 +313,7 @@ function CompanyUsersModal({
             const updatedAssignment: IFRoleAssignment = {
                 companyId: company.id,
                 level: 'company',
-                roles: newRoles,
+                roles: [newRole],
             };
 
             await usersService.update(
@@ -329,12 +325,12 @@ function CompanyUsersModal({
                 token
             );
 
-            notify('Roles actualizados correctamente', 'success', 3000);
+            notify('Rol actualizado correctamente', 'success', 3000);
             await fetchUsers();
             onSuccess?.();
         } catch (error: any) {
-            console.error('Error updating user roles:', error);
-            const msg = error instanceof Error && error.message ? error.message : 'Error al actualizar roles';
+            console.error('Error updating user role:', error);
+            const msg = error instanceof Error && error.message ? error.message : 'Error al actualizar el rol';
             notify(msg, 'error', 3000);
         } finally {
             setActionLoading(false);
@@ -410,8 +406,8 @@ function CompanyUsersModal({
                     availableUsers={availableUsers}
                     selectedUserId={selectedUserIdToAdd}
                     onUserIdChange={setSelectedUserIdToAdd}
-                    selectedRoles={selectedRolesToAdd}
-                    onRolesChange={setSelectedRolesToAdd}
+                    selectedRole={selectedRoleToAdd}
+                    onRoleChange={setSelectedRoleToAdd}
                     onAssign={handleAssignUser}
                     disabled={actionLoading}
                     loading={loading}
@@ -438,7 +434,7 @@ function CompanyUsersModal({
                                 user={user}
                                 companyId={company?.id || ''}
                                 actionLoading={actionLoading}
-                                onUpdateRoles={handleUpdateUserRoles}
+                                onUpdateRole={handleUpdateUserRole}
                                 onRemoveUser={handleRemoveUser}
                             />
                         ))

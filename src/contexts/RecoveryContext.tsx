@@ -3,8 +3,11 @@
 import '@/lib/erp-api-client.setup';
 import { createContext, ReactNode, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
+import { hasScope } from '@repo/access';
 import { useAuth } from './AuthContext';
 import { isPathInRecoveryWhiteList } from '@/app/lib/constants/recoveryWhiteList';
+
+const RECOVERY_READ_SCOPE = 'admin:recovery:read';
 
 interface RecoveryContextType {
     isRecoveryMode: boolean;
@@ -23,7 +26,7 @@ const RecoveryContext = createContext<RecoveryContextType | undefined>(undefined
 
 export function RecoveryProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname();
-    const { isSuperAdmin, permissions } = useAuth();
+    const { isSuperAdmin, effectiveScopes } = useAuth();
     const [recoveryEnabled, setRecoveryEnabledState] = useState<boolean>(true);
 
     const isRouteSupported = useMemo(() => {
@@ -34,9 +37,7 @@ export function RecoveryProvider({ children }: { children: ReactNode }) {
         recoveryEnabled &&
         isRouteSupported && (
             isSuperAdmin ||
-            (permissions && (
-                Boolean((permissions as any)['admin:recovery:read'])
-            ))
+            hasScope(effectiveScopes, RECOVERY_READ_SCOPE)
         )
     );
 
