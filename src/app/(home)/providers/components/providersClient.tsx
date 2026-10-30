@@ -15,10 +15,8 @@ import { IFListBasicParams } from "@repo/api-contracts/erp";
 import { IFProvider } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRecovery } from "@/contexts/RecoveryContext";
-import dynamic from "next/dynamic";
-
-const ProviderCreationModal = dynamic(() => import("./actions/creation"), { ssr: false });
-const ProviderDetailModal = dynamic(() => import("./actions/detail"), { ssr: false });
+import ProviderCreationModal from "./actions/creation";
+import ProviderDetailModal from "./actions/detail";
 
 const { customLoad, customSave } = createGridStateStorage({ gridId: 'providers-grid' });
 

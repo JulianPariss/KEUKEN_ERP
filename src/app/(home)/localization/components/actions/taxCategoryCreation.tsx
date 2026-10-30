@@ -5,6 +5,7 @@ import { taxCategoriesService } from "@repo/erp-services/payments_services/taxCa
 import { IFCodelistTaxCategory } from "@repo/api-contracts/erp";
 import { IFTaxCategoryCreation } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAccess } from "@repo/access";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
@@ -35,12 +36,18 @@ const TaxCategoryCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initia
     const [codelistOptions, setCodelistOptions] = useState<IFCodelistTaxCategory[]>([]);
     const formRef = useRef<any>(null);
     const { token, currentCompany } = useAuth();
+    const { canAccess } = useAccess();
+    const canUseTaxCategoryCodelist = canAccess("billing.codelists.taxCategories.view");
 
     const [formData, setFormData] = useState<IFTaxCategoryCreation>(emptyTaxCategoryData);
 
     useEffect(() => {
         if (isOpen) {
             const fetchCodelists = async () => {
+                if (!canUseTaxCategoryCodelist) {
+                    setCodelistOptions([]);
+                    return;
+                }
                 try {
                     const data = await codelistsService.getTaxCategories(token, currentCompany?.id);
                     setCodelistOptions(data);
@@ -78,7 +85,7 @@ const TaxCategoryCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initia
                 }
             }, 0);
         }
-    }, [isOpen, initialData, selectedCountryCode]);
+    }, [isOpen, initialData, selectedCountryCode, canUseTaxCategoryCodelist, token, currentCompany?.id]);
 
     const handleHidden = useCallback(() => {
         setFormData(emptyTaxCategoryData);
@@ -138,6 +145,7 @@ const TaxCategoryCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initia
                 />
                 <SimpleItem
                     dataField="taxCategoryCode"
+                    visible={canUseTaxCategoryCodelist}
                     label={{ text: "Código de Rubro" }}
                     editorType="dxSelectBox"
                     editorOptions={{
@@ -154,7 +162,11 @@ const TaxCategoryCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initia
                         searchEnabled: true,
                         stylingMode: 'filled',
                     }}
-                    validationRules={[{ type: 'required', message: "El código es obligatorio" }]}
+                    validationRules={
+                        canUseTaxCategoryCodelist
+                            ? [{ type: 'required', message: "El código es obligatorio" }]
+                            : []
+                    }
                 />
 
                 <SimpleItem
@@ -199,7 +211,7 @@ const TaxCategoryCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initia
                 />
             </GroupItem>
         </Form>
-    ), [formData, codelistOptions]);
+    ), [formData, codelistOptions, canUseTaxCategoryCodelist]);
 
     return (
         <Popup

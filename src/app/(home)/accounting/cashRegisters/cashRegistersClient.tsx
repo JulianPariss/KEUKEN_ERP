@@ -2,11 +2,15 @@
 import { useRecovery } from "@/contexts/RecoveryContext";
 import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import PERMISSIONS_CONSTANTS from "@repo/access";
-import { canDo } from "@repo/access";
+import {
+  AccessGate,
+  useAccess,
+  useGridColumns,
+  type IAccessGridColumn,
+} from "@repo/access";
 import { cashRegistersService } from "@repo/erp-services/accountant/cashRegisters.service";
 import { IFCashRegister, IFCashRegisterType } from "@repo/api-contracts/erp";
-import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
+import { GenericDataGrid } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
 import CustomStore from "devextreme/data/custom_store";
@@ -21,13 +25,11 @@ const { customLoad, customSave } = createGridStateStorage({
 
 const CashRegistersClient = () => {
   const { isRecoveryMode, recoveryVisibility } = useRecovery();
-  const { token, currentCompany, permissions, isSuperAdmin } = useAuth();
+  const { token, currentCompany, isSuperAdmin } = useAuth();
+  const { canAccess } = useAccess();
 
-  const canModify = useMemo(() => {
-    return permissions
-      ? canDo("modify", PERMISSIONS_CONSTANTS.modifyCashRegisters, permissions)
-      : false;
-  }, [permissions]);
+  const canModify = canAccess("treasury.cashRegisters.modify");
+  const canSettle = canAccess("treasury.cashRegisters.settlement");
 
   const gridRef = useRef<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -154,7 +156,7 @@ const CashRegistersClient = () => {
           setSelectedRegister(data);
           setIsSettlementModalOpen(true);
         },
-        visible: (e: any) => !isRecoveryMode && canModify,
+        visible: (e: any) => !isRecoveryMode && canSettle,
       },
       {
         icon: "edit",
@@ -178,11 +180,11 @@ const CashRegistersClient = () => {
         visible: (e: any) => isRecoveryMode && isSuperAdmin,
       },
     ],
-    [canModify, isSuperAdmin, isRecoveryMode, token, currentCompany?.id]
+    [canModify, canSettle, isSuperAdmin, isRecoveryMode, token, currentCompany?.id]
   );
 
-  const columns: IGenericDataGridColumn[] = useMemo(() => {
-    const cols: IGenericDataGridColumn[] = [
+  const baseColumns: IAccessGridColumn[] = useMemo(() => {
+    const cols: IAccessGridColumn[] = [
       {
         dataField: "id",
         caption: "ID",
@@ -213,6 +215,7 @@ const CashRegistersClient = () => {
       {
         dataField: "parentCashRegisterId",
         caption: "Caja Padre",
+        capability: "treasury.cashRegisters.hierarchy",
         lookup: {
           dataSource: allRegisters,
           valueExpr: "id",
@@ -246,6 +249,8 @@ const CashRegistersClient = () => {
 
     return cols;
   }, [registerTypes, allRegisters, isRecoveryMode]);
+
+  const columns = useGridColumns(baseColumns);
 
   return (
     <div className="flex flex-col w-full min-w-full h-full rounded-dx font-sans overflow-hidden">
@@ -328,29 +333,33 @@ const CashRegistersClient = () => {
           />
         </div>
       </div>
-      <CashRegisterModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedRegister(null);
-        }}
-        onSuccess={() => {
-          setRefreshVersion((prev) => prev + 1);
-        }}
-        initialData={selectedRegister}
-        registerTypes={registerTypes}
-      />
-      <CashRegisterSettlementModal
-        isOpen={isSettlementModalOpen}
-        onClose={() => {
-          setIsSettlementModalOpen(false);
-          setSelectedRegister(null);
-        }}
-        onSuccess={() => {
-          setRefreshVersion((prev) => prev + 1);
-        }}
-        register={selectedRegister}
-      />
+      <AccessGate capability="treasury.cashRegisters.modify" fallback={null}>
+        <CashRegisterModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedRegister(null);
+          }}
+          onSuccess={() => {
+            setRefreshVersion((prev) => prev + 1);
+          }}
+          initialData={selectedRegister}
+          registerTypes={registerTypes}
+        />
+      </AccessGate>
+      <AccessGate capability="treasury.cashRegisters.settlement" fallback={null}>
+        <CashRegisterSettlementModal
+          isOpen={isSettlementModalOpen}
+          onClose={() => {
+            setIsSettlementModalOpen(false);
+            setSelectedRegister(null);
+          }}
+          onSuccess={() => {
+            setRefreshVersion((prev) => prev + 1);
+          }}
+          register={selectedRegister}
+        />
+      </AccessGate>
     </div>
   );
 };

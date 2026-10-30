@@ -3,20 +3,35 @@ import { TFMeLicenseField } from '@repo/api-contracts/erp';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const publicPaths = ['/login', '/refused'];
+/** Rutas que no deben pasar por chequeo de módulos/permisos ni exigir sesión. */
+const publicPaths = ['/login'];
+
+/** Rutas autenticadas exentas del filtro canRenderRoute (no expulsar / no redirigir en loop). */
+const accessExemptPaths = ['/refused'];
+
+function matchesPath(pathname: string, prefixes: string[]): boolean {
+    return prefixes.some(path => pathname === path || pathname.startsWith(`${path}/`));
+}
 
 export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const token = request.cookies.get('authToken')?.value;
 
-    const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
+    const isPublicPath = matchesPath(pathname, publicPaths);
+    const isAccessExempt = matchesPath(pathname, accessExemptPaths);
 
-    if (!token && !isPublicPath) {
+    if (!token && !isPublicPath && !isAccessExempt) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (token && pathname === '/login') {
+    if (token && isPublicPath) {
         return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    // /refused (y similares) deben renderizar sin re-evaluar canRenderRoute,
+    // o un fallo de cookie/licencia puede disparar un loop de redirect.
+    if (isPublicPath || isAccessExempt) {
+        return NextResponse.next();
     }
 
     const cookieVal = request.cookies.get('permissions')?.value;

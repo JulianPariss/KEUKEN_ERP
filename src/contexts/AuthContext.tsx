@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const savedCompanies = localStorage.getItem('companies');
         const savedCurrentCompany = localStorage.getItem('currentCompany');
 
+        // Sin authToken en LS la sesión no puede restaurarse tras un remount (p.ej. /refused, 404).
         if (storedToken && userData) {
             setIsAuthenticated(true);
             setToken(storedToken);
@@ -149,6 +150,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setLoading(false);
     }, []);
+
+    // Guard de sesión client-side: no expulsar en login/refused (páginas de acceso/denegación).
+    useEffect(() => {
+        if (loading) return;
+        const isExemptPath =
+            pathname.startsWith('/login') ||
+            pathname.startsWith('/refused');
+        if (!isAuthenticated && !isExemptPath) {
+            router.replace('/login');
+        }
+    }, [isAuthenticated, loading, pathname, router]);
 
     const login = async (loginInput: string, passwordInput: string) => {
         try {
@@ -245,6 +257,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('userData', JSON.stringify(authUser));
             }
 
+            localStorage.setItem('authToken', authToken);
             setIsAuthenticated(true);
             setToken(authToken);
             router.push('/');
@@ -270,6 +283,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setEffectiveScopes([]);
         setCompanies([]);
         setCurrentCompany(null);
+        localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
         localStorage.removeItem('profileContext');
         localStorage.removeItem('companyLicense');

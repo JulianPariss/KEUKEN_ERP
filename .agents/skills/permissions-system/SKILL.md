@@ -11,12 +11,14 @@ Esta skill documenta el sistema de control de acceso de la aplicación ERP. El m
 [ 1. Licencias de Empresa ] ───► [ 2. Módulos de Empresa ] ───► [ 3. Permisos de Usuario ] ───► Render UI
 ```
 
+Fuente de verdad operativa del plan: `apps/erp-next/req/PLAN_LIC_&_MODULES.md`.
+
 ---
 
 ## 1. Estructura de Archivos del Sistema
 
-Toda la lógica de acceso está centralizada en:  
-📁 **`src/app/lib/access/`**
+Toda la lógica de acceso está centralizada en el paquete compartido:  
+📁 **`packages/access`** (`@repo/access`)
 
 - `index.ts`: Barrel export principal (`canAccess`, `useAccess`, `AccessGate`, `useGridColumns`, `canDo`, `canView`, etc.).
 - `access.types.ts`: Tipos principales (`ICapabilityRule`, `IAccessContext`, `IAccessEvaluation`, `TFPermissionsConfig`, `TFMeLicenseField`, `TFProductModuleCode`, etc.).
@@ -24,11 +26,17 @@ Toda la lógica de acceso está centralizada en:
 - `access.constants.ts`: Agrupadores de permisos (`PERMISSIONS_CONSTANTS`).
 - `access.capabilities.ts`: Registro central de Capacidades (`CAPABILITIES`) con soporte de `previewEnabled`.
 - `access.helper.ts`: Funciones de evaluación puras (`hasModule`, `isLicenseLocked`, `canAccess`, `evaluateAccess`, `canDo`, `canView`, `canRenderRoute`).
-- `useAccess.ts`: Hook reactivo para Client Components.
-- `AccessGate.tsx`: Componente wrapper declarativo para proteger bloques y botones.
-- `useGridColumns.ts`: Hook para filtrar y preparar columnas de `GenericDataGrid` de `@repo/devextreme`.
+- `AccessContext.tsx` / `useAccess.ts`: Provider + hook reactivo para Client Components.
+- `AccessGate.tsx`: Componente wrapper declarativo (`module` y/o `capability`).
+- `ModuleLockFallback.tsx`: Fallback UI cuando el módulo no está contratado.
+- `useGridColumns.ts`: Hook para filtrar/preparar columnas de `GenericDataGrid` (`@repo/devextreme`).
 
-*(Nota: Los archivos heredados en `src/app/lib/constants/permissions.constants.ts`, `src/app/lib/utils/permission.helper.ts`, y `src/app/lib/permissions/` re-exportan desde `src/app/lib/access` para retrocompatibilidad total).*
+### Integración en apps
+
+- **`apps/erp-next`**: importa desde `@repo/access`. `AuthProvider` alimenta `<AccessProvider>`. Segmentos de ruta usan `ModuleAccessLayout` (`src/components/ModuleAccessLayout.tsx`).
+- **`packages/product-ui`**: importa `canDo`, `PERMISSIONS_CONSTANTS`, `AccessGate` desde `@repo/access`.
+
+> **No usar** paths legacy `src/app/lib/access`, `permission.helper.ts` ni `permissions.constants.ts` — fueron eliminados.
 
 ---
 
@@ -49,27 +57,25 @@ Toda la lógica de acceso está centralizada en:
 
 ## 3. Registro de Capacidades (Capabilities)
 
-En `src/app/lib/access/access.capabilities.ts`, cada capacidad (etiqueta) define sus requisitos:
+En `packages/access/src/access.capabilities.ts`, cada capacidad (etiqueta) define sus requisitos:
 
 ```typescript
 export const CAPABILITIES = {
-    'accounting.multiCurrency': {
-        module: 'accounting',
-        licensePlan: ['finanzas', 'full'],
-        permission: { action: 'view', keys: ['currencies'] },
-        previewEnabled: false,
-    },
-    'cashRegisters.modify': {
+    'treasury.cashRegisters.modify': {
         module: 'treasury',
         permission: { action: 'modify', keys: ['cashRegisters'] },
         previewEnabled: false,
     },
-    'inventory.batchTracking': {
-        module: 'wms',
-        licensePlan: ['deposito', 'full'],
-        permission: { action: 'modify', keys: ['warehouses'] },
+    'treasury.cashRegisters.hierarchy': {
+        module: 'treasury',
+        permission: { action: 'modify', keys: ['cashRegisters'] },
+        previewEnabled: true, // columna en preview si no tiene modify
+    },
+    'maps.view': {
+        module: 'maps',
+        permission: { action: 'view', keys: ['mapa'] },
         previewEnabled: false,
-    }
+    },
 } as const satisfies Record<string, ICapabilityRule>;
 ```
 
@@ -81,47 +87,54 @@ export const CAPABILITIES = {
 
 ## 4. Consumo en la UI según Granularidad
 
-### A. Nivel Macro: Rutas y Middleware (`proxy.ts` / Menú)
-`canRenderRoute(pathname, userPermissions, companyLicense)` evalúa tanto el lockout de licencia, como si el módulo de producto está activo para la empresa, y los permisos del usuario.
+### A. Nivel Macro: Rutas y Middleware (`proxy.ts` / Menú / Layouts)
+`canRenderRoute(pathname, userPermissions, companyLicense)` evalúa lockout de licencia, módulo de producto y permisos de usuario.
 
-En `navSidebar.tsx`:
+Segmentos de dominio en erp-next usan:
+
 ```tsx
-const { user, companyLicense } = useAuth();
-const routes = useMemo(() => {
-    return initialRoutes.filter(route => 
-        canRenderRoute(route.path, user?.roles || [], companyLicense)
-    );
-}, [initialRoutes, user, companyLicense]);
+import ModuleAccessLayout from '@/components/ModuleAccessLayout';
+
+export default function WarehousesLayout({ children }: { children: ReactNode }) {
+    return <ModuleAccessLayout module="wms">{children}</ModuleAccessLayout>;
+}
+```
+
+En `navSidebar.tsx` / home sections:
+```tsx
+import { canRenderRoute } from "@repo/access";
+
+const routes = initialRoutes.filter(route =>
+    canRenderRoute(route.path, userPermissions, companyLicense)
+);
 ```
 
 ### B. Nivel Meso: Bloques y Botones (`<AccessGate>` o `useAccess`)
 ```tsx
-import { AccessGate, useAccess } from "@/app/lib/access";
+import { AccessGate, useAccess } from "@repo/access";
 
 // Forma declarativa:
-<AccessGate capability="cashRegisters.modify">
+<AccessGate capability="treasury.cashRegisters.modify">
     <Button text="Nueva Caja" onClick={openModal} />
 </AccessGate>
 
 // Forma imperativa:
 const { canAccess } = useAccess();
-if (canAccess('cashRegisters.modify')) { ... }
+if (canAccess('treasury.cashRegisters.modify')) { ... }
 ```
 
 ### C. Nivel Micro: Columnas de `GenericDataGrid`
-En conjunto con el wrapper de DevExtreme:
-
 ```tsx
-import { useGridColumns, IAccessGridColumn } from "@/app/lib/access";
+import { useGridColumns, IAccessGridColumn } from "@repo/access";
 
 const columns = useGridColumns([
     { dataField: "id", caption: "ID" },
     { dataField: "name", caption: "Nombre" },
     {
-        dataField: "settlementCurrency",
-        caption: "Moneda de Liquidación",
-        capability: "accounting.multiCurrency" // Se ocultará o entrará en preview automáticamente
-    }
+        dataField: "parentCashRegisterId",
+        caption: "Caja Padre",
+        capability: "treasury.cashRegisters.hierarchy",
+    },
 ]);
 
 return <GenericDataGrid columns={columns} dataSource={data} />;
@@ -135,7 +148,8 @@ const { canAccess } = useAccess();
     dataField="parentCashRegisterId"
     label={{ text: "Caja Padre" }}
     editorType="dxSelectBox"
-    visible={canAccess("cashRegisters.modify")}
+    visible={canAccess("treasury.cashRegisters.hierarchy")}
+    editorOptions={{ disabled: !canAccess("treasury.cashRegisters.hierarchy") }}
 />
 ```
 
@@ -146,4 +160,4 @@ const { canAccess } = useAccess();
 En `AuthContext.tsx`, al invocar `changeCompany(empresa)`:
 1. Se invoca `refreshProfileContext(empresa.id)` llamando a `GET /auth/me?company_id=...`.
 2. Se actualiza reactivamente `companyLicense` y `permissions` en el estado de React y en cookies.
-3. Todas las grillas (`useGridColumns`), formularios y el menú lateral recalculan inmediatamente su visibilidad sin requerir recargar la página.
+3. Todas las grillas (`useGridColumns`), formularios, `AccessGate` y el menú lateral recalculan inmediatamente su visibilidad sin requerir recargar la página.

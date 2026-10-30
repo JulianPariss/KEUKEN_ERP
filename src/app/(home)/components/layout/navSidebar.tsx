@@ -25,6 +25,8 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
   const router = useRouter();
 
   const routes = useMemo(() => {
+    const routeById = new Map(initialRoutes.map(route => [route.id, route]));
+
     const filtered = initialRoutes
       .filter(route => {
         if (IGNORED_ROUTE_KEYS.includes(route.routeKey)) return false;
@@ -36,17 +38,42 @@ const NavSidebar = ({ initialRoutes }: { initialRoutes: IAppRoute[] }) => {
         return { ...route, ...custom };
       });
 
+    // Si un hijo sobrevive al filtro de módulo pero el padre no (ej. brands=core,
+    // products=catalog), reinsertar el padre como shell para no perder el submenú.
+    // hideMainSubRoute evita el link virtual al path del padre (que sigue denegado).
+    const allowedIds = new Set(filtered.map(route => route.id));
+    const shells: typeof filtered = [];
+
+    filtered.forEach(route => {
+      let parentId = route.parentId;
+      while (parentId) {
+        if (allowedIds.has(parentId)) break;
+        const parent = routeById.get(parentId);
+        if (!parent) break;
+        const custom = getCustomData(parent.routeKey);
+        shells.push({
+          ...parent,
+          ...custom,
+          hideMainSubRoute: true,
+        });
+        allowedIds.add(parent.id);
+        parentId = parent.parentId;
+      }
+    });
+
+    const withShells = [...filtered, ...shells];
+
     // Identify which routes have children
     const parentIds = new Set<string>();
-    filtered.forEach(route => {
+    withShells.forEach(route => {
       if (route.parentId) {
         parentIds.add(route.parentId);
       }
     });
 
     // Inject a virtual primary sub-route for grouping routes unless hideMainSubRoute is true
-    const result = [...filtered];
-    filtered.forEach(route => {
+    const result = [...withShells];
+    withShells.forEach(route => {
       if (parentIds.has(route.id) && route.path && !route.hideMainSubRoute) {
         result.push({
           id: `${route.id}/_main`,

@@ -1,10 +1,8 @@
 'use client';
 
 import { GenericTabs, type ITabItem } from '@repo/custom-components';
-import dynamic from 'next/dynamic';
-
-const CustomerMembersList = dynamic(() => import('./components/tabs/customerMembersList'), { ssr: false });
-const ItemMembersList = dynamic(() => import('./components/tabs/itemMembersList'), { ssr: false });
+import CustomerMembersList from './components/tabs/customerMembersList';
+import ItemMembersList from './components/tabs/itemMembersList';
 
 export const AudiencesClient = () => {
     const tabs: ITabItem[] = [

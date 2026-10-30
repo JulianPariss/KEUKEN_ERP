@@ -3,6 +3,7 @@
 import { cashRegistersService } from "@repo/erp-services/accountant/cashRegisters.service";
 import { IFCashRegister, IFCashRegisterCreation, IFCashRegisterType } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAccess } from "@repo/access";
 import { Button } from '@repo/devextreme';
 import Form, { GroupItem, SimpleItem } from "devextreme-react/form";
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
@@ -19,6 +20,8 @@ interface CashRegisterModalProps {
 
 const CashRegisterModal = ({ isOpen, onClose, onSuccess, initialData, registerTypes }: CashRegisterModalProps) => {
     const { token, currentCompany } = useAuth();
+    const { canAccess } = useAccess();
+    const canEditHierarchy = canAccess("treasury.cashRegisters.hierarchy");
     const [loading, setLoading] = useState(false);
     const [registers, setRegisters] = useState<IFCashRegister[]>([]);
     const formRef = useRef<any>(null);
@@ -239,6 +242,7 @@ const CashRegisterModal = ({ isOpen, onClose, onSuccess, initialData, registerTy
                             dataField="parentCashRegisterId"
                             label={{ text: "Caja Padre (Opcional)" }}
                             editorType="dxSelectBox"
+                            visible={canEditHierarchy || Boolean(formData.parentCashRegisterId)}
                             editorOptions={{
                                 dataSource: availableParents,
                                 valueExpr: "id",
@@ -246,7 +250,7 @@ const CashRegisterModal = ({ isOpen, onClose, onSuccess, initialData, registerTy
                                 searchEnabled: true,
                                 showClearButton: true,
                                 stylingMode: 'filled',
-                                disabled: formData.registerType === "tesoreria",
+                                disabled: formData.registerType === "tesoreria" || !canEditHierarchy,
                                 dropDownOptions: {
                                     wrapperAttr: {
                                         class: "popup-menu-container"

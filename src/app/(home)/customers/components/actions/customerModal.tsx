@@ -1,6 +1,7 @@
 import { customersService } from "@repo/erp-services/partners/customers.service";
 import { IFCustomerCreate, IFCustomerUpdate } from "@repo/api-contracts/erp";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAccess } from "@repo/access";
 import { Button } from '@repo/devextreme';
 import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import Form, { Item } from "devextreme-react/form";
@@ -22,6 +23,8 @@ interface CustomerModalProps {
 
 const CustomerModal = ({ isOpen, onClose, onSuccess, customerId }: CustomerModalProps) => {
     const { token, currentCompany } = useAuth();
+    const { canAccess } = useAccess();
+    const canUseTaxAuthoritySchemes = canAccess("billing.taxAuthoritySchemes.lookup");
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<any>({});
     const formRef = useRef<any>(null);
@@ -125,10 +128,14 @@ const CustomerModal = ({ isOpen, onClose, onSuccess, customerId }: CustomerModal
             if (customer.countryIsoCode) {
                 const [statesRes, ivaRes] = await Promise.all([
                     statesService.getAll(token, customer.countryIsoCode).catch(() => ({ items: [] })),
-                    localizationService.getTaxAuthoritySchemes(customer.countryIsoCode, token, undefined, "iva_condition").catch(() => [])
+                    canUseTaxAuthoritySchemes
+                        ? localizationService
+                              .getTaxAuthoritySchemes(customer.countryIsoCode, token, undefined, "iva_condition")
+                              .catch(() => [])
+                        : Promise.resolve([]),
                 ]);
                 initialStatesRef.current = statesRes.items || [];
-                initialIvaRef.current = ivaRes || [];
+                initialIvaRef.current = canUseTaxAuthoritySchemes ? (ivaRes || []) : [];
             } else {
                 initialStatesRef.current = [];
                 initialIvaRef.current = [];
@@ -305,10 +312,12 @@ const CustomerModal = ({ isOpen, onClose, onSuccess, customerId }: CustomerModal
                                                     stateEditorRef.current?.option("dataSource", res.items);
                                                     stateEditorRef.current?.option("disabled", false);
                                                 });
-                                                localizationService.getTaxAuthoritySchemes(e.value, token, undefined, "iva_condition").then(res => {
-                                                    ivaEditorRef.current?.option("dataSource", res);
-                                                    ivaEditorRef.current?.option("disabled", !formRef.current?.instance().option("formData").cityCode);
-                                                });
+                                                if (canUseTaxAuthoritySchemes) {
+                                                    localizationService.getTaxAuthoritySchemes(e.value, token, undefined, "iva_condition").then(res => {
+                                                        ivaEditorRef.current?.option("dataSource", res);
+                                                        ivaEditorRef.current?.option("disabled", !formRef.current?.instance().option("formData").cityCode);
+                                                    });
+                                                }
                                             }
                                         }
                                     }
@@ -380,6 +389,7 @@ const CustomerModal = ({ isOpen, onClose, onSuccess, customerId }: CustomerModal
                             <Item
                                 dataField="taxData.ivaCondition"
                                 editorType="dxSelectBox"
+                                visible={canUseTaxAuthoritySchemes}
                                 label={{ text: "Condición IVA" }}
                                 editorOptions={{
                                     onInitialized: (e: any) => { ivaEditorRef.current = e.component; },

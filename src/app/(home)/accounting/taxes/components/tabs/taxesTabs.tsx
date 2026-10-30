@@ -1,12 +1,10 @@
 'use client';
 
 import { GenericTabs, type ITabItem } from '@repo/custom-components';
-import dynamic from 'next/dynamic';
-
-const TaxesClient = dynamic(() => import('../../taxesClient'));
-const TaxSchemesList = dynamic(() => import('../lists/taxSchemesList'));
-const TaxAuthoritySchemesList = dynamic(() => import('../lists/taxAuthoritySchemesList'));
-const IdentitySchemesList = dynamic(() => import('../lists/identitySchemesList'));
+import TaxesClient from '../../taxesClient';
+import TaxSchemesList from '../lists/taxSchemesList';
+import TaxAuthoritySchemesList from '../lists/taxAuthoritySchemesList';
+import IdentitySchemesList from '../lists/identitySchemesList';
 
 export const TaxesTabs = () => {
     const tabs: ITabItem[] = [

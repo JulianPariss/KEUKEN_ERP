@@ -35,12 +35,12 @@ const MetadataClient = () => {
 
     const canView = useMemo(() => {
         if (isSuperAdmin) return true;
-        return permissions ? canDo('view', ['system'], permissions) : false;
+        return permissions ? canDo('view', ['providers'], permissions) : false;
     }, [permissions, isSuperAdmin]);
 
     const canModify = useMemo(() => {
         if (isSuperAdmin) return true;
-        return permissions ? canDo('modify', PERMISSIONS_CONSTANTS.modifySystem, permissions) : false;
+        return permissions ? canDo('modify', PERMISSIONS_CONSTANTS.modifyProviders, permissions) : false;
     }, [permissions, isSuperAdmin]);
 
     // Fetch groups for lookup and for modal

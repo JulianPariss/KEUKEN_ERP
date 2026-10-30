@@ -1,13 +1,11 @@
 'use client';
 
 import { GenericTabs, type ITabItem } from '@repo/custom-components';
-import dynamic from 'next/dynamic';
-
-const ArticleStockSearch = dynamic(() => import('./articleStockSearch'));
-const StockByAllList = dynamic(() => import('./lists/stockByAllList'));
-const StockByLotsList = dynamic(() => import('./lists/stockByLotsList'));
-const StockByLocationList = dynamic(() => import('./lists/stockByLocationList'));
-const StockSumResume = dynamic(() => import('./lists/stockSumResume'));
+import ArticleStockSearch from './articleStockSearch';
+import StockByAllList from './lists/stockByAllList';
+import StockByLotsList from './lists/stockByLotsList';
+import StockByLocationList from './lists/stockByLocationList';
+import StockSumResume from './lists/stockSumResume';
 
 export const StockTabs = () => {
     const tabs: ITabItem[] = [

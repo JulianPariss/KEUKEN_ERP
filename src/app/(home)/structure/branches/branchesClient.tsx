@@ -2,10 +2,10 @@
 
 import { useRecovery } from "@/contexts/RecoveryContext";
 import PERMISSIONS_CONSTANTS from "@repo/access";
-import { canDo } from "@repo/access";
+import { canDo, useGridColumns, type IAccessGridColumn } from "@repo/access";
 import { commonService } from "@repo/erp-services/common.service";
 import { RECOVERY_ENTITIES } from "@/app/lib/constants/recoveryWhiteList";
-import { GenericDataGrid, IGenericDataGridColumn } from '@repo/devextreme';
+import { GenericDataGrid } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
 import { createGridStateStorage } from "@/lib/storage/gridStateStorage";
 import CustomStore from "devextreme/data/custom_store";
@@ -144,8 +144,8 @@ const BranchesClient = () => {
         }
     };
 
-    const columns: IGenericDataGridColumn[] = useMemo(() => {
-        const cols: IGenericDataGridColumn[] = [
+    const baseColumns: IAccessGridColumn[] = useMemo(() => {
+        const cols: IAccessGridColumn[] = [
             {
                 dataField: 'id',
                 caption: 'ID',
@@ -212,6 +212,7 @@ const BranchesClient = () => {
                 dataField: 'cashRegisterName',
                 caption: 'Caja Registradora',
                 allowSorting: true,
+                capability: 'treasury.cashRegisters.lookup',
                 cellTemplate: (container: HTMLElement, options: any) => {
                     const row = options.data;
                     if (!row?.cashRegisterName) {
@@ -255,6 +256,8 @@ const BranchesClient = () => {
 
         return cols;
     }, [includeInactive, isRecoveryMode]);
+
+    const columns = useGridColumns(baseColumns);
 
     const actions = useMemo(() => [
         {

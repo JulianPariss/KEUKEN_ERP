@@ -1,14 +1,12 @@
 'use client';
 
 import { GenericTabs, type ITabItem } from '@repo/custom-components';
-import dynamic from 'next/dynamic';
-
-const TemperatureLevelsClient = dynamic(() => import('./temperatureLevelsList'));
-const SegregationGroupsClient = dynamic(() => import('./segregationGroupsList'));
-const HazardLevelsClient = dynamic(() => import('./hazardLevelsList'));
-const FragilityLevelsClient = dynamic(() => import('./fragilityLevelsList'));
-const LogisticProfilesClient = dynamic(() => import('./logisticProfilesList'));
-const OperativeProfilesClient = dynamic(() => import('./operativeProfilesList'));
+import TemperatureLevelsClient from './temperatureLevelsList';
+import SegregationGroupsClient from './segregationGroupsList';
+import HazardLevelsClient from './hazardLevelsList';
+import FragilityLevelsClient from './fragilityLevelsList';
+import LogisticProfilesClient from './logisticProfilesList';
+import OperativeProfilesClient from './operativeProfilesList';
 
 export const ConfigurationsTabs = () => {
     const tabs: ITabItem[] = [

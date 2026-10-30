@@ -62,7 +62,7 @@ const RoleDeleteModal = ({ visible, onHiding, onConfirm, roleName }: RoleDeleteM
                     value={inputValue}
                     valueChangeEvent="keyup"
                     onValueChanged={(e) => setInputValue(e.value)}
-                    placeholder="Nombre del rol..."
+                    placeholder="Nombre de la clave..."
                     stylingMode="filled"
                     elementAttr={{ class: "!bg-primary-900 !rounded-dx border h-10" }}
                 />

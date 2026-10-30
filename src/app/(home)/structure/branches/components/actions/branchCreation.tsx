@@ -6,6 +6,7 @@ import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import notify from "devextreme/ui/notify";
 import { GenericButton } from '@repo/devextreme';
 import { useAuth } from "@/contexts/AuthContext";
+import { useAccess } from "@repo/access";
 import { branchesService } from "@repo/erp-services/userContext/branches.service";
 import { establishmentsService } from "@repo/erp-services/userContext/establishments.service";
 import { logisticsCentersService } from "@repo/erp-services/userContext/logisticsCenters.service";
@@ -28,6 +29,8 @@ const BranchCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initialData
     const [loading, setLoading] = useState(false);
     const formRef = useRef<any>(null);
     const { token, currentCompany, companies } = useAuth();
+    const { canAccess } = useAccess();
+    const canUseCashRegisters = canAccess("treasury.cashRegisters.lookup");
 
     const [establishments, setEstablishments] = useState<IFEstablishment[]>([]);
     const [logisticsCenters, setLogisticsCenters] = useState<IFLogisticsCenter[]>([]);
@@ -95,7 +98,9 @@ const BranchCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initialData
                 const [estRes, logRes, cashRes] = await Promise.allSettled([
                     establishmentsService.getAll({ limit: 100, company_id: targetCompanyId }, token),
                     logisticsCentersService.getAll({ limit: 100, company_id: targetCompanyId }, token),
-                    cashRegistersService.getAll(token, targetCompanyId),
+                    canUseCashRegisters
+                        ? cashRegistersService.getAll(token, targetCompanyId)
+                        : Promise.resolve({ items: [] as IFCashRegister[] }),
                 ]);
 
                 if (estRes.status === "fulfilled") {
@@ -104,8 +109,10 @@ const BranchCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initialData
                 if (logRes.status === "fulfilled") {
                     setLogisticsCenters(logRes.value.items || []);
                 }
-                if (cashRes.status === "fulfilled") {
+                if (canUseCashRegisters && cashRes.status === "fulfilled") {
                     setCashRegisters(cashRes.value.items || []);
+                } else {
+                    setCashRegisters([]);
                 }
             } catch (err) {
                 console.error("Error loading branch options:", err);
@@ -113,7 +120,7 @@ const BranchCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initialData
         };
 
         loadOptions();
-    }, [isOpen, token, formData.companyId, currentCompany?.id]);
+    }, [isOpen, token, formData.companyId, currentCompany?.id, canUseCashRegisters]);
 
     const handleSubmit = useCallback(async () => {
         const formInstance = formRef.current?.instance();
@@ -261,6 +268,7 @@ const BranchCreationModal = ({ isOpen, onClose, onSuccess, onHidden, initialData
                         />
                         <SimpleItem
                             dataField="cashRegisterId"
+                            visible={canUseCashRegisters}
                             label={{ text: "Caja Registradora" }}
                             editorType="dxSelectBox"
                             editorOptions={{
